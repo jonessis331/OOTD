@@ -1,6 +1,5 @@
-import { Text } from 'react-native';
+import { Text } from "react-native";
 
-export default function About() {
-    return <Text>feed</Text>;
-    
+export default function FeedScreen() {
+  return <Text>feed</Text>;
 }
