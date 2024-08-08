@@ -1,9 +1,44 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native";
 import posts from "~/assets/data/posts.json";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { useState } from "react";
 
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from "cloudinary-react-native";
+
+// Import required actions and qualifiers.
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { byRadius } from "@cloudinary/url-gen/actions/roundCorners";
+import { focusOn } from "@cloudinary/url-gen/qualifiers/gravity";
+import { FocusOn } from "@cloudinary/url-gen/qualifiers/focusOn";
+import { cld } from "~/src/lib/cloudinary";
+
 export default function PostListItem({ post }) {
+  const { width } = useWindowDimensions();
+
+  // Use the image with public ID, 'front_face'.
+  const image = cld.image(post.image);
+  // Apply the transformation.
+  image.resize(
+    thumbnail()
+      .width(width)
+      .aspectRatio(2 / 3)
+  );
+  //.gravity(focusOn(FocusOn.face()))) // Crop the image, focusing on the face.
+  //.roundCorners(byRadius(100)); // Round the corners.
+
+  const avatar = cld.image(post.user.avatar_url);
+  // Apply the transformation.
+  avatar.resize(
+    thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
+  );
+
   const [showBoxes, setShowBoxes] = useState(false);
 
   const handleToggleBoxes = () => {
@@ -14,8 +49,8 @@ export default function PostListItem({ post }) {
     <View className="bg-white">
       {/*Header */}
       <View className="ml-1 p-3 flex-row items-center gap-2">
-        <Image
-          source={{ uri: post.user.image_url }}
+        <AdvancedImage
+          cldImg={avatar}
           className="w-12 aspect-square rounded-full border-2 border-emerald-50"
         />
         <Text className="font-semibold">{post.user.username}</Text>
@@ -23,9 +58,10 @@ export default function PostListItem({ post }) {
       {/**Post Image */}
       <View>
         <TouchableOpacity onPress={handleToggleBoxes} activeOpacity={1}>
-          <Image
-            source={{ uri: post.image_url }}
-            className="ml-2 aspect-[2/3] rounded-3xl mr-2 press: z-0"
+          {/* Content */}
+          <AdvancedImage
+            cldImg={image}
+            className="ml-2 aspect-[2/3] rounded-3xl mr-2"
           />
         </TouchableOpacity>
         {showBoxes && (
