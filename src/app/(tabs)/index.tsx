@@ -6,7 +6,7 @@ import PostListItem from "~/src/components/PostListItem";
 export default function FeedScreen() {
   return (
     <FlatList
-      className="bg-black"
+      className="bg-indigo-300"
       data={posts}
       contentContainerStyle={{
         gap: 10,

@@ -46,22 +46,24 @@ export default function PostListItem({ post }) {
   };
 
   return (
-    <View className="bg-white">
+    <View className="bg-indigo-400">
       {/*Header */}
-      <View className="ml-1 p-3 flex-row items-center gap-2">
+      <View className="ml-3 w-60 mt-2 mb-2 bg-fuchsia-500 rounded-3xl" >
+      <View className="ml-1 flex-row items-center gap-2">
         <AdvancedImage
           cldImg={avatar}
           className="w-12 aspect-square rounded-full border-2 border-emerald-50"
         />
         <Text className="font-semibold">{post.user.username}</Text>
       </View>
+      </View>
       {/**Post Image */}
-      <View>
+      <View className = "shadow-2xl">
         <TouchableOpacity onPress={handleToggleBoxes} activeOpacity={1}>
           {/* Content */}
           <AdvancedImage
             cldImg={image}
-            className="ml-2 aspect-[2/3] rounded-3xl mr-2"
+            className="item-center ml-4 aspect-[2/3] rounded-3xl mr-4"
           />
         </TouchableOpacity>
         {showBoxes && (
