@@ -12,6 +12,8 @@ import * as ImageManipulator from "expo-image-manipulator";
 import Button from "~/src/components/Button";
 import { uploadImage, makeImagePublic } from "~/src/lib/cloudinary";
 import { searchImage, detectItems, getDeepTags } from "~/src/lib/lykdat";
+import { fetchGoogleLensResults } from "~/src/lib/googlelens";
+import * as FileSystem from 'expo-file-system';
 
 
 type BoundingBox = {
@@ -30,6 +32,17 @@ type DetectedItem = {
 };
 
 type ImageUrl = string;
+
+const writeJsonToFile = async (jsonData, fileName = 'output.json') => {
+  try {
+    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+    await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(jsonData, null, 2));
+    console.log(`JSON data successfully written to ${fileUri}`);
+  } catch (error) {
+    console.error('Error writing JSON data to file:', error);
+  }
+};
+
 
 function deepStringify(obj: any, space: number = 2): string {
   const cache = new Set();
@@ -54,6 +67,7 @@ export default function New() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState(null);
   const [deepTags, setDeepTags] = useState(null);
+  const [googleLensResults, setGoogleLensResults] = useState(null);
 
   const [items, setItems] = useState<DetectedItem[]>([]); // Initialize as an empty array
 
@@ -62,6 +76,8 @@ export default function New() {
       pickImage();
     }
   }, [image]);
+
+  
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -93,23 +109,7 @@ export default function New() {
       } catch (error) {
         Alert.alert("Error getting detected items");
       }
-
-      // Search for similar images using the URL from Cloudinary
-      // try {
-      //   const results = await searchImage(response.secure_url);
-      //   setSearchResults(results);
-      //  // console.log("Results:", JSON.stringify(results, null, 2));
-      // } catch (error) {
-      //   Alert.alert("Error searching image");
-      // }
-      // Get deep tags using the URL from Cloudinary
-      // try {
-      //   const tags = await getDeepTags(response.secure_url);
-      //   setDeepTags(tags);
-      //   console.log("Deep Tags:", JSON.stringify(tags, null, 2));
-      // } catch (error) {
-      //   Alert.alert("Error getting deep tags");
-      // }
+      
     }
   };
 
@@ -118,26 +118,38 @@ export default function New() {
     console.log("Item Count:", detectItems.length)
 
     for (const item of detectedItems) {
+      console.log("item:", item);
       const { bounding_box } = item;
-      const cropUrl = `${imageUrl.replace('/upload/', `/upload/c_crop,w_${Math.round(bounding_box.right * 800)},h_${Math.round(bounding_box.bottom * 800)},x_${Math.round(bounding_box.left * 800)},y_${Math.round(bounding_box.top * 800)}/`)}`;
+      const cropUrl = `${imageUrl.replace('/upload/', `/upload/c_crop,w_${Math.round(Math.abs(bounding_box.left * 800 - bounding_box.right * 800))},h_${Math.round(bounding_box.bottom * 800)},x_${Math.round(bounding_box.left * 800)},y_${Math.round(bounding_box.top * 800)}/`)}`;
       console.log("crop url:", cropUrl);
 
-      // Perform specific search and tag checks for each cropped image
       try {
-        const results = await searchImage(cropUrl);
-        //console.log(`Search results for ${item.name}:`, deepStringify(results));
-        console.log(`Search results for ${item.name}`);
+        const googleLensResults = await fetchGoogleLensResults(cropUrl);
+        await writeJsonToFile(googleLensResults, `google_lens_results_${item.name}.json`);
+        //console.log(`Google Lens results for ${item.name}:`, deepStringify(googleLensResults));
       } catch (error) {
-        console.error(`Error searching image for ${item.name}:`, error);
+        console.error(`Error getting Google Lens results for ${item.name}:`, error);
       }
 
       try {
         const tags = await getDeepTags(cropUrl);
-        //console.log(`Deep tags for ${item.name}:`, deepStringify(tags));
-        console.log(`Deep Tags for ${item.name}`);
+        // console.log(`Deep tags for ${item.name}:`, deepStringify(tags));
+        // console.log(`Deep Tags for ${item.name}`);
+        await writeJsonToFile(tags, `deep_tags_${item.name}.json`);
       } catch (error) {
         console.error(`Error getting deep tags for ${item.name}:`, error);
       }
+
+      // Perform specific search and tag checks for each cropped image
+      try {
+        // const results = await searchImage(cropUrl);
+        // console.log(`Search results for ${item.name}:`, deepStringify(results));
+        // console.log(`Search results for ${item.name}`);
+      } catch (error) {
+        console.error(`Error searching image for ${item.name}:`, error);
+      }
+
+      
     }
   };
 
@@ -191,11 +203,16 @@ export default function New() {
           {/* Render deep tags here */}
         </View>
       )}
+      {googleLensResults && (
+        <View>
+          <Text>Google Lens Results:</Text>
+          {/* Render Google Lens results here */}
+        </View>
+      )}
       <View className="mt-auto w-full">
         <Button title="Share" onPress={createPost} />
         <Button title="Cancel" onPress={handleCancel} />
       </View>
-      
     </View>
   );
 }
