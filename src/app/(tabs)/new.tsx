@@ -8,7 +8,10 @@ import {
   ActivityIndicator,
   ScrollView,
   Pressable,
+  Linking,
 } from "react-native";
+
+import { useNavigation } from '@react-navigation/native';
 
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -17,10 +20,16 @@ import Button from "~/src/components/Button";
 import { uploadImage, makeImagePublic } from "~/src/lib/cloudinary";
 import { detectItems, getDeepTags } from "~/src/lib/lykdat";
 import { fetchGoogleLensResults } from "~/src/lib/googlelens";
+import { scrapUrl } from "~/src/lib/scraperapi";
+import { generateTags } from "~/src/lib/openai";
+
 import deepTagsMock from "~/mock_data/deep_tags.json";
 import googleLensMock from "~/mock_data/google_lens_response.json";
 import mockDetectedItems from "~/mock_data/detected_items.json";
 import mockResponse from "~/mock_data/mock_response.json";
+import mockScrapeData from "~/mock_data/mock_scraper_data.json"
+
+
 
 type BoundingBox = {
   bottom: number;
@@ -80,21 +89,21 @@ export default function New() {
       );
 
       setImage(manipResult.uri);
-      //const response = await uploadImage(manipResult.uri);
-      const response = mockResponse;
+      const response = await uploadImage(manipResult.uri);
+      //const response = mockResponse;
 
       //setImageUrl(response.secure_url);
-      setImageUrl(mockResponse.secure_url);
+      setImageUrl(response.secure_url);
 
       setIsLoading(true); // Start loading
       try {
-        //const detectedItemsResponse = await detectItems(response.secure_url);
-        const detectedItemsResponse = mockDetectedItems;
+        const detectedItemsResponse = await detectItems(response.secure_url);
+        //const detectedItemsResponse = mockDetectedItems;
         const enrichedItems = await processDetectedItems(
           detectedItemsResponse.data.detected_items,
           response.secure_url
         );
-        //console.log("enrichedItems", JSON.stringify(enrichedItems, null, 2));
+        console.log("enrichedItems", JSON.stringify(enrichedItems, null, 2));
         setItems(enrichedItems);
         //console.log(enrichedItems)
       } catch (error) {
@@ -123,10 +132,10 @@ export default function New() {
       )}`;
 
       try {
-        //const googleLensResults = await fetchGoogleLensResults(cropUrl);
-        const googleLensResults = googleLensMock;
-        //const tags = await getDeepTags(cropUrl);
-        const tags = deepTagsMock;
+        const googleLensResults = await fetchGoogleLensResults(cropUrl);
+        //const googleLensResults = googleLensMock;
+        const tags = await getDeepTags(cropUrl);
+        //const tags = deepTagsMock;
 
         enrichedItems.push({
           cropUrl,
@@ -229,10 +238,35 @@ export default function New() {
     </ScrollView>
   );
 }
+const handleSelect = async (link: string) => {
+  
+  try {
+    const data = await scrapUrl(link);
+    // console.log('scraped data', JSON.stringify(data)); 
+    //const mock_data = mockScrapeData;
+    try {
+      const scraped_tags = await generateTags(data);
+      console.log('scraped tags',  JSON.stringify(scraped_tags))
+      
+    } catch (error) {
+      console.error('error tagging scraped:', error);
+      
+    }
+    
+
+  } catch (error) {
+    console.error('error during scraping:', error);
+  }
+};
 
 const PieceComponent = ({ item }: { item: DetectedItem }) => {
+
+  const navigation = useNavigation()
   const [isExpanded, setIsExpanded] = useState(false);
   const [itemSelected, setItemSelected] = useState();
+
+
+
 
   return (
     <View style={{ marginTop: 20 }}>
@@ -246,6 +280,9 @@ const PieceComponent = ({ item }: { item: DetectedItem }) => {
             <Text className="font-serif font-extrabold">
               {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
             </Text>
+            <TextInput className = "w-11 items-center bg-white">
+
+            </TextInput>
           </View>
         </Pressable>
         <Pressable
@@ -253,8 +290,10 @@ const PieceComponent = ({ item }: { item: DetectedItem }) => {
           onPress={async () =>
             await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")
           }
+          
+          // save webpage last open url and toggle is manual to flag for deep tag additional call
         >
-          <View className="w-12 aspect-square bg-slate-800 ml-2"></View>
+          <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2"></View>
         </Pressable>
       </View>
 
@@ -281,7 +320,10 @@ const PieceComponent = ({ item }: { item: DetectedItem }) => {
                   <Button
                     width="100%"
                     title="Select"
-                    onPress={() => setIsExpanded(!isExpanded)}
+                    onPress={() => { 
+                      handleSelect(similarItem.link)
+                      setIsExpanded(!isExpanded);
+                    }}
                   />
                 </View>
               ))
