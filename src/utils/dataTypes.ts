@@ -20,12 +20,18 @@ export type BoundingBox = {
     category: string;
     detection_confidence: number;
     name: string;
-    similarItems?: SimilarItem[]; // Adding similarItems to DetectedItem
+    similarItems?: SimilarItem[];
     cropUrl?: string;
-    tags?: any; // Tags from deep tagger or OpenAI
+    tags?: any;
   };
   
-  export type ImageUrl = string;
+  export type OutfitMetadata = {
+    outfit_id: string;
+    user_id: string;
+    outfit_image_url: string;
+    item_id?: string;
+    item_image_url?: string;
+  };
   
   export type MergedTags = {
     colors: string[];
@@ -36,13 +42,5 @@ export type BoundingBox = {
     pattern: string | null;
     fit: string | null;
     category: string | null;
-  };
-  
-  export type OutfitMetadata = {
-    outfit_id: string;
-    user_id: string;
-    outfit_image_url: string;
-    item_id: string;
-    item_image_url: string;
   };
   

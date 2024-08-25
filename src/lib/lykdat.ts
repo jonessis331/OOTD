@@ -1,4 +1,5 @@
 export const searchImage = async (imageUrl: string) => {
+    console.log("Entering searchImage function"); // Log added
     const formdata = new FormData();
     formdata.append("api_key", "REMOVED_LYKDAT_KEY");
     formdata.append("image_url", imageUrl);
@@ -13,12 +14,13 @@ export const searchImage = async (imageUrl: string) => {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.error('Error:', error);
+      //console.error('Error:', error);
       throw error;
     }
   };
 
   export const detectItems = async (imageUrl: string) => {
+    console.log("Entering detectItems function"); // Log added
     const myHeaders = new Headers();
     myHeaders.append("x-api-key", "REMOVED_LYKDAT_KEY");
 
@@ -34,15 +36,16 @@ export const searchImage = async (imageUrl: string) => {
     try {
         const response = await fetch("https://cloudapi.lykdat.com/v1/detection/items", requestOptions);
         const result = await response.json();
-        //console.log("result:", result);
+        ////console.log("result:", result);
         return result;
     } catch (error) {
-        console.error('Error:', error);
+        //console.error('Error:', error);
         throw error;
     }
 };
 
 export const getDeepTags = async (imageUrl: string) => {
+  console.log("Entering getDeepTags function"); // Log added
   const myHeaders = new Headers();
   myHeaders.append("x-api-key", "REMOVED_LYKDAT_KEY");
 
@@ -60,7 +63,7 @@ export const getDeepTags = async (imageUrl: string) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error('Error:', error);
+    //console.error('Error:', error);
     throw error;
   }
 };

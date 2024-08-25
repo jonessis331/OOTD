@@ -27,9 +27,9 @@
 //       });
   
 //       const tags = response.data.choices[0].text.trim();
-//       console.log("Generated Tags:", tags);
+//       //console.log("Generated Tags:", tags);
 //     } catch (error) {
-//       console.error("Error generating tags:", error);
+//       //console.error("Error generating tags:", error);
 //     }
 //   };
 
@@ -48,6 +48,7 @@ const openAI = axios.create({
   });
   
   export const generateTags = async (text) => {
+    console.log("Entering generateTags function"); // Log added
     try {
         const response = await openAI.post('/chat/completions', {
           model: 'gpt-4',
@@ -72,23 +73,24 @@ const openAI = axios.create({
               Return the output in a JSON format with these keys.`,
             }
           ],
-          max_tokens: 300,
+          max_tokens: 200,
         });
     
         const extractedTags = response.data.choices[0].message.content.trim();
         console.log('Extracted Tags:', extractedTags);
         return JSON.parse(extractedTags);
       } catch (error) {
+        console.log("generating openai error", error);
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            console.error('API Error Response:', error.response.data);
+            //console.error('API Error Response:', error.response.data);
           } else if (error.request) {
-            console.error('API No Response:', error.request);
+            //console.error('API No Response:', error.request);
           } else {
-            console.error('API Request Error:', error.message);
+            //console.error('API Request Error:', error.message);
           }
         } else {
-          console.error('Unexpected Error:', error);
+          //console.error('Unexpected Error:', error);
         }
         throw error;
       }

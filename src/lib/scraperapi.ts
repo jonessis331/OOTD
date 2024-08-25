@@ -1,6 +1,7 @@
 import axios from 'axios'; // Import axios
 
 export const scrapUrl = async (cropUrl: string) => {
+  console.log("Entering scrapUrl function"); // Log added
   try {
     // Construct the ScraperAPI URL with your API key and the URL you want to scrape
     const apiKey = '36d1ef13a6905df230a1f181a1b7f579';
@@ -8,9 +9,9 @@ export const scrapUrl = async (cropUrl: string) => {
 
     // Make a GET request to the ScraperAPI endpoint
     const { data } = await axios.get(scraperApiUrl);
-    console.log('here')
+    //console.log('here')
 
-    console.log('Scraped Data:', data); // Log the scraped data
+    //console.log('Scraped Data:', data); // Log the scraped data
     return data; // Return the scraped data
   } catch (error) {
     console.error('Error fetching data:', error);

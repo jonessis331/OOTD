@@ -8,7 +8,7 @@
 //         engine: "google_lens",
 //         url: secure_url,
 //     }, (results: any) => {
-//         console.log(util.inspect(results, { colors: true, depth: null }));
+//         //console.log(util.inspect(results, { colors: true, depth: null }));
 //     });
 // }
 
@@ -21,6 +21,6 @@ export const fetchGoogleLensResults = async (secure_url: string) => {
     }
     
     const results = await response.json();
-    //console.log(results);
+    ////console.log(results);
     return results;
   };

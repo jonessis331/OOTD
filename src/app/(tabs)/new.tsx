@@ -17,12 +17,14 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as WebBrowser from 'expo-web-browser';
 import Button from "~/src/components/Button";
+import PieceComponent from "~/src/components/PieceComponent";
 import { uploadImage, makeImagePublic } from "~/src/lib/cloudinary";
 import { detectItems, getDeepTags } from "~/src/lib/lykdat";
 import { fetchGoogleLensResults } from "~/src/lib/googlelens";
 import { scrapUrl } from "~/src/lib/scraperapi";
 import { generateTags } from "~/src/lib/openai";
-
+import { createCompleteOutfitData } from "~/src/lib/dataprocess";
+import { DetectedItem, OutfitMetadata } from "~/src/utils/dataTypes"
 import deepTagsMock from "~/mock_data/deep_tags.json";
 import googleLensMock from "~/mock_data/google_lens_response.json";
 import mockDetectedItems from "~/mock_data/detected_items.json";
@@ -31,29 +33,7 @@ import mockScrapeData from "~/mock_data/mock_scraper_data.json"
 
 
 
-type BoundingBox = {
-  bottom: number;
-  left: number;
-  right: number;
-  top: number;
-};
 
-type SimilarItem = {
-  link: string;
-  source: string;
-  title: string;
-  thumbnail: string;
-};
-
-type DetectedItem = {
-  area: number;
-  bounding_box: BoundingBox;
-  category: string;
-  detection_confidence: number;
-  name: string;
-  similarItems?: SimilarItem[]; // Adding similarItems to DetectedItem
-  cropUrl?: string;
-};
 
 type ImageUrl = string;
 
@@ -62,6 +42,7 @@ export default function New() {
   const [image, setImage] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<DetectedItem[]>([]); // Detected items array
+  const [selectedTags, setSelectedTags] = useState<{ [key: string]: any }>({}); // Store selected tags
   const [isLoading, setIsLoading] = useState(false); // Loading state for the entire process
 
   useEffect(() => {
@@ -71,6 +52,7 @@ export default function New() {
   }, [image]);
 
   const pickImage = async () => {
+    console.log("Entering pickImage function"); // Log added
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -89,23 +71,23 @@ export default function New() {
       );
 
       setImage(manipResult.uri);
-      const response = await uploadImage(manipResult.uri);
-      //const response = mockResponse;
+      //const response = await uploadImage(manipResult.uri);
+      const response = mockResponse;
 
       //setImageUrl(response.secure_url);
-      setImageUrl(response.secure_url);
+      setImageUrl(mockResponse.secure_url);
 
       setIsLoading(true); // Start loading
       try {
-        const detectedItemsResponse = await detectItems(response.secure_url);
+        const detectedItemsResponse = await detectItems(mockResponse.secure_url);
         //const detectedItemsResponse = mockDetectedItems;
         const enrichedItems = await processDetectedItems(
           detectedItemsResponse.data.detected_items,
           response.secure_url
         );
-        console.log("enrichedItems", JSON.stringify(enrichedItems, null, 2));
+        //console.log("enrichedItems", JSON.stringify(enrichedItems, null, 2));
         setItems(enrichedItems);
-        //console.log(enrichedItems)
+        ////console.log(enrichedItems)
       } catch (error) {
         Alert.alert("Error getting detected items");
       } finally {
@@ -118,6 +100,7 @@ export default function New() {
     detectedItems: DetectedItem[],
     imageUrl: ImageUrl
   ): Promise<DetectedItem[]> => {
+    console.log("Entering processDetectedItems function"); // Log added
     const enrichedItems = [];
 
     for (const item of detectedItems) {
@@ -144,7 +127,7 @@ export default function New() {
           tags,
         });
       } catch (error) {
-        console.error(`Error processing item ${item.name}:`, error);
+        //console.error(`Error processing item ${item.name}:`, error);
         enrichedItems.push({
           ...item,
           similarItems: [],
@@ -156,23 +139,36 @@ export default function New() {
     return enrichedItems;
   };
 
+  const handleItemSelect = (selectedTagsForItem: any) => {
+    console.log("Entering handleItemSelect function"); // Log added
+    setSelectedTags(prevTags => ({
+      ...prevTags,
+      [selectedTagsForItem.itemId]: selectedTagsForItem.tags
+    }));
+    console.log(selectedTags)
+  };
+
   const createPost = async () => {
+    console.log("Entering createPost function"); // Log added
     if (!imageUrl) {
       return;
     }
     try {
-      await makeImagePublic(imageUrl);
+      //await makeImagePublic(imageUrl);
       // Save the post in database (functionality can be added here)
-      console.log("image url:", imageUrl);
+      await createCompleteOutfitData(items, imageUrl, selectedTags);
+      //console.log("image url:", imageUrl);
     } catch (error) {
       Alert.alert("Error making image public");
     }
   };
 
   const handleCancel = () => {
+    console.log("Entering handleCancel function"); // Log added
     setImage(null);
     setImageUrl(null);
     setItems([]); // Clear detected items
+    setSelectedTags({}); // Clear selected tags
   };
 
   // WebBrowser
@@ -227,7 +223,7 @@ export default function New() {
             }}
           />
           {items.map((item, index) => (
-            <PieceComponent key={index} item={item} />
+            <PieceComponent key={index} item={item} onItemSelect={handleItemSelect}  />
           ))}
         </>
       )}
@@ -238,101 +234,101 @@ export default function New() {
     </ScrollView>
   );
 }
-const handleSelect = async (link: string) => {
+// const handleSelect = async (link: string) => {
   
-  try {
-    const data = await scrapUrl(link);
-    // console.log('scraped data', JSON.stringify(data)); 
-    //const mock_data = mockScrapeData;
-    try {
-      const scraped_tags = await generateTags(data);
-      console.log('scraped tags',  JSON.stringify(scraped_tags))
+//   try {
+//     const data = await scrapUrl(link);
+//     // //console.log('scraped data', JSON.stringify(data)); 
+//     //const mock_data = mockScrapeData;
+//     try {
+//       const scraped_tags = await generateTags(data);
+//       //console.log('scraped tags',  JSON.stringify(scraped_tags))
       
-    } catch (error) {
-      console.error('error tagging scraped:', error);
+//     } catch (error) {
+//       //console.error('error tagging scraped:', error);
       
-    }
+//     }
     
 
-  } catch (error) {
-    console.error('error during scraping:', error);
-  }
-};
+//   } catch (error) {
+//     //console.error('error during scraping:', error);
+//   }
+// };
 
-const PieceComponent = ({ item }: { item: DetectedItem }) => {
+// const PieceComponent = ({ item }: { item: DetectedItem }) => {
 
-  const navigation = useNavigation()
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [itemSelected, setItemSelected] = useState();
-
-
+//   const navigation = useNavigation()
+//   const [isExpanded, setIsExpanded] = useState(false);
+//   const [itemSelected, setItemSelected] = useState();
 
 
-  return (
-    <View style={{ marginTop: 20 }}>
-      <View className="flex-row items-center w-full bg-gray-200 rounded-full p-2">
-        <Pressable onPress={() => setIsExpanded(!isExpanded)}>
-          <View className="flex-row gap-3 items-center">
-            <Image
-              source={{ uri: item.cropUrl }}
-              className="w-10 aspect-square rounded-full"
-            />
-            <Text className="font-serif font-extrabold">
-              {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-            </Text>
-            <TextInput className = "w-11 items-center bg-white">
 
-            </TextInput>
-          </View>
-        </Pressable>
-        <Pressable
-          className = "ml-auto"
-          onPress={async () =>
-            await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")
-          }
+
+//   return (
+//     <View style={{ marginTop: 20 }}>
+//       <View className="flex-row items-center w-full bg-gray-200 rounded-full p-2">
+//         <Pressable onPress={() => setIsExpanded(!isExpanded)}>
+//           <View className="flex-row gap-3 items-center">
+//             <Image
+//               source={{ uri: item.cropUrl }}
+//               className="w-10 aspect-square rounded-full"
+//             />
+//             <Text className="font-serif font-extrabold">
+//               {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+//             </Text>
+//             <TextInput className = "w-11 items-center bg-white">
+
+//             </TextInput>
+//           </View>
+//         </Pressable>
+//         <Pressable
+//           className = "ml-auto"
+//           onPress={async () =>
+//             await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")
+//           }
           
-          // save webpage last open url and toggle is manual to flag for deep tag additional call
-        >
-          <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2"></View>
-        </Pressable>
-      </View>
+//           // save webpage last open url and toggle is manual to flag for deep tag additional call
+//         >
+//           <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2"></View>
+//         </Pressable>
+//       </View>
 
-      {isExpanded && (
-        <View>
-          <View className="flex flex-row flex-wrap">
-            {item.similarItems && item.similarItems.length > 0 ? (
-              item.similarItems.map((similarItem, index) => (
-                <View key={index} style={{ width: "45%", margin: "2.5%" }}>
-                  <Pressable
-                    onPress={async () =>
-                      await WebBrowser.openBrowserAsync(similarItem.link)
-                    }
-                  >
-                    <Image
-                      source={{ uri: similarItem.thumbnail }}
-                      className="w-[100%] aspect-square rounded-lg"
-                    />
-                  </Pressable>
-                  <Text numberOfLines={2} ellipsizeMode="tail">
-                    {similarItem.title}
-                  </Text>
-                  <Text>{similarItem.source}</Text>
-                  <Button
-                    width="100%"
-                    title="Select"
-                    onPress={() => { 
-                      handleSelect(similarItem.link)
-                      setIsExpanded(!isExpanded);
-                    }}
-                  />
-                </View>
-              ))
-            ) : (
-              <Text>No similar items found</Text>
-            )}
-          </View>
-        </View>
-      )}
-    </View>
-  );
-};
+//       {isExpanded && (
+//         <View>
+//           <View className="flex flex-row flex-wrap">
+//             {item.similarItems && item.similarItems.length > 0 ? (
+//               item.similarItems.map((similarItem, index) => (
+//                 <View key={index} style={{ width: "45%", margin: "2.5%" }}>
+//                   <Pressable
+//                     onPress={async () =>
+//                       await WebBrowser.openBrowserAsync(similarItem.link)
+//                     }
+//                   >
+//                     <Image
+//                       source={{ uri: similarItem.thumbnail }}
+//                       className="w-[100%] aspect-square rounded-lg"
+//                     />
+//                   </Pressable>
+//                   <Text numberOfLines={2} ellipsizeMode="tail">
+//                     {similarItem.title}
+//                   </Text>
+//                   <Text>{similarItem.source}</Text>
+//                   <Button
+//                     width="100%"
+//                     title="Select"
+//                     onPress={() => { 
+//                       handleSelect(similarItem.link)
+//                       setIsExpanded(!isExpanded);
+//                     }}
+//                   />
+//                 </View>
+//               ))
+//             ) : (
+//               <Text>No similar items found</Text>
+//             )}
+//           </View>
+//         </View>
+//       )}
+//     </View>
+//   );
+// };
