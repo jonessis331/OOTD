@@ -42,5 +42,8 @@ export type BoundingBox = {
     pattern: string | null;
     fit: string | null;
     category: string | null;
+    openTagsOne: string[]; // Add this line
+    openTagsTwo: string[]; // Add this line
+    scraped_tags: string[]; // Add this line
+    otherTags: string[]; // Add this line
   };
-  

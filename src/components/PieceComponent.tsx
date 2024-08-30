@@ -1,27 +1,68 @@
 import React, { useState } from "react";
-import { Image, Pressable, Text, View, TextInput} from "react-native";
+import { Image, Pressable, Text, View, TextInput, ActivityIndicator } from "react-native";
 import { DetectedItem } from "../utils/dataTypes";
 import { useNavigation } from '@react-navigation/native';
 import Button from "./Button";
-import { scrapUrl } from "~/src/lib/scraperapi";
-import { generateTags } from "~/src/lib/openai";
+import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
+import { generateTags, generateTagsTwo } from "~/src/lib/openai";
 import * as WebBrowser from 'expo-web-browser';
+import { fetchAndParseWebpage, fetchProductInfo } from "../lib/experiment";
+
+import { logger } from "react-native-logs";
+
+var log = logger.createLogger();
+
 
 const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSelect: (selectedTags: any) => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(false); // State to manage loading
+  const [link, setLink] = useState(""); // State to manage the input link
 
   const handleSelect = async (link: string) => {
+    setLoading(true); // Start loading
     try {
       console.log("Entering handleSelect function");
+      
+      const parseResponse = await fetchAndParseWebpage(link);
+      // console.log("Brand " , parseResponse.brand)
+      // console.log("Materials " , parseResponse.materialTags)
+      // console.log("Other Tags " , parseResponse.otherTags)
+      const openTagsTwo = await generateTagsTwo(parseResponse.paragraph)
+      let openTagsOne
+      if (!link.includes('amazon')){
+        const scrappedINFO = await scrapUrlWithBeeScraper(link)
+        openTagsOne =  await generateTags(scrappedINFO)
+      } 
+      else{
+        openTagsOne = null
+      }
+
+      
+
+      // console.log(openTags)
       const data = await scrapUrl(link);
       const scraped_tags = await generateTags(data);
-      console.log('scraped tags', JSON.stringify(scraped_tags));
+
+      log.info('scraped tags', JSON.stringify(scraped_tags));
 
       // Pass the generated tags back to the parent component
-      onItemSelect({ itemId: item.name, tags: scraped_tags });
+      onItemSelect({
+        itemId: item.name,
+        tags: {
+          openTagsOne,
+          openTagsTwo,
+          scraped_tags,
+          material: parseResponse.materialTags,
+          Brand: parseResponse.brand,
+          Other: parseResponse.otherTags,
+          // Include any additional tags you want to store
+        }
+      });
 
     } catch (error) {
-      //console.error('error tagging scraped:', error);
+      log.error('error tagging scraped:', error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
   return (
@@ -36,15 +77,21 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
             <Text className="font-serif font-extrabold">
               {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
             </Text>
-            <TextInput className = "w-11 items-center bg-white">
-
-            </TextInput>
+            <TextInput
+              className="w-11 items-center bg-white"
+              value={link}
+              onChangeText={setLink} // Update the link state
+              onSubmitEditing={() => handleSelect(link)} // Call handleSelect on submit
+              returnKeyType="go" // Change the return key to "go"
+            />
           </View>
         </Pressable>
         <Pressable
-          className = "ml-auto"
+          className="ml-auto"
           onPress={async () =>
-            await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")
+            await WebBrowser.openBrowserAsync(
+              "https://www.google.com/?client=safari"
+            )
           }
           
           // save webpage last open url and toggle is manual to flag for deep tag additional call
@@ -76,9 +123,13 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
                   <Button
                     width="100%"
                     title="Select"
-                    
-                    onPress={() => { 
-                      handleSelect(similarItem.link)
+                    onPress={() => {
+                      handleSelect(similarItem.link);
+                      {loading ? (
+                        <ActivityIndicator size="small" color="#0000ff" />
+                      ) : (
+                        <Text>Select Item</Text>
+                      )}
                       setIsExpanded(!isExpanded);
                     }}
                   />

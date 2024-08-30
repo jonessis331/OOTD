@@ -16,5 +16,34 @@ export const scrapUrl = async (cropUrl: string) => {
   } catch (error) {
     console.error('Error fetching data:', error);
     throw error; // Rethrow or handle as needed
+  } finally {
+    console.log("Leaving scrapUrl function");
+  }
+};
+
+export const scrapUrlWithBeeScraper = async (productUrl: string) => {
+  // request Axios
+  console.log("Entering ScrapUrlWithBeeScraper")
+  try {
+
+    axios
+      .get("https://app.scrapingbee.com/api/v1/", {
+        params: {
+          api_key:
+            "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
+          url: productUrl,
+          json_response: "true",
+
+        },
+      })
+      .then(function (response) {
+        // handle success
+        //console.log(JSON.stringify(response.data.metadata, null, 4));
+        return JSON.stringify(response.data.metadata, null, 6)
+      });
+  } catch (error) {
+    console.log("Error ScrapurlBeee", error)
+  } finally{
+    console.log("Leaving ScrapUrlWithBeeScraper")
   }
 };

@@ -36,6 +36,9 @@
 
 // OpenAIService.js
 import axios from 'axios';
+import { logger } from "react-native-logs";
+
+var log = logger.createLogger();
 
 const API_KEY = 'REMOVED_OPENAI_KEY';
 
@@ -47,8 +50,8 @@ const openAI = axios.create({
     },
   });
   
-  export const generateTags = async (text) => {
-    console.log("Entering generateTags function"); // Log added
+export const generateTags = async (text: any): Promise<any | null> => {
+    log.info("Entering generateTags function"); // Log added
     try {
         const response = await openAI.post('/chat/completions', {
           model: 'gpt-4',
@@ -59,7 +62,7 @@ const openAI = axios.create({
             },
             {
               role: 'user',
-              content: `Given the following product JSON:\n\n${JSON.stringify(text)}\n\nPlease extract the following tags: 
+              content: `Given the following product page JSON \n\n${JSON.stringify(text)}\n\nPlease extract the following tags: 
               - color 
               - material 
               - occasion 
@@ -68,31 +71,71 @@ const openAI = axios.create({
               - pattern 
               - price 
               - category. 
-              
-    
-              Return the output in a JSON format with these keys.`,
+              Return the output strictly in JSON format. If the input is invalid or undefined, return null.`,
+              // response_format: { "type": "json_object" }
             }
           ],
-          max_tokens: 200,
+          max_tokens: 300,
         });
-    
+        log.info(typeof(response) )
+        log.info(response.data.choices[0].message.content.trim())
         const extractedTags = response.data.choices[0].message.content.trim();
-        console.log('Extracted Tags:', extractedTags);
-        return JSON.parse(extractedTags);
-      } catch (error) {
-        console.log("generating openai error", error);
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-            //console.error('API Error Response:', error.response.data);
-          } else if (error.request) {
-            //console.error('API No Response:', error.request);
-          } else {
-            //console.error('API Request Error:', error.message);
-          }
+
+        // Check if the response starts with a valid JSON character
+        if (extractedTags.startsWith('{') || extractedTags.startsWith('[')) {
+            log.info('Extracted Tags:', extractedTags);
+            return JSON.parse(extractedTags);
         } else {
-          //console.error('Unexpected Error:', error);
+            console.warn('Response does not start with JSON:', extractedTags);
+            return null;
         }
-        throw error;
+      } catch (error) {
+        log.info("generating openai error", error);
+        // Error handling as needed
+        return null; // Ensure that on error, you return null or handle it according to your logic
       }
   };
 
+export const generateTagsTwo = async (text: any): Promise<any | null> => {
+    log.info("Entering generateTagsTwo function"); // Log added
+    try {
+        const response = await openAI.post('/chat/completions', {
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a fashion assistant that extracts relevant fashion tags from a large unorganized product page text body.',
+            },
+            {
+              role: 'user',
+              content: `Given the following extract html product page text  \n\n${text}\n\nPlease extract the following tags: 
+              - color 
+              - material 
+              - occasion 
+              - brand name 
+              - style 
+              - pattern 
+              - price 
+              - category. 
+              Return the output strictly in JSON format. If the input is invalid or undefined, return null.`,
+            }
+          ],
+          max_tokens: 300,
+        });
+    
+        const extractedTags = response.data.choices[0].message.content.trim();
+
+        // Check if the response starts with a valid JSON character
+        if (extractedTags.startsWith('{') || extractedTags.startsWith('[')) {
+            log.info('Extracted Tags:', extractedTags);
+            return JSON.parse(extractedTags);
+        } else {
+            console.warn('Response does not start with JSON:', extractedTags);
+            return null;
+        }
+      } catch (error) {
+        log.info("generating openai error", error);
+        // Error handling as needed
+        return null; // Ensure that on error, you return null or handle it according to your logic
+      }
+  };

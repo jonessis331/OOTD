@@ -13,6 +13,8 @@ import {
 
 import { useNavigation } from '@react-navigation/native';
 
+
+import { logger } from "react-native-logs";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as WebBrowser from 'expo-web-browser';
@@ -21,21 +23,21 @@ import PieceComponent from "~/src/components/PieceComponent";
 import { uploadImage, makeImagePublic } from "~/src/lib/cloudinary";
 import { detectItems, getDeepTags } from "~/src/lib/lykdat";
 import { fetchGoogleLensResults } from "~/src/lib/googlelens";
-import { scrapUrl } from "~/src/lib/scraperapi";
-import { generateTags } from "~/src/lib/openai";
+import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
+import { generateTags, generateTagsTwo } from "~/src/lib/openai";
 import { createCompleteOutfitData } from "~/src/lib/dataprocess";
-import { DetectedItem, OutfitMetadata } from "~/src/utils/dataTypes"
+import { DetectedItem, OutfitMetadata } from "~/src/utils/dataTypes";
 import deepTagsMock from "~/mock_data/deep_tags.json";
 import googleLensMock from "~/mock_data/google_lens_response.json";
 import mockDetectedItems from "~/mock_data/detected_items.json";
 import mockResponse from "~/mock_data/mock_response.json";
-import mockScrapeData from "~/mock_data/mock_scraper_data.json"
 
-
-
-
+import { fetchAndParseWebpage, fetchProductInfo } from "~/src/lib/experiment";
+import { useMockData } from '~/src/utils/config';
 
 type ImageUrl = string;
+var log = logger.createLogger();
+
 
 export default function New() {
   const [caption, setCaption] = useState("");
@@ -45,14 +47,80 @@ export default function New() {
   const [selectedTags, setSelectedTags] = useState<{ [key: string]: any }>({}); // Store selected tags
   const [isLoading, setIsLoading] = useState(false); // Loading state for the entire process
 
+
+  
   useEffect(() => {
     if (!image) {
       pickImage();
     }
   }, [image]);
 
+  const processDetectedItems = async (
+    detectedItems: DetectedItem[],
+    imageUrl: ImageUrl
+  ): Promise<DetectedItem[]> => {
+    log.info("Entering processDetectedItems function"); // Log added
+    const enrichedItems: DetectedItem[] = [];
+
+    for (const item of detectedItems) {
+      const { bounding_box } = item;
+      const cropUrl = `${imageUrl.replace(
+        "/upload/",
+        `/upload/c_crop,w_${Math.round(
+          Math.abs(bounding_box.left * 800 - bounding_box.right * 800)
+        )},h_${Math.round(bounding_box.bottom * 800)},x_${Math.round(
+          bounding_box.left * 800
+        )},y_${Math.round(bounding_box.top * 800)}/`
+      )}`;
+
+      let googleLensResults, tags;
+      try {
+        if (useMockData) {
+          googleLensResults = googleLensMock;
+          tags = deepTagsMock;
+        } else {
+          googleLensResults = await fetchGoogleLensResults(cropUrl);
+          tags = await getDeepTags(cropUrl);
+        }
+
+        enrichedItems.push({
+          cropUrl,
+          ...item,
+          similarItems: [], 
+          //similarItems: googleLensResults.visual_matches || [], // Add similarItems to each detected item
+          tags,
+        });
+      } catch (error) {
+        log.error(`Error processing item ${item.name}:`, error);
+        enrichedItems.push({
+          ...item,
+          similarItems: [],
+          tags: [],
+        }); // Fallback if an error occurs
+      }
+    }
+
+    return enrichedItems;
+  };
+
+  const handleItemSelect = (selectedTagsForItem: any) => {
+    log.info("Selected Tags For Item:", selectedTagsForItem); // Debugging line
+
+    setSelectedTags(prevTags => {
+      const updatedTags = {
+        ...prevTags,
+        [selectedTagsForItem.itemId]: {
+          ...prevTags[selectedTagsForItem.itemId], // Preserve existing tags if any
+          ...selectedTagsForItem.tags, // Merge new tags
+        }
+      };
+      log.info("Updated Tags:", JSON.stringify(updatedTags, null, 6)); // Debugging line
+      return updatedTags;
+    });
+  };
+
   const pickImage = async () => {
-    console.log("Entering pickImage function"); // Log added
+    log.info("Entering pickImage function"); // Log added
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -71,23 +139,24 @@ export default function New() {
       );
 
       setImage(manipResult.uri);
-      //const response = await uploadImage(manipResult.uri);
-      const response = mockResponse;
-
-      //setImageUrl(response.secure_url);
-      setImageUrl(mockResponse.secure_url);
+      
+      // Choose whether to use mock response or actual upload
+      const response = useMockData ? mockResponse : await uploadImage(manipResult.uri);
+      setImageUrl(response.secure_url);
 
       setIsLoading(true); // Start loading
       try {
-        const detectedItemsResponse = await detectItems(mockResponse.secure_url);
-        //const detectedItemsResponse = mockDetectedItems;
+        // Choose whether to use mock detected items or actual detection
+        const detectedItemsResponse = useMockData ? mockDetectedItems : await detectItems(response.secure_url);
+        
         const enrichedItems = await processDetectedItems(
           detectedItemsResponse.data.detected_items,
           response.secure_url
         );
-        //console.log("enrichedItems", JSON.stringify(enrichedItems, null, 2));
+        log.info(typeof(JSON.stringify(enrichedItems, null, 2)))
+        log.info(typeof(enrichedItems))
+        log.info("enrichedItems", JSON.stringify(enrichedItems, null, 2));
         setItems(enrichedItems);
-        ////console.log(enrichedItems)
       } catch (error) {
         Alert.alert("Error getting detected items");
       } finally {
@@ -96,89 +165,43 @@ export default function New() {
     }
   };
 
-  const processDetectedItems = async (
-    detectedItems: DetectedItem[],
-    imageUrl: ImageUrl
-  ): Promise<DetectedItem[]> => {
-    console.log("Entering processDetectedItems function"); // Log added
-    const enrichedItems = [];
-
-    for (const item of detectedItems) {
-      const { bounding_box } = item;
-      const cropUrl = `${imageUrl.replace(
-        "/upload/",
-        `/upload/c_crop,w_${Math.round(
-          Math.abs(bounding_box.left * 800 - bounding_box.right * 800)
-        )},h_${Math.round(bounding_box.bottom * 800)},x_${Math.round(
-          bounding_box.left * 800
-        )},y_${Math.round(bounding_box.top * 800)}/`
-      )}`;
-
-      try {
-        const googleLensResults = await fetchGoogleLensResults(cropUrl);
-        //const googleLensResults = googleLensMock;
-        const tags = await getDeepTags(cropUrl);
-        //const tags = deepTagsMock;
-
-        enrichedItems.push({
-          cropUrl,
-          ...item,
-          similarItems: googleLensResults.visual_matches || [], // Add similarItems to each detected item
-          tags,
-        });
-      } catch (error) {
-        //console.error(`Error processing item ${item.name}:`, error);
-        enrichedItems.push({
-          ...item,
-          similarItems: [],
-          tags: [],
-        }); // Fallback if an error occurs
-      }
-    }
-
-    return enrichedItems;
-  };
-
-  const handleItemSelect = (selectedTagsForItem: any) => {
-    console.log("Entering handleItemSelect function"); // Log added
-    setSelectedTags(prevTags => ({
-      ...prevTags,
-      [selectedTagsForItem.itemId]: selectedTagsForItem.tags
-    }));
-    console.log(selectedTags)
-  };
 
   const createPost = async () => {
-    console.log("Entering createPost function"); // Log added
+    log.info("Entering createPost function"); // Log added
+
     if (!imageUrl) {
       return;
     }
     try {
       //await makeImagePublic(imageUrl);
-      // Save the post in database (functionality can be added here)
+      log.info(JSON.stringify(items), imageUrl, JSON.stringify(selectedTags))
       await createCompleteOutfitData(items, imageUrl, selectedTags);
-      //console.log("image url:", imageUrl);
     } catch (error) {
       Alert.alert("Error making image public");
     }
   };
 
   const handleCancel = () => {
-    console.log("Entering handleCancel function"); // Log added
+    log.info("Entering handleCancel function"); // Log added
     setImage(null);
     setImageUrl(null);
     setItems([]); // Clear detected items
     setSelectedTags({}); // Clear selected tags
   };
 
-  // WebBrowser
+  const handleTest = async () => {
+    const productOuputParse = fetchProductInfo('https://www.amazon.com/Adriana-Degreas-Metallic-Shoulder-Feathers/dp/B09X8CZRX6');
+    // if (productOuputParse) {
+    //   console.log("Brand", productOuputParse.brand);
+    //   console.log("Materials", productOuputParse.materialTags);
+    //   console.log("Other Tags", productOuputParse.otherTags);
+    // }
 
-  // const [result, setResult] = useState(null);
-
-  // const _handlePressButtonAsync = async () => {
-  //   let result = await WebBrowser.openBrowserAsync('https://expo.dev');
-  //   setResult(result);
-  // };
+    const parseResponse = await fetchAndParseWebpage('https://www.amazon.com/Adriana-Degreas-Metallic-Shoulder-Feathers/dp/B09X8CZRX6');
+    log.info("Brand", parseResponse.brand);
+    log.info("Materials", parseResponse.materialTags);
+    log.info("Other Tags", parseResponse.otherTags);
+  };
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20 }}>
@@ -210,6 +233,8 @@ export default function New() {
           >
             Change
           </Text>
+          <Pressable className="w-5 aspect-square bg-zinc-950" onPress={handleTest}>
+          </Pressable>
           <TextInput
             value={caption}
             onChangeText={(newValue) => setCaption(newValue)}
@@ -223,7 +248,7 @@ export default function New() {
             }}
           />
           {items.map((item, index) => (
-            <PieceComponent key={index} item={item} onItemSelect={handleItemSelect}  />
+            <PieceComponent key={index} item={item} onItemSelect={handleItemSelect} />
           ))}
         </>
       )}
@@ -234,6 +259,8 @@ export default function New() {
     </ScrollView>
   );
 }
+
+
 // const handleSelect = async (link: string) => {
   
 //   try {
