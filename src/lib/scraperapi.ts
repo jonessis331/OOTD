@@ -1,49 +1,36 @@
-import axios from 'axios'; // Import axios
+import axios from "axios";
+import { logger } from "react-native-logs";
+
+const log = logger.createLogger();
 
 export const scrapUrl = async (cropUrl: string) => {
-  console.log("Entering scrapUrl function"); // Log added
+  log.info("Scraping URL:", cropUrl);
   try {
-    // Construct the ScraperAPI URL with your API key and the URL you want to scrape
-    const apiKey = '36d1ef13a6905df230a1f181a1b7f579';
-    const scraperApiUrl = `http://api.scraperapi.com/?api_key=${apiKey}&url=${encodeURIComponent(cropUrl)}&render=true&autoparse=true`;
-
-    // Make a GET request to the ScraperAPI endpoint
+    const apiKey = "36d1ef13a6905df230a1f181a1b7f579";
+    const scraperApiUrl = `http://api.scraperapi.com/?api_key=${apiKey}&url=${encodeURIComponent(
+      cropUrl
+    )}&render=true&autoparse=true`;
     const { data } = await axios.get(scraperApiUrl);
-    //console.log('here')
-
-    //console.log('Scraped Data:', data); // Log the scraped data
-    return data; // Return the scraped data
+    return data;
   } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error; // Rethrow or handle as needed
-  } finally {
-    console.log("Leaving scrapUrl function");
+    log.error("Error fetching data:", error);
+    throw error;
   }
 };
 
 export const scrapUrlWithBeeScraper = async (productUrl: string) => {
-  // request Axios
-  console.log("Entering ScrapUrlWithBeeScraper")
+  log.info("Scraping with BeeScraper:", productUrl);
   try {
-
-    axios
-      .get("https://app.scrapingbee.com/api/v1/", {
-        params: {
-          api_key:
-            "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
-          url: productUrl,
-          json_response: "true",
-
-        },
-      })
-      .then(function (response) {
-        // handle success
-        //console.log(JSON.stringify(response.data.metadata, null, 4));
-        return JSON.stringify(response.data.metadata, null, 6)
-      });
+    const response = await axios.get("https://app.scrapingbee.com/api/v1/", {
+      params: {
+        api_key: "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
+        url: productUrl,
+        json_response: "true",
+      },
+    });
+    return response.data.metadata;
   } catch (error) {
-    console.log("Error ScrapurlBeee", error)
-  } finally{
-    console.log("Leaving ScrapUrlWithBeeScraper")
+    log.error("Error in BeeScraper:", error);
+    throw error;
   }
 };

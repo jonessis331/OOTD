@@ -40,13 +40,13 @@ export default function ProfileScreen() {
       )}
       <Text
         onPress={pickImage}
-        className="text-blue-500 font-semibold m-5 self-center"
+        className="font-mono font-semibold text-blue-500 m-5 self-center"
       >
         Change
       </Text>
 
       {/*form */}
-      <Text className="mb-2 text-gray-500 font-semibold">Username</Text>
+      <Text className="mb-2 text-gray-500 font-mono font-semibold">Username</Text>
       <TextInput
         placeholder="Username"
         value={username}

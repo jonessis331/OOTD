@@ -2,10 +2,10 @@
 
 //import fs from 'react-native-fs'; // or the appropriate file system library for your environment
 
-import { logger } from "react-native-logs";
+
+import { log } from "~/src/utils/config";
 import { supabase } from '~/src/lib/supabase'; // Adjust the import path as necessary
 
-var log = logger.createLogger();
 
 export const saveOutfitData = async (data: any) => {
     try {

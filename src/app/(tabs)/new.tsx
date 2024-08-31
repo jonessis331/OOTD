@@ -14,7 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 
-import { logger } from "react-native-logs";
+import { log } from "~/src/utils/config";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as WebBrowser from 'expo-web-browser';
@@ -36,7 +36,7 @@ import { fetchAndParseWebpage, fetchProductInfo } from "~/src/lib/experiment";
 import { useMockData } from '~/src/utils/config';
 
 type ImageUrl = string;
-var log = logger.createLogger();
+
 
 
 export default function New() {
@@ -79,15 +79,17 @@ export default function New() {
           googleLensResults = googleLensMock;
           tags = deepTagsMock;
         } else {
-          googleLensResults = await fetchGoogleLensResults(cropUrl);
+          googleLensResults = googleLensMock;
+          //tags = deepTagsMock;
+          //googleLensResults = await fetchGoogleLensResults(cropUrl);
           tags = await getDeepTags(cropUrl);
         }
 
         enrichedItems.push({
           cropUrl,
           ...item,
-          similarItems: [], 
-          //similarItems: googleLensResults.visual_matches || [], // Add similarItems to each detected item
+          //similarItems: [], 
+          similarItems: googleLensResults.visual_matches || [], // Add similarItems to each detected item
           tags,
         });
       } catch (error) {
@@ -206,53 +208,30 @@ export default function New() {
   return (
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       {isLoading ? (
-        <View style={{ alignItems: "center" }}>
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text style={{ marginTop: 10 }}>Analyzing image...</Text>
-        </View>
+        <LoadingIndicator />
       ) : (
         <>
           {image ? (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 200, height: 300, borderRadius: 10 }}
-            />
+            <Image source={{ uri: image }} className="w-dvw aspect-[2/3] rounded-2xl" />
           ) : (
-            <View
-              style={{
-                width: 200,
-                height: 300,
-                borderRadius: 10,
-                backgroundColor: "#d3d3d3",
-              }}
-            />
+            <PlaceholderImage />
           )}
-          <Text
-            onPress={pickImage}
-            style={{ color: "#1E90FF", fontWeight: "bold", marginTop: 20 }}
-          >
+          <Text onPress={pickImage} className="text-blue-500 font-bold mt-5">
             Change
           </Text>
-          <Pressable className="w-5 aspect-square bg-zinc-950" onPress={handleTest}>
-          </Pressable>
+          <Pressable className="w-5 aspect-square bg-zinc-950" onPress={handleTest} />
           <TextInput
             value={caption}
-            onChangeText={(newValue) => setCaption(newValue)}
+            onChangeText={setCaption}
             placeholder="What is on your mind"
-            style={{
-              backgroundColor: "#fff",
-              width: "100%",
-              padding: 10,
-              borderRadius: 20,
-              marginTop: 20,
-            }}
+            className="bg-white w-full p-3 rounded-xl mt-5"
           />
           {items.map((item, index) => (
             <PieceComponent key={index} item={item} onItemSelect={handleItemSelect} />
           ))}
         </>
       )}
-      <View style={{ marginTop: 20, width: "100%" }}>
+      <View className="mt-5 w-full">
         <Button width="100%" title="Share" onPress={createPost} />
         <Button width="100%" title="Cancel" onPress={handleCancel} />
       </View>
@@ -260,102 +239,13 @@ export default function New() {
   );
 }
 
+const LoadingIndicator = () => (
+  <View className="flex items-center">
+    <ActivityIndicator size="large" color="#0000ff" />
+    <Text className="mt-2">Analyzing image...</Text>
+  </View>
+);
 
-// const handleSelect = async (link: string) => {
-  
-//   try {
-//     const data = await scrapUrl(link);
-//     // //console.log('scraped data', JSON.stringify(data)); 
-//     //const mock_data = mockScrapeData;
-//     try {
-//       const scraped_tags = await generateTags(data);
-//       //console.log('scraped tags',  JSON.stringify(scraped_tags))
-      
-//     } catch (error) {
-//       //console.error('error tagging scraped:', error);
-      
-//     }
-    
-
-//   } catch (error) {
-//     //console.error('error during scraping:', error);
-//   }
-// };
-
-// const PieceComponent = ({ item }: { item: DetectedItem }) => {
-
-//   const navigation = useNavigation()
-//   const [isExpanded, setIsExpanded] = useState(false);
-//   const [itemSelected, setItemSelected] = useState();
-
-
-
-
-//   return (
-//     <View style={{ marginTop: 20 }}>
-//       <View className="flex-row items-center w-full bg-gray-200 rounded-full p-2">
-//         <Pressable onPress={() => setIsExpanded(!isExpanded)}>
-//           <View className="flex-row gap-3 items-center">
-//             <Image
-//               source={{ uri: item.cropUrl }}
-//               className="w-10 aspect-square rounded-full"
-//             />
-//             <Text className="font-serif font-extrabold">
-//               {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-//             </Text>
-//             <TextInput className = "w-11 items-center bg-white">
-
-//             </TextInput>
-//           </View>
-//         </Pressable>
-//         <Pressable
-//           className = "ml-auto"
-//           onPress={async () =>
-//             await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")
-//           }
-          
-//           // save webpage last open url and toggle is manual to flag for deep tag additional call
-//         >
-//           <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2"></View>
-//         </Pressable>
-//       </View>
-
-//       {isExpanded && (
-//         <View>
-//           <View className="flex flex-row flex-wrap">
-//             {item.similarItems && item.similarItems.length > 0 ? (
-//               item.similarItems.map((similarItem, index) => (
-//                 <View key={index} style={{ width: "45%", margin: "2.5%" }}>
-//                   <Pressable
-//                     onPress={async () =>
-//                       await WebBrowser.openBrowserAsync(similarItem.link)
-//                     }
-//                   >
-//                     <Image
-//                       source={{ uri: similarItem.thumbnail }}
-//                       className="w-[100%] aspect-square rounded-lg"
-//                     />
-//                   </Pressable>
-//                   <Text numberOfLines={2} ellipsizeMode="tail">
-//                     {similarItem.title}
-//                   </Text>
-//                   <Text>{similarItem.source}</Text>
-//                   <Button
-//                     width="100%"
-//                     title="Select"
-//                     onPress={() => { 
-//                       handleSelect(similarItem.link)
-//                       setIsExpanded(!isExpanded);
-//                     }}
-//                   />
-//                 </View>
-//               ))
-//             ) : (
-//               <Text>No similar items found</Text>
-//             )}
-//           </View>
-//         </View>
-//       )}
-//     </View>
-//   );
-// };
+const PlaceholderImage = () => (
+  <View className="w-52 h-80 rounded-xl bg-gray-300" />
+);

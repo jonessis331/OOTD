@@ -4,9 +4,7 @@ import { MergedTags, DetectedItem, OutfitMetadata } from "../utils/dataTypes";
 import { saveOutfitData } from "../utils/dataStorage";
 import { v4 as uuidv5 } from 'uuid'; 
 
-import { logger } from "react-native-logs";
-
-var log = logger.createLogger();
+import { log } from "~/src/utils/config";;
 
 /**
  * Merges tags from OpenAI and deep tagging services.
@@ -77,22 +75,3 @@ export const createCompleteOutfitData = async (
 
     return outfitData;
 };
-
-
-//   // Create the outfit data object
-//   const outfitData = {
-//     outfit_id: outfitMetadata.outfit_id,
-//     user_id: outfitMetadata.user_id,
-//     outfit_image_url: outfitMetadata.outfit_image_url,
-//     date_created: new Date().toISOString(),
-//     items: processedItems,
-//     additional_info: {
-//       // Any additional info you want to include, e.g., average rating, customer reviews, etc.
-//     },
-//   };
-
-//   // Save the outfit data to a file or database
-//   saveOutfitData(outfitData, `./data/outfit_data_${outfitMetadata.outfit_id}.json`);
-
-//   return outfitData;
-// };

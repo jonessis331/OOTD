@@ -1,5 +1,8 @@
+
+import { log } from "~/src/utils/config";
+
 export const searchImage = async (imageUrl: string) => {
-    console.log("Entering searchImage function"); // Log added
+    log.info("Entering searchImage function"); // Log added
     const formdata = new FormData();
     formdata.append("api_key", "REMOVED_LYKDAT_KEY");
     formdata.append("image_url", imageUrl);
@@ -20,7 +23,7 @@ export const searchImage = async (imageUrl: string) => {
   };
 
   export const detectItems = async (imageUrl: string) => {
-    console.log("Entering detectItems function"); // Log added
+    log.info("Entering detectItems function"); // Log added
     const myHeaders = new Headers();
     myHeaders.append("x-api-key", "REMOVED_LYKDAT_KEY");
 
@@ -45,7 +48,7 @@ export const searchImage = async (imageUrl: string) => {
 };
 
 export const getDeepTags = async (imageUrl: string) => {
-  console.log("Entering getDeepTags function"); // Log added
+  log.info("Entering getDeepTags function"); // Log added
   const myHeaders = new Headers();
   myHeaders.append("x-api-key", "REMOVED_LYKDAT_KEY");
 

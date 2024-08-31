@@ -1,4 +1,44 @@
-export const useMockData = true; 
+import { logger } from 'react-native-logs';
+import * as FileSystem from 'expo-file-system';
+
+const logFilePath = FileSystem.documentDirectory + 'logs_' + new Date().toISOString().split('T')[0] + '.log';
+
+const config = {
+  severity: 'debug',
+  transport: async (log) => {
+    try {
+      // Read existing content
+      let existingContent = '';
+      
+
+      try {
+        existingContent = await FileSystem.readAsStringAsync(logFilePath, { encoding: FileSystem.EncodingType.UTF8 });
+        
+      } catch (error) {
+        // File might not exist yet, ignore the error
+      }
+
+      // Write the new log entry
+      await FileSystem.writeAsStringAsync(logFilePath, existingContent + log + '\n', { encoding: FileSystem.EncodingType.UTF8 });
+    } catch (error) {
+      console.error("Failed to write log:", error);
+    }
+  },
+};
+
+const log = logger.createLogger(config);
+
+log.info("Print this string to a file");
+// Set severity level based on environment
+if (__DEV__) {
+    log.setSeverity('debug'); // Log everything in development
+} else {
+    log.setSeverity('error'); // Log only errors in production
+}
+
+export { log };
+
+export const useMockData = false; 
 
 
 
@@ -371,3 +411,5 @@ export const brandNames: string[] = [
     "Zappos", "Bluefly", "Shoes.com", "Overstock", "Rakuten", "eBay", 
     "Alibaba", "AliExpress"
 ];
+
+
