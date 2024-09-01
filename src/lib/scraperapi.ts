@@ -4,7 +4,7 @@ import { logger } from "react-native-logs";
 const log = logger.createLogger();
 
 export const scrapUrl = async (cropUrl: string) => {
-  log.info("Scraping URL:", cropUrl);
+  log.info("Entering Scraping URL");
   try {
     const apiKey = "36d1ef13a6905df230a1f181a1b7f579";
     const scraperApiUrl = `http://api.scraperapi.com/?api_key=${apiKey}&url=${encodeURIComponent(
@@ -15,6 +15,8 @@ export const scrapUrl = async (cropUrl: string) => {
   } catch (error) {
     log.error("Error fetching data:", error);
     throw error;
+  } finally {
+    log.info("leaving Scrap Url (scraperapi)")
   }
 };
 
@@ -32,5 +34,7 @@ export const scrapUrlWithBeeScraper = async (productUrl: string) => {
   } catch (error) {
     log.error("Error in BeeScraper:", error);
     throw error;
+  } finally {
+    log.info("leaving beescraper")
   }
 };

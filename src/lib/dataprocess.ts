@@ -4,7 +4,7 @@ import { MergedTags, DetectedItem, OutfitMetadata } from "../utils/dataTypes";
 import { saveOutfitData } from "../utils/dataStorage";
 import { v4 as uuidv5 } from 'uuid'; 
 
-import { log } from "~/src/utils/config";;
+import { log, logIncomingData } from "~/src/utils/config";;
 
 /**
  * Merges tags from OpenAI and deep tagging services.
@@ -14,15 +14,13 @@ import { log } from "~/src/utils/config";;
  */
 export const mergeTags = (openAITags: any, deepTags: any): any => {
     log.info("Entering simple mergeTags function");
-    log.info("OpenAI Tags:", openAITags);
-    log.info("Deep Tags:", deepTags);
-
+    logIncomingData({ openAITags, deepTags }, 'mergeTags'); // Log incoming data
     const mergedTags = {
         openAITags: openAITags || {},  // Include all tags from OpenAI
         deepTags: deepTags.data || {}, // Include all tags from the deep tagging service
     };
 
-    log.info("Merged Tags:", mergedTags); // Log the merged tags for debugging
+    log.info("Leaving MergeTags"); // Log the merged tags for debugging
     return mergedTags;
 };
 
@@ -39,7 +37,7 @@ export const createCompleteOutfitData = async (
     selectedTags: { [key: string]: any }
 ): Promise<any> => {
     log.info("Entering createCompleteOutfitData function");
-    log.info('here')
+    logIncomingData({ items, imageUrl, selectedTags }, 'createCompleteOutfitData'); // Log incoming data
 
     const outfitMetadata: OutfitMetadata = {
         outfit_id: "uuidv5()",
@@ -49,8 +47,7 @@ export const createCompleteOutfitData = async (
     log.info(outfitMetadata)
 
     const processedItems = await Promise.all(items.map(async (item) => {
-        log.info("item log", item)
-        log.info(`Processing item: ${item.name}`); // Log each item being processed
+        logIncomingData(item, 'Processing Item'); // Log incoming item data each item being processed
         const openAITags = selectedTags[item.name] || {};
         const mergedTags = mergeTags(openAITags, item.tags);
 
@@ -71,6 +68,7 @@ export const createCompleteOutfitData = async (
     };
 
     // Save outfit data to Supabase
+    log.info("Leaving CreateCompleteOutifitData")
     await saveOutfitData(outfitData);
 
     return outfitData;

@@ -9,6 +9,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { fetchAndParseWebpage, fetchProductInfo } from "../lib/experiment";
 
 import { log } from "~/src/utils/config";
+import { logIncomingData } from "~/src/utils/config"; // Import the logging utility
 
 const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSelect: (selectedTags: any) => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -16,31 +17,30 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
   const [link, setLink] = useState(""); // State to manage the input link
 
   const handleSelect = async (link: string) => {
+    logIncomingData(link, 'handleSelect'); // Log incoming data
     setLoading(true); // Start loading
     try {
       console.log("Entering handleSelect function");
       
       const parseResponse = await fetchAndParseWebpage(link);
-      // console.log("Brand " , parseResponse.brand)
-      // console.log("Materials " , parseResponse.materialTags)
-      // console.log("Other Tags " , parseResponse.otherTags)
-      const openTagsTwo = await generateTagsTwo(parseResponse.paragraph)
-      let openTagsOne
-      if (!link.includes('amazon')){
-        const scrappedINFO = await scrapUrlWithBeeScraper(link)
-        openTagsOne =  await generateTags(scrappedINFO)
-      } 
-      else{
-        openTagsOne = null
+      logIncomingData(parseResponse, 'fetchAndParseWebpage Response'); // Log response data
+
+      const openTagsTwo = await generateTagsTwo(parseResponse.paragraph);
+      logIncomingData(openTagsTwo, 'generateTagsTwo Response'); // Log response data
+
+      let openTagsOne;
+      if (!link.includes('amazon')) {
+        const scrappedINFO = await scrapUrlWithBeeScraper(link);
+        logIncomingData(scrappedINFO, 'scrapUrlWithBeeScraper Response'); // Log response data
+        openTagsOne = await generateTags(scrappedINFO);
+        logIncomingData(openTagsOne, 'generateTags Response'); // Log response data
+      } else {
+        openTagsOne = null;
       }
 
-      
-
-      // console.log(openTags)
       const data = await scrapUrl(link);
       const scraped_tags = await generateTags(data);
-
-      log.info('scraped tags', JSON.stringify(scraped_tags));
+      logIncomingData(scraped_tags, 'scrapUrl Response'); // Log response data
 
       // Pass the generated tags back to the parent component
       onItemSelect({
@@ -59,6 +59,7 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
     } catch (error) {
       log.error('error tagging scraped:', error);
     } finally {
+      log.info("Leaving handleSelect")
       setLoading(false); // End loading
     }
   };

@@ -14,7 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 
-import { log } from "~/src/utils/config";
+import { log, logIncomingData } from "~/src/utils/config";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as WebBrowser from 'expo-web-browser';
@@ -59,7 +59,8 @@ export default function New() {
     detectedItems: DetectedItem[],
     imageUrl: ImageUrl
   ): Promise<DetectedItem[]> => {
-    log.info("Entering processDetectedItems function"); // Log added
+    logIncomingData({ detectedItems, imageUrl }, 'processDetectedItems'); // Log incoming data
+    log.info("Entering processDetectedItems function");
     const enrichedItems: DetectedItem[] = [];
 
     for (const item of detectedItems) {
@@ -99,6 +100,8 @@ export default function New() {
           similarItems: [],
           tags: [],
         }); // Fallback if an error occurs
+      } finally {
+        log.info("leaving processDetectedItem")
       }
     }
 
@@ -106,7 +109,8 @@ export default function New() {
   };
 
   const handleItemSelect = (selectedTagsForItem: any) => {
-    log.info("Selected Tags For Item:", selectedTagsForItem); // Debugging line
+    logIncomingData(selectedTagsForItem, 'handleItemSelect'); // Log incoming data
+    log.info("(handleItemSelct) Selected Tags For Item:", selectedTagsForItem); // Debugging line
 
     setSelectedTags(prevTags => {
       const updatedTags = {
@@ -116,7 +120,8 @@ export default function New() {
           ...selectedTagsForItem.tags, // Merge new tags
         }
       };
-      log.info("Updated Tags:", JSON.stringify(updatedTags, null, 6)); // Debugging line
+      //log.info("Updated Tags:", JSON.stringify(updatedTags, null, 6)); // Debugging line
+      log.info("leaving handleItemSelect")
       return updatedTags;
     });
   };
@@ -129,6 +134,8 @@ export default function New() {
       aspect: [4, 3],
       quality: 1,
     });
+
+    logIncomingData(result, 'pickImage'); // Log incoming data
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
@@ -155,13 +162,14 @@ export default function New() {
           detectedItemsResponse.data.detected_items,
           response.secure_url
         );
-        log.info(typeof(JSON.stringify(enrichedItems, null, 2)))
-        log.info(typeof(enrichedItems))
-        log.info("enrichedItems", JSON.stringify(enrichedItems, null, 2));
+        //log.info(typeof(JSON.stringify(enrichedItems, null, 2)))
+        //log.info(typeof(enrichedItems))
+       // log.info("enrichedItems", JSON.stringify(enrichedItems, null, 2));
         setItems(enrichedItems);
       } catch (error) {
         Alert.alert("Error getting detected items");
       } finally {
+        log.info("leaving pickImage")
         setIsLoading(false); // End loading
       }
     }
@@ -170,18 +178,21 @@ export default function New() {
 
   const createPost = async () => {
     log.info("Entering createPost function"); // Log added
+    logIncomingData({ imageUrl, items, selectedTags }, 'createPost'); // Log incoming data
 
     if (!imageUrl) {
       return;
     }
     try {
       //await makeImagePublic(imageUrl);
-      log.info(JSON.stringify(items), imageUrl, JSON.stringify(selectedTags))
+      logIncomingData({ items: JSON.stringify(items), imageUrl, selectedTags: JSON.stringify(selectedTags) }, "before createCompleteOutfit");
       await createCompleteOutfitData(items, imageUrl, selectedTags);
     } catch (error) {
       Alert.alert("Error making image public");
+    } finally {
+      log.info("leaving createPost")
     }
-  };
+  };  
 
   const handleCancel = () => {
     log.info("Entering handleCancel function"); // Log added
@@ -192,6 +203,7 @@ export default function New() {
   };
 
   const handleTest = async () => {
+    log.info("Entering handleTest function"); // Log added
     const productOuputParse = fetchProductInfo('https://www.amazon.com/Adriana-Degreas-Metallic-Shoulder-Feathers/dp/B09X8CZRX6');
     // if (productOuputParse) {
     //   console.log("Brand", productOuputParse.brand);

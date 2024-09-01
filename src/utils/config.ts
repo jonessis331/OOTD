@@ -1,44 +1,63 @@
 import { logger } from 'react-native-logs';
 import * as FileSystem from 'expo-file-system';
 
-const logFilePath = FileSystem.documentDirectory + 'logs_' + new Date().toISOString().split('T')[0] + '.log';
 
-const config = {
-  severity: 'debug',
-  transport: async (log) => {
-    try {
-      // Read existing content
-      let existingContent = '';
+const log = logger.createLogger();
+
+export const logIncomingData = (data: any, functionName: string) => {
+    const dataType = typeof data;
+    let logMessage = `Entering ${functionName} with data of type ${dataType}: `;
+
+    if (dataType === 'object' && data !== null) {
+        if (data.visual_matches && Array.isArray(data.visual_matches)) {
+            logMessage += `visual_matches: [${data.visual_matches.slice(0, 3).map(item => JSON.stringify(item)).join(', ')}]... (truncated)`;
+        } else {
+            logMessage += JSON.stringify(data, null, 2).slice(0, 200) + '... (truncated)';
+        }
+    } else {
+        logMessage += JSON.stringify(data);
+    }
+
+    log.info(logMessage);
+};
+// const logFilePath = FileSystem.documentDirectory + 'logs_' + new Date().toISOString().split('T')[0] + '.log';
+
+// const config = {
+//   severity: 'debug',
+//   transport: async (log) => {
+//     try {
+//       // Read existing content
+//       let existingContent = '';
       
 
-      try {
-        existingContent = await FileSystem.readAsStringAsync(logFilePath, { encoding: FileSystem.EncodingType.UTF8 });
+//       try {
+//         existingContent = await FileSystem.readAsStringAsync(logFilePath, { encoding: FileSystem.EncodingType.UTF8 });
         
-      } catch (error) {
-        // File might not exist yet, ignore the error
-      }
+//       } catch (error) {
+//         // File might not exist yet, ignore the error
+//       }
 
-      // Write the new log entry
-      await FileSystem.writeAsStringAsync(logFilePath, existingContent + log + '\n', { encoding: FileSystem.EncodingType.UTF8 });
-    } catch (error) {
-      console.error("Failed to write log:", error);
-    }
-  },
-};
+//       // Write the new log entry
+//       await FileSystem.writeAsStringAsync(logFilePath, existingContent + log + '\n', { encoding: FileSystem.EncodingType.UTF8 });
+//     } catch (error) {
+//       log.error("Failed to write log:", error);
+//     }
+//   },
+// };
 
-const log = logger.createLogger(config);
 
-log.info("Print this string to a file");
-// Set severity level based on environment
-if (__DEV__) {
-    log.setSeverity('debug'); // Log everything in development
-} else {
-    log.setSeverity('error'); // Log only errors in production
-}
+
+// log.info("Print this string to a file");
+// // Set severity level based on environment
+// if (__DEV__) {
+//     log.setSeverity('debug'); // Log everything in development
+// } else {
+//     log.setSeverity('error'); // Log only errors in production
+// }
 
 export { log };
 
-export const useMockData = false; 
+export const useMockData = true; 
 
 
 

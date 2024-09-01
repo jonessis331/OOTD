@@ -19,6 +19,8 @@ export const searchImage = async (imageUrl: string) => {
     } catch (error) {
       //console.error('Error:', error);
       throw error;
+    } finally {
+      log.info("leaving SearchImage")
     }
   };
 
@@ -44,6 +46,8 @@ export const searchImage = async (imageUrl: string) => {
     } catch (error) {
         //console.error('Error:', error);
         throw error;
+    } finally {
+      log.info("Leaving DetectItems ")
     }
 };
 
@@ -68,5 +72,8 @@ export const getDeepTags = async (imageUrl: string) => {
   } catch (error) {
     //console.error('Error:', error);
     throw error;
+  }
+  finally {
+    log.info("Leaving Get Deep Tags")
   }
 };
