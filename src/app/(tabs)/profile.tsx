@@ -1,18 +1,54 @@
-import { Image, Text, TextInput, View } from "react-native";
+import { Image, Text, TextInput, View, Alert} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import Button from "~/src/components/Button";
 import { supabase } from "~/src/lib/supabase";
+import { useAuth } from "~/src/providers/AuthProvider";
+import { uploadImage, makeImagePublic } from "~/src/lib/cloudinary";
 
 export default function ProfileScreen() {
+  const { user } = useAuth();
   const [username, setUsername] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | "null">("null");
+  const [profile, setProfile] = useState<any>();
+  const [outfits, setOutfits] = useState<any[]>([]);
+  const [publicId, setPublicId] = useState<string | null>(null);
+  
+  const fetchProfileAndOutfits = async () => {
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
 
-  // useEffect(() => {
-  //   if (!image) {
-  //     pickImage();
-  //   }
-  // }, [image]);
+      if (profileError) throw profileError;
+
+      setProfile(profileData);
+      //console.warn('SUP', profileData)
+
+      const { data: outfitsData, error: outfitsError } = await supabase
+        .from("outfits")
+        .select("*")
+        .eq("user_id", user?.id);
+
+      if (outfitsError) throw outfitsError;
+
+      setOutfits(outfitsData);
+    } catch (error) {
+      console.error("Error fetching profile and outfits:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchProfileAndOutfits();
+    }
+  }, [user?.id]);
+
+  if (!profile) {
+    return <Text>Loading...</Text>;
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -27,6 +63,34 @@ export default function ProfileScreen() {
       setImage(result.assets[0].uri);
     }
   };
+
+  const updateProfile = async () => {
+    try {
+      const response = await uploadImage(image) 
+      console.warn('CLOUDINARY RESPONSE', response)
+      setPublicId(response.public_id); // Save the public_id
+
+      const updates = {
+        id: user?.id,
+        username: username,
+        avatar_url: response.public_id,
+        updated_at: new Date(),
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
+      Alert.alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error updating profile");
+    }
+  };
+
   return (
     <View className="p-3 flex-1">
       {/* Avatar image picker */}
@@ -55,7 +119,7 @@ export default function ProfileScreen() {
       />
       {/*Button*/}
       <View className="gap-2 mt-auto">
-        <Button title={"Update"}></Button>
+        <Button title={"Update"} onPress={updateProfile}></Button>
         <Button
           title={"Sign out"}
           onPress={() => supabase.auth.signOut()}

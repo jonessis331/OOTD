@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from "react-native";
-import posts from "~/assets/data/posts.json";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { useState } from "react";
 
@@ -18,13 +17,18 @@ import { byRadius } from "@cloudinary/url-gen/actions/roundCorners";
 import { focusOn } from "@cloudinary/url-gen/qualifiers/gravity";
 import { FocusOn } from "@cloudinary/url-gen/qualifiers/focusOn";
 import { cld } from "~/src/lib/cloudinary";
+import ItemInfoPopups from "./ItemInfoPopups";
+
+import { supabase } from "~/src/lib/supabase";
+import { log } from "~/src/utils/config";
 
 export default function PostListItem({ post }) {
   const { width } = useWindowDimensions();
 
   // Use the image with public ID, 'front_face'.
-  const image = cld.image(post.image);
-  // Apply the transformation.
+  //console.log('hello', post)
+  const image = cld.image(post.outfit_image_public_id);
+  
   image.resize(
     thumbnail()
       .width(width)
@@ -32,33 +36,35 @@ export default function PostListItem({ post }) {
   );
   //.gravity(focusOn(FocusOn.face()))) // Crop the image, focusing on the face.
   //.roundCorners(byRadius(100)); // Round the corners.
-
-  const avatar = cld.image(post.user.avatar_url);
+  //console.warn("HELLO", typeof(post?.user))
+  const user = post?.user
+  const avatar = cld.image(post?.profiles?.avatar_url);
   // Apply the transformation.
   avatar.resize(
     thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
   );
 
   const [showBoxes, setShowBoxes] = useState(false);
+  //const [zoomed, setZoomed] = useState(false);
 
   const handleToggleBoxes = () => {
     setShowBoxes((prevState) => !prevState);
   };
 
   return (
-    <View className="bg-indigo-400">
+    <View className="bg-white">
       {/*Header */}
-      <View className="ml-3 w-60 mt-2 mb-2 bg-fuchsia-500 rounded-3xl" >
+      <View className="ml-3 w-60 mt-2 mb-2 bg-gray-200 opacity-80 rounded-3xl shadow-md shadow-black" >
       <View className="ml-1 flex-row items-center gap-2">
         <AdvancedImage
           cldImg={avatar}
           className="w-12 aspect-square rounded-full border-2 border-emerald-50"
         />
-        <Text className="font-semibold">{post.user.username}</Text>
+        <Text className="font-semibold">{post?.profiles?.username}</Text>
       </View>
       </View>
       {/**Post Image */}
-      <View className = "shadow-2xl">
+      <View className = "shadow-md shadow-black">
         <TouchableOpacity onPress={handleToggleBoxes} activeOpacity={1}>
           {/* Content */}
           <AdvancedImage
@@ -67,12 +73,7 @@ export default function PostListItem({ post }) {
           />
         </TouchableOpacity>
         {showBoxes && (
-          <View className="absolute inset-0">
-            <View className="absolute top-96 left-10 bg-amber-500 p-2 rounded-lg hover: z-50">
-              <View className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-amber-600 border-2 border-amber-900"></View>
-              <Text className="text-white">Raybands Erika Classics 2015</Text>
-            </View>
-          </View>
+          <ItemInfoPopups items={post.items} />
         )}
       </View>
       {/* Icons */}

@@ -1,65 +1,37 @@
 import { logger } from 'react-native-logs';
 import * as FileSystem from 'expo-file-system';
 
-
 const log = logger.createLogger();
 
-export const logIncomingData = (data: any, functionName: string) => {
+const logObject = (obj: any, depth: number, maxDepth: number): string => {
+    if (depth > maxDepth) return '... (truncated)';
+    if (typeof obj !== 'object' || obj === null) return JSON.stringify(obj);
+
+    let result = '{';
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            result += `\n${'  '.repeat(depth + 1)}${key}: ${logObject(obj[key], depth + 1, maxDepth)}`;
+        }
+    }
+    result += `\n${'  '.repeat(depth)}}`;
+    return result;
+};
+
+export const logIncomingData = (data: any, functionName: string, maxDepth: number = 3) => {
     const dataType = typeof data;
-    let logMessage = `Entering ${functionName} with data of type ${dataType}: `;
+    let logMessage = `Entering function:${functionName} with data of type: ${dataType}: `;
 
     if (dataType === 'object' && data !== null) {
-        if (data.visual_matches && Array.isArray(data.visual_matches)) {
-            logMessage += `visual_matches: [${data.visual_matches.slice(0, 3).map(item => JSON.stringify(item)).join(', ')}]... (truncated)`;
-        } else {
-            logMessage += JSON.stringify(data, null, 2).slice(0, 200) + '... (truncated)';
-        }
+        logMessage += logObject(data, 0, maxDepth);
     } else {
         logMessage += JSON.stringify(data);
     }
 
-    log.info(logMessage);
+    log.debug(logMessage);
 };
-// const logFilePath = FileSystem.documentDirectory + 'logs_' + new Date().toISOString().split('T')[0] + '.log';
-
-// const config = {
-//   severity: 'debug',
-//   transport: async (log) => {
-//     try {
-//       // Read existing content
-//       let existingContent = '';
-      
-
-//       try {
-//         existingContent = await FileSystem.readAsStringAsync(logFilePath, { encoding: FileSystem.EncodingType.UTF8 });
-        
-//       } catch (error) {
-//         // File might not exist yet, ignore the error
-//       }
-
-//       // Write the new log entry
-//       await FileSystem.writeAsStringAsync(logFilePath, existingContent + log + '\n', { encoding: FileSystem.EncodingType.UTF8 });
-//     } catch (error) {
-//       log.error("Failed to write log:", error);
-//     }
-//   },
-// };
-
-
-
-// log.info("Print this string to a file");
-// // Set severity level based on environment
-// if (__DEV__) {
-//     log.setSeverity('debug'); // Log everything in development
-// } else {
-//     log.setSeverity('error'); // Log only errors in production
-// }
 
 export { log };
-
-export const useMockData = true; 
-
-
+export const useMockData = false;
 
 export const synonymGroups: { [key: string]: string[] } = {
     "polyamide": ["polyamide", "nylon"],
@@ -200,8 +172,6 @@ export const synonymGroups: { [key: string]: string[] } = {
     "jewelry": ["jewelry", "accessories", "adornments"],
     "watches": ["watches", "timepieces", "chronographs"]
 };
-
-
 
 export const categoryMap: { [key: string]: string } = {
     // Materials
@@ -389,7 +359,6 @@ export const categoryMap: { [key: string]: string } = {
     "bow": "detail",
     "padded": "detail",
 };
-
 
 export const brandNames: string[] = [
     "Gucci", "Prada", "Nike", "Adidas", "Zara", "H&M", "Louis Vuitton", "Chanel", "Hermès",

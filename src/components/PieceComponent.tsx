@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Image, Pressable, Text, View, TextInput, ActivityIndicator } from "react-native";
-import { DetectedItem } from "../utils/dataTypes";
+import { DetectedItem, SimilarItem } from "../utils/dataTypes";
 import { useNavigation } from '@react-navigation/native';
 import Button from "./Button";
 import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
@@ -10,19 +10,21 @@ import { fetchAndParseWebpage, fetchProductInfo } from "../lib/experiment";
 
 import { log } from "~/src/utils/config";
 import { logIncomingData } from "~/src/utils/config"; // Import the logging utility
+import { getDeepTags } from "../lib/lykdat";
+
 
 const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSelect: (selectedTags: any) => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [loading, setLoading] = useState(false); // State to manage loading
   const [link, setLink] = useState(""); // State to manage the input link
 
-  const handleSelect = async (link: string) => {
-    logIncomingData(link, 'handleSelect'); // Log incoming data
+  const handleSelect = async (similarItem: SimilarItem) => {
+    logIncomingData(similarItem.link, 'handleSelect'); // Log incoming data
     setLoading(true); // Start loading
     try {
       console.log("Entering handleSelect function");
       
-      const parseResponse = await fetchAndParseWebpage(link);
+      const parseResponse = await fetchAndParseWebpage(similarItem.link);
       logIncomingData(parseResponse, 'fetchAndParseWebpage Response'); // Log response data
 
       const openTagsTwo = await generateTagsTwo(parseResponse.paragraph);
@@ -30,25 +32,38 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
 
       let openTagsOne;
       if (!link.includes('amazon')) {
-        const scrappedINFO = await scrapUrlWithBeeScraper(link);
+        const scrappedINFO = await scrapUrlWithBeeScraper(similarItem.link);
         logIncomingData(scrappedINFO, 'scrapUrlWithBeeScraper Response'); // Log response data
-        openTagsOne = await generateTags(scrappedINFO);
+        openTagsOne = await generateTags(scrappedINFO) ? scrappedINFO : null;
         logIncomingData(openTagsOne, 'generateTags Response'); // Log response data
       } else {
         openTagsOne = null;
       }
-
-      const data = await scrapUrl(link);
+      
+      const data = await scrapUrl(similarItem.link);
       const scraped_tags = await generateTags(data);
       logIncomingData(scraped_tags, 'scrapUrl Response'); // Log response data
+
+      // Fetch deep tags
+      const deepTags = similarItem.thumbnail 
+        ? await getDeepTags(similarItem.thumbnail ?? '') 
+        : await getDeepTags(item.cropUrl ?? '');
+      logIncomingData(deepTags, 'getDeepTags Response'); // Log response data
 
       // Pass the generated tags back to the parent component
       onItemSelect({
         itemId: item.name,
+        googleItem: {
+          link: similarItem.link,
+          title: similarItem.title,
+          source: similarItem.source,
+          thumbnail: similarItem.thumbnail
+        },
         tags: {
           openTagsOne,
           openTagsTwo,
           scraped_tags,
+          deepTags,
           material: parseResponse.materialTags,
           Brand: parseResponse.brand,
           Other: parseResponse.otherTags,
@@ -96,7 +111,7 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
                   {similarItem.title}
                 </Text>
                 <Text>{similarItem.source}</Text>
-                <Button width="100%" title="Select" onPress={() => handleSelect(similarItem.link)} />
+                <Button width="100%" title="Select" onPress={() => handleSelect(similarItem)} />
                 {loading && <ActivityIndicator size="small" color="#0000ff" />}
               </View>
             ))

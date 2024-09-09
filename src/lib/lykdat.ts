@@ -1,5 +1,6 @@
 
 import { log } from "~/src/utils/config";
+import { normalizeItemName } from "../utils/dataTypes";
 
 export const searchImage = async (imageUrl: string) => {
     log.info("Entering searchImage function"); // Log added
@@ -41,13 +42,29 @@ export const searchImage = async (imageUrl: string) => {
     try {
         const response = await fetch("https://cloudapi.lykdat.com/v1/detection/items", requestOptions);
         const result = await response.json();
-        ////console.log("result:", result);
-        return result;
+        
+        log.info("Fetched items from API", result); // Log the fetched result
+
+        const uniqueItems = new Set<string>();
+        const filteredItems = result.data.detected_items.filter((item: any) => {
+            const normalizedItemName = normalizeItemName(item.name);
+            log.info(`Normalized item name: ${normalizedItemName}`); // Log normalized item name
+            if (uniqueItems.has(normalizedItemName)) {
+                log.info(`Duplicate item found: ${normalizedItemName}`); // Log duplicate item
+                return false; // Skip duplicate items
+            }
+            uniqueItems.add(normalizedItemName);
+            return true;
+        });
+
+        log.info("Filtered unique items", filteredItems); // Log filtered items
+
+        return { ...result, data: { detected_items: filteredItems } };
     } catch (error) {
-        //console.error('Error:', error);
+        log.error('Error in detectItems:', error); // Log the error
         throw error;
     } finally {
-      log.info("Leaving DetectItems ")
+      log.info("Leaving DetectItems");
     }
 };
 

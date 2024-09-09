@@ -32,6 +32,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="closet"
+        options={{
+          headerTitle: "Your Closet",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="book" size={26} color={color} />
+          ),
+        }}
+      />
 
       <Tabs.Screen
         name="profile"

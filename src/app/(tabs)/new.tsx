@@ -13,7 +13,7 @@ import {
 
 import { useNavigation } from '@react-navigation/native';
 
-
+import { useAuth } from "~/src/providers/AuthProvider";
 import { log, logIncomingData } from "~/src/utils/config";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -26,7 +26,7 @@ import { fetchGoogleLensResults } from "~/src/lib/googlelens";
 import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
 import { generateTags, generateTagsTwo } from "~/src/lib/openai";
 import { createCompleteOutfitData } from "~/src/lib/dataprocess";
-import { DetectedItem, OutfitMetadata } from "~/src/utils/dataTypes";
+import { DetectedItem, normalizeItemName, OutfitMetadata } from "~/src/utils/dataTypes";
 import deepTagsMock from "~/mock_data/deep_tags.json";
 import googleLensMock from "~/mock_data/google_lens_response.json";
 import mockDetectedItems from "~/mock_data/detected_items.json";
@@ -34,6 +34,7 @@ import mockResponse from "~/mock_data/mock_response.json";
 
 import { fetchAndParseWebpage, fetchProductInfo } from "~/src/lib/experiment";
 import { useMockData } from '~/src/utils/config';
+
 
 type ImageUrl = string;
 
@@ -43,10 +44,11 @@ export default function New() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [publicId, setPublicId] = useState<string | null>(null); // New state for public_id
   const [items, setItems] = useState<DetectedItem[]>([]); // Detected items array
   const [selectedTags, setSelectedTags] = useState<{ [key: string]: any }>({}); // Store selected tags
   const [isLoading, setIsLoading] = useState(false); // Loading state for the entire process
-
+  const { user } = useAuth();
 
   
   useEffect(() => {
@@ -61,6 +63,7 @@ export default function New() {
   ): Promise<DetectedItem[]> => {
     logIncomingData({ detectedItems, imageUrl }, 'processDetectedItems'); // Log incoming data
     log.info("Entering processDetectedItems function");
+
     const enrichedItems: DetectedItem[] = [];
 
     for (const item of detectedItems) {
@@ -78,12 +81,12 @@ export default function New() {
       try {
         if (useMockData) {
           googleLensResults = googleLensMock;
-          tags = deepTagsMock;
-        } else {
-          googleLensResults = googleLensMock;
           //tags = deepTagsMock;
-          //googleLensResults = await fetchGoogleLensResults(cropUrl);
-          tags = await getDeepTags(cropUrl);
+        } else {
+          //googleLensResults = googleLensMock;
+          //tags = deepTagsMock;
+          googleLensResults = await fetchGoogleLensResults(cropUrl);
+          //tags = await getDeepTags(cropUrl);
         }
 
         enrichedItems.push({
@@ -91,7 +94,8 @@ export default function New() {
           ...item,
           //similarItems: [], 
           similarItems: googleLensResults.visual_matches || [], // Add similarItems to each detected item
-          tags,
+          bounding_box: item.bounding_box,
+          tags: [],
         });
       } catch (error) {
         log.error(`Error processing item ${item.name}:`, error);
@@ -111,13 +115,14 @@ export default function New() {
   const handleItemSelect = (selectedTagsForItem: any) => {
     logIncomingData(selectedTagsForItem, 'handleItemSelect'); // Log incoming data
     log.info("(handleItemSelct) Selected Tags For Item:", selectedTagsForItem); // Debugging line
-
+    
     setSelectedTags(prevTags => {
       const updatedTags = {
         ...prevTags,
         [selectedTagsForItem.itemId]: {
           ...prevTags[selectedTagsForItem.itemId], // Preserve existing tags if any
           ...selectedTagsForItem.tags, // Merge new tags
+          googleItem: selectedTagsForItem.googleItem // Ensure googleItem is included
         }
       };
       //log.info("Updated Tags:", JSON.stringify(updatedTags, null, 6)); // Debugging line
@@ -131,7 +136,7 @@ export default function New() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4,3],
       quality: 1,
     });
 
@@ -152,16 +157,19 @@ export default function New() {
       // Choose whether to use mock response or actual upload
       const response = useMockData ? mockResponse : await uploadImage(manipResult.uri);
       setImageUrl(response.secure_url);
+      setPublicId(response.public_id); // Save the public_id
 
       setIsLoading(true); // Start loading
       try {
         // Choose whether to use mock detected items or actual detection
         const detectedItemsResponse = useMockData ? mockDetectedItems : await detectItems(response.secure_url);
+        logIncomingData(detectedItemsResponse, "detectedItemsResponse")
         
         const enrichedItems = await processDetectedItems(
           detectedItemsResponse.data.detected_items,
           response.secure_url
         );
+        logIncomingData(enrichedItems, "after processDetectedItems back in PickImage")
         //log.info(typeof(JSON.stringify(enrichedItems, null, 2)))
         //log.info(typeof(enrichedItems))
        // log.info("enrichedItems", JSON.stringify(enrichedItems, null, 2));
@@ -177,20 +185,21 @@ export default function New() {
 
 
   const createPost = async () => {
-    log.info("Entering createPost function"); // Log added
-    logIncomingData({ imageUrl, items, selectedTags }, 'createPost'); // Log incoming data
+    
+    logIncomingData({ imageUrl, publicId, items, selectedTags }, 'createPost'); // Log incoming data
 
     if (!imageUrl) {
       return;
     }
     try {
-      //await makeImagePublic(imageUrl);
+      //await makeImagePublic(publicId);
       logIncomingData({ items: JSON.stringify(items), imageUrl, selectedTags: JSON.stringify(selectedTags) }, "before createCompleteOutfit");
-      await createCompleteOutfitData(items, imageUrl, selectedTags);
+      console.warn(user?.id, "user id")
+      await createCompleteOutfitData(items, imageUrl, publicId, selectedTags, user?.id);
     } catch (error) {
       Alert.alert("Error making image public");
     } finally {
-      log.info("leaving createPost")
+      log.info("leaving createPost");
     }
   };  
 
@@ -198,6 +207,7 @@ export default function New() {
     log.info("Entering handleCancel function"); // Log added
     setImage(null);
     setImageUrl(null);
+    setPublicId(null); // Clear the public_id
     setItems([]); // Clear detected items
     setSelectedTags({}); // Clear selected tags
   };

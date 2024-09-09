@@ -19,6 +19,7 @@ export const saveOutfitData = async (data: any) => {
                     outfit_id: data.outfit_id,
                     user_id: data.user_id,
                     outfit_image_url: data.outfit_image_url,
+                    outfit_image_public_id: data.outfit_image_public_id,
                     date_created: data.date_created,
                     items: data.items, // Ensure this is in the correct format for your database
                     additional_info: data.additional_info,

@@ -34,39 +34,47 @@ export const mergeTags = (openAITags: any, deepTags: any): any => {
 export const createCompleteOutfitData = async (
     items: DetectedItem[],
     imageUrl: string,
-    selectedTags: { [key: string]: any }
+    publicId: string,
+    selectedTags: { [key: string]: any },
+    user_id: any
 ): Promise<any> => {
     log.info("Entering createCompleteOutfitData function");
     logIncomingData({ items, imageUrl, selectedTags }, 'createCompleteOutfitData'); // Log incoming data
-
+    console.warn('hello')
     const outfitMetadata: OutfitMetadata = {
-        outfit_id: "uuidv5()",
-        user_id: "67890",
+        outfit_id: 'defualt',
+        user_id: user_id,
         outfit_image_url: imageUrl,
+        outfit_image_public_id: publicId,
     };
-    log.info(outfitMetadata)
+    console.warn(outfitMetadata, "outfitMetadata")
 
     const processedItems = await Promise.all(items.map(async (item) => {
-        logIncomingData(item, 'Processing Item'); // Log incoming item data each item being processed
+        console.warn(item, 'Processing Item'); // Log incoming item data each item being processed
         const openAITags = selectedTags[item.name] || {};
         const mergedTags = mergeTags(openAITags, item.tags);
+        //console.log(JSON.stringify(selectedTags[item.name], null, 2))
 
         return {
             item_id: item.name,
-            item_image_url: item.cropUrl,
+            item_image_url: item.cropUrl,               
             category: mergedTags.deepTags.category || mergedTags.openAITags.category || "unknown",
             tags: mergedTags,
+            googleItem: selectedTags[item.name]?.googleItem || null, // Ensure googleItem is included
+            bounding_box: item.bounding_box,
         };
     }));
 
     const outfitData = {
         user_id: outfitMetadata.user_id,
         outfit_image_url: outfitMetadata.outfit_image_url,
+        outfit_image_public_id: outfitMetadata.outfit_image_public_id,
         date_created: new Date().toISOString(),
         items: processedItems,
         additional_info: {},
+        
     };
-
+    logIncomingData(outfitData, "outfitData")
     // Save outfit data to Supabase
     log.info("Leaving CreateCompleteOutifitData")
     await saveOutfitData(outfitData);
