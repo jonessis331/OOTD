@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import InfoSheet from './InfoSheet';
 
 
-const SmallItem = ({ item }) => {
+const SmallItemImageOnly = ({ item }) => {
     const tags = item?.tags || {}; // Ensure tags is defined
     const deepTags = tags?.deepTags || {};
     const openAITags = tags?.openAITags || {};
@@ -14,13 +14,8 @@ const SmallItem = ({ item }) => {
     <View style={styles.container}>
       <View>
       <Image source={{ uri:  item.item_image_url }} style={styles.image} />
-      {/* <Text style={styles.title}>{item.name || item.googleItem?.title || 'no name'}</Text> */}
-      </View>
-      
-      <View className = ''>
-      <InfoSheet item={item}/>
-      </View>
-    <Text style={styles.brand}>{brand}</Text>
+     </View>
+    {/* <Text style={styles.brand}>{brand}</Text> */}
 </View>
   );
 };
@@ -47,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SmallItem;
+export default SmallItemImageOnly;

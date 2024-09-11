@@ -19,7 +19,7 @@ export const fetchOutfits = async () => {
           username,
           avatar_url
         )
-      `);
+      `).order('date_created', { ascending: false });
 
     if (error) {
       log.error("Error fetching outfits:", error);
@@ -65,7 +65,7 @@ export default function FeedScreen() {
 
   return (
     <FlatList
-      className="bg-slate-50"
+      className="bg-gray-600"
       data={posts}
       contentContainerStyle={{
         gap: 10,

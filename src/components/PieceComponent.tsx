@@ -27,21 +27,21 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
       const parseResponse = await fetchAndParseWebpage(similarItem.link);
       logIncomingData(parseResponse, 'fetchAndParseWebpage Response'); // Log response data
 
-      const openTagsTwo = await generateTagsTwo(parseResponse.paragraph);
+      const openTagsTwo = await generateTagsTwo({ paragraph: parseResponse.paragraph, link: similarItem.link, title: similarItem.title, source: similarItem.source});
       logIncomingData(openTagsTwo, 'generateTagsTwo Response'); // Log response data
 
       let openTagsOne;
       if (!link.includes('amazon')) {
         const scrappedINFO = await scrapUrlWithBeeScraper(similarItem.link);
         logIncomingData(scrappedINFO, 'scrapUrlWithBeeScraper Response'); // Log response data
-        openTagsOne = await generateTags(scrappedINFO) ? scrappedINFO : null;
+        openTagsOne = await generateTags({paragraph: JSON.stringify(scrappedINFO), link: similarItem.link, title: similarItem.title, source: similarItem.source}) ? scrappedINFO : null;
         logIncomingData(openTagsOne, 'generateTags Response'); // Log response data
       } else {
         openTagsOne = null;
       }
       
       const data = await scrapUrl(similarItem.link);
-      const scraped_tags = await generateTags(data);
+      const scraped_tags = await generateTags({paragraph: data, link: similarItem.link, title: similarItem.title, source: similarItem.source});
       logIncomingData(scraped_tags, 'scrapUrl Response'); // Log response data
 
       // Fetch deep tags

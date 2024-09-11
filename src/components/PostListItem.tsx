@@ -4,9 +4,12 @@ import {
   Image,
   TouchableOpacity,
   useWindowDimensions,
+  LayoutChangeEvent,
+  Animated,
+  PanResponder
 } from "react-native";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "cloudinary-react-native";
@@ -21,9 +24,56 @@ import ItemInfoPopups from "./ItemInfoPopups";
 
 import { supabase } from "~/src/lib/supabase";
 import { log } from "~/src/utils/config";
+import ItemInfoPopupGridItem from "./ItemInfoPopupGridItem";
 
 export default function PostListItem({ post }) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [showBoxes, setShowBoxes] = useState(false);
+  const translateX = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const onImageLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setImageDimensions({ width, height });
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 20;
+      },
+      onPanResponderMove: Animated.event(
+        [null, { dx: translateX }],
+        { useNativeDriver: false }
+      ),
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx < -50) {
+          Animated.spring(translateX, {
+            toValue: -width,
+            useNativeDriver: false
+          }).start(() => {
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 300,
+              useNativeDriver: true
+            }).start();
+          });
+        } else {
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: false
+          }).start(() => {
+            Animated.timing(opacity, {
+              toValue: 0,
+              duration: 300,
+              useNativeDriver: true
+            }).start();
+          });
+        }
+      }
+    })
+  ).current;
 
   // Use the image with public ID, 'front_face'.
   //console.log('hello', post)
@@ -44,44 +94,61 @@ export default function PostListItem({ post }) {
     thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
   );
 
-  const [showBoxes, setShowBoxes] = useState(false);
-  //const [zoomed, setZoomed] = useState(false);
-
-  const handleToggleBoxes = () => {
-    setShowBoxes((prevState) => !prevState);
-  };
-
   return (
-    <View className="bg-white">
+    <View className="bg-gray-600 mt-10">
       {/*Header */}
-      <View className="ml-3 w-60 mt-2 mb-2 bg-gray-200 opacity-80 rounded-3xl shadow-md shadow-black" >
+      <View className="ml-3 w-60 mt-2 mb-2  opacity-80 rounded-3xl shadow-md shadow-black" >
       <View className="ml-1 flex-row items-center gap-2">
         <AdvancedImage
           cldImg={avatar}
-          className="w-12 aspect-square rounded-full border-2 border-emerald-50"
+          className="w-12 aspect-square rounded-full border border-emerald-50"
         />
-        <Text className="font-semibold">{post?.profiles?.username}</Text>
+        <Text className="font-semibold text-white">{post?.profiles?.username}</Text>
       </View>
       </View>
       {/**Post Image */}
-      <View className = "shadow-md shadow-black">
-        <TouchableOpacity onPress={handleToggleBoxes} activeOpacity={1}>
-          {/* Content */}
-          <AdvancedImage
-            cldImg={image}
-            className="item-center ml-4 aspect-[2/3] rounded-3xl mr-4"
-          />
-        </TouchableOpacity>
-        {showBoxes && (
-          <ItemInfoPopups items={post.items} />
-        )}
+      <View className = "shadow-xl shadow-black">
+        <Animated.View
+          {...panResponder.panHandlers}
+          style={{ transform: [{ translateX }] }}
+        >
+          <TouchableOpacity onPress={() => setShowBoxes(!showBoxes)} activeOpacity={1}>
+            {/* Content */}
+            <AdvancedImage
+              cldImg={image}
+              className="item-center ml-4 aspect-[2/3] rounded-3xl mr-4"
+              onLayout={onImageLayout}
+              style={{ width: '100%', height: undefined, aspectRatio: 2/3 }} // Adjust aspect ratio as needed
+            />
+          </TouchableOpacity>
+          {showBoxes && (
+            <ItemInfoPopups items={post.items} imageWidth={imageDimensions.width} imageHeight={imageDimensions.height} />
+          )}
+        </Animated.View>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: width,
+            width: width,
+            height: height,
+            backgroundColor: 'white',
+            opacity,
+            transform: [{ translateX }]
+          }}
+        >
+          <ItemInfoPopupGridItem items={post.items} />
+        </Animated.View>
       </View>
       {/* Icons */}
-      <View className="flex-row gap-3 p-3">
-        <AntDesign name="hearto" size={20} />
-        <Ionicons name="chatbubble-outline" size={20} />
-        <Feather name="send" size={20} />
-        <Feather name="bookmark" size={20} className="ml-auto" />
+      <View className="flex-row gap-3 p-5">
+        <AntDesign name="hearto" color="white" size={25} />
+        {/* <Ionicons name="share" size={20}/> */}
+        {/* <Feather name="send" size={20} /> */}
+        <Text>
+          {post?.outfit_caption}
+        </Text>
+        <Feather name="share" color="white" size={25} className="ml-auto" />
       </View>
     </View>
   );

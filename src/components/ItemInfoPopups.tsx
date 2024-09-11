@@ -1,18 +1,41 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import { DetectedItem } from "../utils/dataTypes";
 
-export default function ItemInfoPopups({ items }) {
+interface ItemInfoPopupsProps {
+  items: DetectedItem[];
+  imageWidth: number;
+  imageHeight: number;
+}
+
+export default function ItemInfoPopups({ items, imageWidth, imageHeight }: ItemInfoPopupsProps) {
   return (
     <View className="absolute inset-0">
-      {items.map((item, index) => (
-        <View key={index} className="bg-white w-32 p-4 m-2 rounded-lg shadow-lg">
-          <Image
-            source={{ uri: item.googleItem?.thumbnail }}
-            className="w-24 h-24 rounded-lg"
-          />
-          <Text className="font-semibold mt-2" numberOfLines={1}>{item.googleItem?.title || item.item_id}</Text>
-          {/* Add more item details as needed */}
-        </View>
-      ))}
+      {items.map((item, index) => {
+        if (!item.googleItem?.thumbnail) return null;
+
+        const { bounding_box } = item;
+        const centerX = (bounding_box.left + bounding_box.right) / 2 * imageWidth;
+        const centerY = (bounding_box.top + bounding_box.bottom) / 2 * imageHeight;
+
+        return (
+          <TouchableOpacity key={index} onPress={() => { openItemInfo(item) }}>
+            <View
+              className="absolute bg-slate-400 w-24 p-4 m-2 rounded-lg shadow-lg"
+              style={{ left: centerX, top: centerY }}
+            >
+              <Image
+                source={{ uri: item.googleItem?.thumbnail }}
+                className="w-16 h-16 rounded-lg"
+              />
+              <View className="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-slate-300 border border-slate-400" />
+              <Text className="font-semibold mt-2" numberOfLines={1}>
+                {item.googleItem?.title || item.item_id}
+              </Text>
+              {/* Add more item details as needed */}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }

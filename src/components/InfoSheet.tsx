@@ -45,22 +45,32 @@ const InfoSheet = ({ item }) => {
   ];
 
   return (
-    <View className = "rounded-xl bg-white border border-slate-600">
-      <Text className="font-mono font-bold text-xl">{title || 'Item Name'}</Text>
-      <View className = "flex-row grid-rows-2 rounded-xl   w-full"> 
-      <Text className="font-mono text-xs w-80" numberOfLines={7}>
-        {bulletPoints}
+    <View className="bg-slate-500">
+      <Text className="font-mono font-bold text-xl" numberOfLines={1}>
+        {title || "Item Name"}
       </Text>
-      <View style={{
-        left: -10,
-        width: 50, // Width of the square
-        height: 50, // Height of the square
-        backgroundColor: '#'+ highestConfidenceColor?.hex_code, // Set background color to the hex code
-        marginTop: 0, // Space above the square
-      }} />
-      <Image source={{ uri: thumbnail }} style={{ width: 50, height: 50 }} />
+      <View className="flex-row items-center rounded-xl w-full">
+        <Text className="font-mono text-xs w-50" numberOfLines={3}>
+          {bulletPoints}
+        </Text>
+        {/* <View
+          style={{
+            // Width of the square
+            width: 50,
+            marginLeft: 'auto',
+            paddingRight: 10,
+            height: 50, // Height of the square
+            backgroundColor: "#" + highestConfidenceColor?.hex_code, // Set background color to the hex code
+            marginTop: 10, // Space above the square
+          }}
+        /> */}
+        
+          <Image
+            source={{ uri: thumbnail }}
+            style={{ width: 50, height: 50, borderRadius: 10, marginLeft: 'auto'}}
+          />
+        
       </View>
-      
     </View>
   );
 }

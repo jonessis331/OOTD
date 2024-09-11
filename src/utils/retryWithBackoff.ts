@@ -4,8 +4,10 @@
  * @returns {Promise<void>} A promise that resolves after the specified time.
  */
 function waitFor(milliseconds: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
-  }
+  const jitter = Math.random() * 100; // Add up to 100ms of jitter
+  return new Promise((resolve) => setTimeout(resolve, milliseconds + jitter));
+}
+
   
   /**
    * Execute a promise and retry with exponential backoff
@@ -24,20 +26,30 @@ function waitFor(milliseconds: number): Promise<void> {
       try {
         if (retries > 0) {
           const timeToWait = 2 ** retries * 100;
-          console.log(`Waiting for ${timeToWait}ms...`);
+          console.log(`Retry attempt ${retries}. Waiting for ${timeToWait}ms...`);
           await waitFor(timeToWait);
         }
         return await promiseFn();
-      } catch (e) {
-        if (retries < maxRetries) {
+      } catch (e: any) {
+        if (e.response?.status === 429 && retries < maxRetries) {
+          const retryAfter = e.response.headers['retry-after'];
+          const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : 2 ** retries * 100;
+          console.log(`Rate limited. Waiting for ${waitTime}ms before retrying...`);
+          await waitFor(waitTime);
+          onRetry();
+          return retry(retries + 1);
+        } else if (retries < maxRetries) {
+          console.warn(`Retry attempt ${retries} failed. Retrying...`);
           onRetry();
           return retry(retries + 1);
         } else {
-          console.warn("Max retries reached. Bubbling the error up");
+          console.error("Max retries reached. Bubbling the error up");
           throw e;
         }
       }
     }
+    
+    
   
     return retry(0);
   }

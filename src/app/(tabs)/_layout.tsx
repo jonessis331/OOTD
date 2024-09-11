@@ -10,13 +10,17 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={{ tabBarActiveTintColor: "black", tabBarShowLabel: false }}
+      screenOptions={{  tabBarStyle: {backgroundColor: '#2e353d'}, tabBarActiveTintColor: "black", tabBarShowLabel: false }}
       
     >
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: "For you",
+          //headerTitle: "For you",
+          
+          headerStyle: {height: "0%"},
+          headerTintColor: "black",
+        
           tabBarIcon: ({ color }) => (
             <FontAwesome name="home" size={24} color={color} />
           ),

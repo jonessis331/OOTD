@@ -6,12 +6,16 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  Pressable,
+  ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { supabase } from "~/src/lib/supabase";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import InfoSheet from "~/src/components/InfoSheet";
 import RectangleComponent from '~/src/components/RectangleComponent';
+import SmallItemImageOnly from "~/src/components/SmallItem";
+import ItemInfoPopups from "~/src/components/ItemInfoPopups";
 
 // Inside your Closet component's return statement
 
@@ -27,18 +31,18 @@ export default function Closet() {
   const [currentBottomIndex, setCurrentBottomIndex] = useState(0);
   const [currentShoeIndex, setCurrentShoeIndex] = useState(0);
   const [showRectangle, setShowRectangle] = useState(false);
-
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   useEffect(() => {
     fetchOutfits();
   }, []);
 
-  const addItem = () => {
+  const addPage = () => {
     setShowRectangle(!showRectangle);
   };
 
   const fetchOutfits = async () => {
     try {
-      const { data, error } = await supabase.from("outfits").select("*");
+      const { data, error } = await supabase.from("outfits").select("*").order('date_created', { ascending: false });
 
       if (error) {
         console.error("Error fetching outfits:", error);
@@ -48,14 +52,14 @@ export default function Closet() {
       setTops(getCategoryItems(["top", "shirt", "jacket"], data));
       setBottoms(getCategoryItems(["bottom", "shorts", "pants"], data));
       setShoes(getCategoryItems(["shoe"], data));
-      
+
       // Filter for accessories and other items that are NOT tops, bottoms, or shoes
       const excludedCategories = ["top", "shirt", "bottom", "shorts", "pants", "shoe"];
       const allItems = data.flatMap(outfit => outfit.items);
       const filteredAccessories = allItems.filter(item => !excludedCategories.includes(item.item_id));
-      
+
       setAccessories(filteredAccessories); // Set accessories to the filtered items
-     } catch (error) {
+    } catch (error) {
       console.error("Error fetching outfits:", error);
     }
   };
@@ -68,6 +72,14 @@ export default function Closet() {
       return [...items, ...categoryItems];
     }, []);
   };
+
+  const handleAddItem = (item: any) => {
+    setSelectedItems(prevItems => [...prevItems, item]);
+    setShowRectangle(false);
+  };
+  const handleRemoveItem = (item: any) => {
+    setSelectedItems(prevItems => prevItems.filter(i => i.id !== item.id));
+  }
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
     return (
@@ -84,9 +96,25 @@ export default function Closet() {
     );
   };
 
+  const createOutfit = () => {
+    const outfit = {
+      top: tops[currentTopIndex],
+      bottom: bottoms[currentBottomIndex],
+      shoes: shoes[currentShoeIndex],
+      accessories: selectedItems,
+    };
+    console.log("Created Outfit:", JSON.stringify(outfit));
+  };
+
   return (
-    <View style={styles.container}>
-      {showRectangle && <RectangleComponent items={accessories} />}
+    <ScrollView style={styles.container}>
+      {showRectangle && (
+        <RectangleComponent
+          items={accessories}
+          onClose={addPage}
+          onAdd={handleAddItem}
+        />
+      )}
       {tops.length > 0 &&
       bottoms.length > 0 &&
       shoes.length > 0 &&
@@ -96,15 +124,27 @@ export default function Closet() {
       currentBottomIndex < bottoms.length &&
       currentShoeIndex >= 0 &&
       currentShoeIndex < shoes.length ? (
-        <View className='m-4 rounded-xl  bg-white border-black shadow-lg shadow-slate-800 gap-4'>
+        <View className="m-10 mb-52 rounded-xl bg-slate-600">
           <InfoSheet item={tops[currentTopIndex]} />
           <InfoSheet item={bottoms[currentBottomIndex]} />
           <InfoSheet item={shoes[currentShoeIndex]} />
+          {selectedItems.length > 0 && (
+            <View >
+              {selectedItems.map((item, index) => (
+                <View className="flex-row justify-between">
+                <SmallItemImageOnly key={index} item={item} />
+                <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item)}>
+                  <Text style={styles.removeButtonText}>Remove</Text>
+                </TouchableOpacity>
+              </View>
+              ))}
+            </View>
+          )}
         </View>
       ) : (
         <Text>No item selected</Text>
       )}
-
+      <View className = "max-h-lvh">
       {tops.length > 0 && (
         <FlatList
           data={tops}
@@ -112,108 +152,127 @@ export default function Closet() {
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={styles.itemContainer}>
-              <Image source={{ uri: item.item_image_url }} style={styles.image} />
+              <Image
+                source={{ uri: item.item_image_url }}
+                style={styles.image}
+              />
             </View>
           )}
           snapToInterval={width}
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ alignItems: 'center' }}
+          contentContainerStyle={{ alignItems: "center" }}
           snapToAlignment="center"
           onScroll={(event) => {
-            const index = Math.round(
-              event.nativeEvent.contentOffset.x / width
-            );
+            const index = Math.round(event.nativeEvent.contentOffset.x / width);
             setCurrentTopIndex(index);
           }}
         />
       )}
 
-      
       {bottoms.length > 0 && (
-         <FlatList
-         data={bottoms}
-         horizontal
-         keyExtractor={(item, index) => index.toString()}
-         renderItem={({ item }) => (
-           <View style={styles.itemContainer}>
-             <Image source={{ uri: item.item_image_url }} style={styles.image} />
-           </View>
-         )}
-         snapToInterval={width}
-         decelerationRate="fast"
-         showsHorizontalScrollIndicator={false}
-         contentContainerStyle={{ alignItems: 'center' }}
-         snapToAlignment="center"
-         onScroll={(event) => {
-           const index = Math.round(
-             event.nativeEvent.contentOffset.x / width
-           );
-           setCurrentBottomIndex(index);
-         }}
-       />
-      )}
-
-
-      {shoes.length > 0 && (
-        <View>
-         <FlatList
-          data={shoes}
+        <FlatList
+          data={bottoms}
           horizontal
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={styles.itemContainer}>
-              <Image source={{ uri: item.item_image_url }} style={styles.image} />
+              <Image
+                source={{ uri: item.item_image_url }}
+                style={styles.image}
+              />
             </View>
           )}
           snapToInterval={width}
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ alignItems: 'center' }}
+          contentContainerStyle={{ alignItems: "center" }}
           snapToAlignment="center"
           onScroll={(event) => {
-            const index = Math.round(
-              event.nativeEvent.contentOffset.x / width
-            );
-            setCurrentShoeIndex(index);
+            const index = Math.round(event.nativeEvent.contentOffset.x / width);
+            setCurrentBottomIndex(index);
           }}
         />
+      )}
+
+      {shoes.length > 0 && (
+        <View>
+          <FlatList
+            data={shoes}
+            horizontal
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.itemContainer}>
+                <Image
+                  source={{ uri: item.item_image_url }}
+                  style={styles.image}
+                />
+              </View>
+            )}
+            snapToInterval={width}
+            decelerationRate="fast"
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: "center" }}
+            snapToAlignment="center"
+            onScroll={(event) => {
+              const index = Math.round(
+                event.nativeEvent.contentOffset.x / width
+              );
+              setCurrentShoeIndex(index);
+            }}
+          />
         </View>
       )}
+
+      </View>
+      
 
       <Text className="pl-2 font-mono font-semibold">Accessories</Text>
       <FlatList
         data={accessories}
         horizontal
-        keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())} // Fallback to index if no id
+        keyExtractor={(item, index) =>
+          item.id ? item.id.toString() : index.toString()
+        } // Fallback to index if no id
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text>{item.name}</Text>
           </View>
         )}
         ListHeaderComponent={
-          <TouchableOpacity className="bg-slate-50" onPress={addItem}>
+          <TouchableOpacity className="w-96 bg-slate-900" onPress={addPage}>
             <FontAwesome
               name="plus-circle"
               size={25}
               color="black"
-              backgroundColor="white"
+              backgroundColor="#64748B"
             />
           </TouchableOpacity>
         }
-        ListHeaderComponentStyle={{ height: "auto", padding: 1, marginLeft: 10, marginBottom: 4 }}
+        ListHeaderComponentStyle={{
+          height: "auto",
+          padding: 1,
+          marginLeft: 10,
+          marginBottom: 4,
+        }}
         style={styles.flatList}
       />
-    </View>
+
+      <TouchableOpacity
+        onPress={createOutfit}
+        style={styles.createOutfitButton}
+      >
+        <Text style={styles.createOutfitButtonText}>Create Outfit</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0,
-    backgroundColor: "white",
+    flex: 1,
+    backgroundColor: "#64748B",
     padding: 0,
-    marginTop: 'auto'
   },
   title: {
     fontSize: 18,
@@ -227,19 +286,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: (width - ITEM_WIDTH) / 2, // Center the first item
     paddingRight: (width - ITEM_WIDTH) / 2, // Center the last item
-    backgroundColor: "white",
+    backgroundColor: "#64748B",
     borderWidth: 1,
-    borderColor: 'white'
+    borderColor: '#64748B'
   },
   itemContainer: {
     width: width, // Full width of the screen
     alignItems: 'center', // Center the image horizontally
     justifyContent: 'center', // Center the image vertically
-    backgroundColor: "white",
+    backgroundColor: "#64748B",
   },
   image: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     marginVertical: 5,
     // Shadow properties for iOS
@@ -268,6 +327,32 @@ const styles = StyleSheet.create({
   flatList: {
     height: 30,
     flexGrow: 0,
-    backgroundColor: "white",
+    backgroundColor: "#64748B",
+  },
+  createOutfitButton: {
+    backgroundColor: 'darkslategray',
+    alignSelf: 'center',
+    width: '50%',
+    padding: 5,
+    height: 30,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 0,
+  },
+  createOutfitButtonText: {
+    //alignSelf: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  removeButton: {
+    marginLeft: 'auto',
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
+    maxHeight: 40,
+  },
+  removeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
