@@ -72,7 +72,7 @@ export default function New() {
         "/upload/",
         `/upload/c_crop,w_${Math.round(
           Math.abs(bounding_box.left * 800 - bounding_box.right * 800)
-        )},h_${Math.round(bounding_box.bottom * 800)},x_${Math.round(
+        )},h_${Math.round(Math.abs(bounding_box.top * 800 - bounding_box.bottom * 800))},x_${Math.round(
           bounding_box.left * 800
         )},y_${Math.round(bounding_box.top * 800)}/`
       )}`;
@@ -194,7 +194,7 @@ export default function New() {
     try {
       //await makeImagePublic(publicId);
       logIncomingData({ items: JSON.stringify(items), imageUrl, selectedTags: JSON.stringify(selectedTags) }, "before createCompleteOutfit");
-      console.warn(user?.id, "user id")
+      //console.warn(user?.id, "user id")
       await createCompleteOutfitData(items, imageUrl, publicId, selectedTags, user?.id);
     } catch (error) {
       Alert.alert("Error making image public");

@@ -1,0 +1,195 @@
+[
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": ["trousers"],
+        "deepTags": {
+          "data": {
+            "items": [
+              {"name": "shoe", "category": "shoes", "confidence": 0.835},
+              {"name": "pants", "category": "clothing", "confidence": 0.816},
+              {"name": "shoe", "category": "shoes", "confidence": 0.812},
+              {"name": "footwear", "category": "shoes", "confidence": 0.689},
+              {"name": "outerwear", "category": "clothing", "confidence": 0.672},
+              {"name": "footwear", "category": "shoes", "confidence": 0.663},
+              {"name": "clothing", "category": "clothing", "confidence": 0.639}
+            ],
+            "colors": [
+              {"name": "eerie black", "hex_code": "17151f", "confidence": 0.747},
+              {"name": "dark liver", "hex_code": "503436", "confidence": 0.519},
+              {"name": "woody brown", "hex_code": "4e3232", "confidence": 0.472},
+              {"name": "light grey", "hex_code": "e5d9c8", "confidence": 0.326},
+              {"name": "congo brown", "hex_code": "6a504f", "confidence": 0.324}
+            ],
+            "labels": [
+              {"name": "shoe", "confidence": 0.981, "classification": "apparel", "secondary_classification": "legs and feet"},
+              {"name": "plain", "confidence": 0.966, "classification": "textile pattern"},
+              {"name": "symmetrical", "confidence": 0.963, "classification": "silhouette"},
+              {"name": "sleeve", "confidence": 0.957, "classification": "garment parts"},
+              {"name": "pocket", "confidence": 0.952, "classification": "garment parts"},
+              {"name": "wrist-length", "confidence": 0.950, "classification": "length"},
+              {"name": "single breasted", "confidence": 0.949, "classification": "opening type"},
+              {"name": "above the hip", "confidence": 0.939, "classification": "length"},
+              {"name": "collar", "confidence": 0.939, "classification": "garment parts"},
+              {"name": "maxi", "confidence": 0.939, "classification": "length"},
+              {"name": "jacket", "confidence": 0.905, "classification": "apparel", "secondary_classification": "upper body"},
+              {"name": "pants", "confidence": 0.905, "classification": "apparel", "secondary_classification": "lower body"},
+              {"name": "regular", "confidence": 0.880, "classification": "silhouette"},
+              {"name": "set-in sleeve", "confidence": 0.840, "classification": "nickname"},
+              {"name": "trucker jacket", "confidence": 0.778, "classification": "nickname"},
+              {"name": "fly", "confidence": 0.738, "classification": "opening type"},
+              {"name": "normal waist", "confidence": 0.708, "classification": "waistline"},
+              {"name": "regular collar", "confidence": 0.660, "classification": "nickname"},
+              {"name": "flap pocket", "confidence": 0.626, "classification": "nickname"},
+              {"name": "washed", "confidence": 0.509, "classification": "finishing technique"}
+            ]
+          }
+        },
+        "material": ["cotton", "polyester"],
+        "googleItem": {
+          "link": "https://bojoni.com/products/naze-slim-fit-high-quality-dark-blue-patterned-anthracite-pants",
+          "title": "Bojoni Astoria Slim Fit High Quality Dark Blue Patterned Anthracite Pants 34W",
+          "source": "bojoni",
+          "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB7QpMp2Jqpzro-pUUJO7YeO-Ge7Q51ZHNa4rrZLviSurNjw6Y"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": {
+          "color": "dark blue",
+          "price": "USD",
+          "style": "Slim Fit",
+          "pattern": "Patterned",
+          "category": "Pants",
+          "material": "Polyester, Viscon, Elestan",
+          "occasion": null,
+          "brand_name": "Bojoni",
+          "name_of_item": "Astoria Slim Fit High Quality Dark Blue Patterned Anthracite Pants"
+        },
+        "scraped_tags": null
+      }
+    },
+    "item_id": "pants",
+    "category": "unknown",
+    "bounding_box": {
+      "top": 0.455,
+      "left": 0.422,
+      "right": 0.590,
+      "bottom": 0.855
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_134,h_684,x_338,y_364/v1725984896/eyyfqwhamm616dcfbhua.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": ["t-shirt", "trousers", "jeans", "sunglasses"],
+        "deepTags": {
+          "data": {
+            "items": [
+              {"name": "top", "category": "clothing", "confidence": 0.765},
+              {"name": "jeans", "category": "clothing", "confidence": 0.759},
+              {"name": "top", "category": "clothing", "confidence": 0.719},
+              {"name": "pants", "category": "clothing", "confidence": 0.705},
+              {"name": "shoe", "category": "shoes", "confidence": 0.702}
+            ],
+            "colors": [
+              {"name": "eerie black", "hex_code": "10151c", "confidence": 0.819},
+              {"name": "dark grey", "hex_code": "3b3a3c", "confidence": 0.612}
+            ],
+            "labels": [
+              {"name": "shoe", "confidence": 0.991, "classification": "apparel", "secondary_classification": "legs and feet"},
+              {"name": "sleeve", "confidence": 0.970, "classification": "garment parts"},
+              {"name": "belt", "confidence": 0.963, "classification": "apparel", "secondary_classification": "waist"},
+              {"name": "plain", "confidence": 0.950, "classification": "textile pattern"},
+              {"name": "short sleeve", "confidence": 0.945, "classification": "length"}
+            ]
+          }
+        },
+        "material": ["leather", "leather"],
+        "googleItem": {
+          "link": "https://lookastic.com/men/charcoal-suede-derby-shoes/how-to-wear-with/grey-crew-neck-t-shirt",
+          "title": "Charcoal Suede Derby Shoes with Grey Crew-neck T-shirt Outfits",
+          "source": "Lookastic",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTS1qiCchGCEXqg-0Vp2s87ohUo037q8cspChRPWOOVDWbXed22"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": {
+          "color": ["Charcoal", "Grey"],
+          "style": ["Relaxed", "Smart Casual"],
+          "category": ["Shoes", "T-Shirts"]
+        },
+        "scraped_tags": null
+      }
+    },
+    "item_id": "top",
+    "category": "unknown",
+    "bounding_box": {
+      "top": 0.211,
+      "left": 0.391,
+      "right": 0.621,
+      "bottom": 0.467
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_184,h_373,x_313,y_169/v1725984896/eyyfqwhamm616dcfbhua.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": [],
+        "deepTags": {
+          "data": {
+            "items": [
+              {"name": "shoe", "category": "shoes", "confidence": 0.630},
+              {"name": "footwear", "category": "shoes", "confidence": 0.629},
+              {"name": "clothing", "category": "clothing", "confidence": 0.627}
+            ],
+            "colors": [
+              {"name": "smokey grey", "hex_code": "70757a", "confidence": 0.315},
+              {"name": "davy's grey", "hex_code": "535558", "confidence": 0.310}
+            ],
+            "labels": [
+              {"name": "symmetrical", "confidence": 0.723, "classification": "silhouette"}
+            ]
+          }
+        },
+        "material": [],
+        "googleItem": {
+          "link": "https://www.mercari.com/us/item/m87929861991/",
+          "title": "Lace-up shoes Brecos Woven Leather Made On Italy",
+          "source": "Mercari",
+          "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeMCs0Kl5uik1rQ4P8AVtBqk8fYd1ag9Xe7eOySH4cceZ7YjhR"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": null,
+        "scraped_tags": null
+      }
+    },
+    "item_id": "shoe",
+    "category": "unknown",
+    "bounding_box": {
+      "top": 0.773,
+      "left": 0.449,
+      "right": 0.504,
+      "bottom": 0.879
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_44,h_703,x_359,y_619/v1725984896/eyyfqwhamm616dcfbhua.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {}
+    },
+    "item_id": "belt",
+    "category": "unknown",
+    "bounding_box": {
+      "top": 0.453,
+      "left": 0.436,
+      "right": 0.578,
+      "bottom": 0.490
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_114,h_392,x_348,y_363/v1725984896/eyyfqwhamm616dcfbhua.jpg"
+  }
+]

@@ -7,7 +7,7 @@ import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
 import { generateTags, generateTagsTwo } from "~/src/lib/openai";
 import * as WebBrowser from 'expo-web-browser';
 import { fetchAndParseWebpage, fetchProductInfo } from "../lib/experiment";
-
+import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { log } from "~/src/utils/config";
 import { logIncomingData } from "~/src/utils/config"; // Import the logging utility
 import { getDeepTags } from "../lib/lykdat";
@@ -80,7 +80,7 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
   };
   return (
     <View className="mt-5">
-      <View className="flex-row items-center w-full bg-white rounded-full p-2">
+      <View className="flex-row items-center w-full bg-white">
         <Pressable onPress={() => setIsExpanded(!isExpanded)}>
           <View className="flex-row gap-3 items-center">
             <Image source={{ uri: item.cropUrl }} className="w-24 aspect-square rounded-full" />
@@ -95,7 +95,8 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
           </View>
         </Pressable>
         <Pressable className="ml-auto" onPress={async () => await WebBrowser.openBrowserAsync("https://www.google.com/?client=safari")}>
-          <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2" />
+          {/* <View className="w-12 aspect-square rounded-full bg-slate-800 ml-2" /> */}
+          <AntDesign name="link" color="black" size={22} className="pl-2"/>
         </Pressable>
       </View>
 

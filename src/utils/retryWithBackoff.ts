@@ -39,7 +39,7 @@ function waitFor(milliseconds: number): Promise<void> {
           onRetry();
           return retry(retries + 1);
         } else if (retries < maxRetries) {
-          console.warn(`Retry attempt ${retries} failed. Retrying...`);
+          //console.warn(`Retry attempt ${retries} failed. Retrying...`);
           onRetry();
           return retry(retries + 1);
         } else {

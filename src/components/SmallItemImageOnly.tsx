@@ -7,7 +7,7 @@ const SmallItemImageOnly = ({ item }) => {
     const tags = item?.tags || {}; // Ensure tags is defined
     const deepTags = tags?.deepTags || {};
     const openAITags = tags?.openAITags || {};
-    console.warn(item, "item")
+    //console.warn(item, "item")
     const brand = openAITags?.openTagsTwo?.['brand name'] || item.openAITags?.scraped_tags?.brand_name || ''; 
     
   return (

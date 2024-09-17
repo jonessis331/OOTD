@@ -55,7 +55,7 @@ export default function PostListItem({ post }) {
           }).start(() => {
             Animated.timing(opacity, {
               toValue: 1,
-              duration: 300,
+              duration: 100,
               useNativeDriver: true
             }).start();
           });
@@ -66,7 +66,7 @@ export default function PostListItem({ post }) {
           }).start(() => {
             Animated.timing(opacity, {
               toValue: 0,
-              duration: 300,
+              duration: 100,
               useNativeDriver: true
             }).start();
           });
@@ -86,7 +86,7 @@ export default function PostListItem({ post }) {
   );
   //.gravity(focusOn(FocusOn.face()))) // Crop the image, focusing on the face.
   //.roundCorners(byRadius(100)); // Round the corners.
-  //console.warn("HELLO", typeof(post?.user))
+  ////console.warn("HELLO", typeof(post?.user))
   const user = post?.user
   const avatar = cld.image(post?.profiles?.avatar_url);
   // Apply the transformation.
@@ -97,58 +97,61 @@ export default function PostListItem({ post }) {
   return (
     <View className="bg-gray-600 mt-10">
       {/*Header */}
-      <View className="ml-3 w-60 mt-2 mb-2  opacity-80 rounded-3xl shadow-md shadow-black" >
-      <View className="ml-1 flex-row items-center gap-2">
+      <View className="ml-3 w-60 mt-2 mb-4  opacity-80 rounded-3xl shadow-md shadow-black" >
+      <View className="ml-2 flex-row items-center gap-2">
         <AdvancedImage
           cldImg={avatar}
-          className="w-12 aspect-square rounded-full border border-emerald-50"
+          className="w-14 aspect-square rounded-full border border-emerald-50"
         />
-        <Text className="font-semibold text-white">{post?.profiles?.username}</Text>
+        <Text className="ml-2 font-monofont-bold text-xl text-white">{post?.profiles?.username}</Text>
       </View>
       </View>
       {/**Post Image */}
       <View className = "shadow-xl shadow-black">
-        <Animated.View
+        {/* <Animated.View
           {...panResponder.panHandlers}
           style={{ transform: [{ translateX }] }}
-        >
+        > */}
+        <View>
           <TouchableOpacity onPress={() => setShowBoxes(!showBoxes)} activeOpacity={1}>
             {/* Content */}
             <AdvancedImage
               cldImg={image}
-              className="item-center ml-4 aspect-[2/3] rounded-3xl mr-4"
+              className="item-center aspect-[16/9] rounded-3xl self-center"
               onLayout={onImageLayout}
-              style={{ width: '100%', height: undefined, aspectRatio: 2/3 }} // Adjust aspect ratio as needed
+              style={{ width: '100%', height: undefined, aspectRatio: 9/15 }} // Adjust aspect ratio as needed
             />
           </TouchableOpacity>
           {showBoxes && (
             <ItemInfoPopups items={post.items} imageWidth={imageDimensions.width} imageHeight={imageDimensions.height} />
           )}
-        </Animated.View>
-        <Animated.View
+          </View>
+        {/* </Animated.View> */}
+        {/* <Animated.View
           style={{
             position: 'absolute',
             top: 0,
             left: width,
             width: width,
             height: height,
-            backgroundColor: 'white',
+            backgroundColor: "slategray",//'#4D766E',
             opacity,
             transform: [{ translateX }]
+            
           }}
         >
           <ItemInfoPopupGridItem items={post.items} />
-        </Animated.View>
+        </Animated.View> */}
       </View>
       {/* Icons */}
-      <View className="flex-row gap-3 p-5">
-        <AntDesign name="hearto" color="white" size={25} />
+      <View className="flex-row gap-3 pl-5 pt-3 pr-">
+        <AntDesign name="hearto" color="white" size={22} />
         {/* <Ionicons name="share" size={20}/> */}
         {/* <Feather name="send" size={20} /> */}
         <Text>
           {post?.outfit_caption}
         </Text>
-        <Feather name="share" color="white" size={25} className="ml-auto" />
+        <Feather name="share" color="white" size={22} className="" />
       </View>
     </View>
   );

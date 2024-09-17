@@ -14,7 +14,7 @@ const openAI = axios.create({
 });
 
 const fetchTags = async (text: any, ask: number) => {
-  log.warn("WORKING ON TEXT", text, JSON.stringify(text));
+  //log.warn("WORKING ON TEXT", text, JSON.stringify(text));
   if (ask === 1) {
     try {
       const response = await openAI.post("/chat/completions", {
@@ -44,7 +44,7 @@ const fetchTags = async (text: any, ask: number) => {
         ],
         max_tokens: 900,
       });
-      log.warn("RESPONSE", response.data);
+      //log.warn("RESPONSE", response.data);
       const extractedTags = response.data.choices[0].message.content.trim();
       return JSON.parse(extractedTags);
       

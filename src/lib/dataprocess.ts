@@ -17,7 +17,7 @@ export const mergeTags = (openAITags: any, deepTags: any): any => {
     logIncomingData({ openAITags, deepTags }, 'mergeTags'); // Log incoming data
     const mergedTags = {
         openAITags: openAITags || {},  // Include all tags from OpenAI
-        deepTags: deepTags.data || {}, // Include all tags from the deep tagging service
+       // deepTags: deepTags.data || {}, // Include all tags from the deep tagging service
     };
 
     log.info("Leaving MergeTags"); // Log the merged tags for debugging
@@ -40,26 +40,26 @@ export const createCompleteOutfitData = async (
 ): Promise<any> => {
     log.info("Entering createCompleteOutfitData function");
     logIncomingData({ items, imageUrl, selectedTags }, 'createCompleteOutfitData'); // Log incoming data
-    console.warn('hello')
+    //console.warn('hello')
     const outfitMetadata: OutfitMetadata = {
         outfit_id: 'defualt',
         user_id: user_id,
         outfit_image_url: imageUrl,
         outfit_image_public_id: publicId,
     };
-    console.warn(outfitMetadata, "outfitMetadata")
+    //console.warn(outfitMetadata, "outfitMetadata")
 
     const processedItems = await Promise.all(items.map(async (item) => {
-        console.warn(item, 'Processing Item'); // Log incoming item data each item being processed
+        //console.warn(item, 'Processing Item'); // Log incoming item data each item being processed
         const openAITags = selectedTags[item.name] || {};
         const mergedTags = mergeTags(openAITags, item.tags);
-        //console.log(JSON.stringify(selectedTags[item.name], null, 2))
+        console.warn('TEST', JSON.stringify(item, null, 2))
 
         return {
             item_id: item.name,
             item_image_url: item.cropUrl,               
             category: mergedTags.deepTags.category || mergedTags.openAITags.category || "unknown",
-            tags: mergedTags,
+            tags: openAITags,
             googleItem: selectedTags[item.name]?.googleItem || null, // Ensure googleItem is included
             bounding_box: item.bounding_box,
         };

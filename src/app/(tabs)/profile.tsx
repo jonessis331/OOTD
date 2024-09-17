@@ -25,7 +25,7 @@ export default function ProfileScreen() {
       if (profileError) throw profileError;
 
       setProfile(profileData);
-      //console.warn('SUP', profileData)
+      ////console.warn('SUP', profileData)
 
       const { data: outfitsData, error: outfitsError } = await supabase
         .from("outfits")
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
   const updateProfile = async () => {
     try {
       const response = await uploadImage(image) 
-      console.warn('CLOUDINARY RESPONSE', response)
+      //console.warn('CLOUDINARY RESPONSE', response)
       setPublicId(response.public_id); // Save the public_id
 
       const updates = {

@@ -1,3 +1,5 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, Image, FlatList } from "react-native";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import PostListItem from "~/src/components/PostListItem";
@@ -5,7 +7,9 @@ import { supabase } from "~/src/lib/supabase";
 import { log } from "~/src/utils/config";
 import { useState, useEffect } from "react";
 import { useAuth } from "~/src/providers/AuthProvider";
-
+import ItemInfoPopupGridItem from '~/src/components/ItemInfoPopupGridItem';
+import DetailScreenTwo from '~/src/components/detailscreen';
+const Stack = createStackNavigator();
 
 export const fetchOutfits = async () => {
   log.info("Entering fetchOutfits function"); // Log added
@@ -36,7 +40,7 @@ export const fetchOutfits = async () => {
   }
 };
 
-export default function FeedScreen() {
+export function FeedScreen() {
   
   const [posts, setPosts] = useState<any[]>([]);
   const [profile, setProfile] = useState<any[]>([]);
@@ -47,7 +51,7 @@ export default function FeedScreen() {
       try {
         const data = await fetchOutfits();
         setPosts(data);
-        //console.warn(data);
+        ////console.warn(data);
         //setProfile(profiles);
       } catch (error) {
         console.error("Failed to fetch outfits", error);
@@ -76,5 +80,41 @@ export default function FeedScreen() {
       renderItem={({ item }) => <PostListItem post={item} />}
       showsVerticalScrollIndicator={false}
     />
+  );
+};
+
+const DetailScreen = ({ route }) => {
+  const { items = [], selectedItem } = route.params;
+  console.warn('selectedItem', selectedItem);
+  console.warn('items', items);
+  return (
+    <View className="self-center top-56 justify-center bg-[#B6C2CE] w-80 h-2/4 rounded-3xl">
+      <View className="absolute top-0 rounded-t-3xl m-5 mb-10">
+        <Image source={{ uri: selectedItem.item_image_url }} className="w-64 h-64" />
+      </View>
+      
+      <Text>{selectedItem.tags.openAITags?.googleItem?.title}</Text>
+      <View className = 'flex top-20 bg-[#4D766E] w-80 h-auto rounded-3xl'>
+      {items.map((item, index) => (
+        <View className = 'flex items-center h-max flex-row bg-yellow-400'>
+        <Text className = "ml-3 font-mono font-semibold max-w-52 from-neutral-950">{item.tags.openAITags.googleItem?.title} </Text>
+        <Image source={{ uri: item.tags.openAITags?.googleItem?.thumbnail }} className="w-20 h-20 ml-auto mr-5" />
+        </View>
+        
+      ))}
+    </View>
+    </View>
+  );
+};
+
+export default function Index() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="Feed">
+        <Stack.Screen name = "DetailScreenTwo" options={{headerShown: false}} component={DetailScreenTwo}/>
+        <Stack.Screen name="Feed" options={{headerShown: false}} component={FeedScreen}/>
+        <Stack.Screen name="Detail" options={{headerShown: false}} component={DetailScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

@@ -1,11 +1,10 @@
 import { View, Text, Image } from 'react-native'
 import React from 'react'
 
-const ItemInfoPopupGridItem = ({items}) => {
+const ItemInfoPopupGridItem = ({items, post}) => {
     return (
         <View className="flex-row inset-0">
           {items.map((item, index) => {
-            
             return (
               <View
                 key={index}

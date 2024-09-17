@@ -1,5 +1,6 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import React from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const InfoSheet = ({ item }) => {
   if (!item) return null; // Return null if item is undefined
@@ -35,44 +36,117 @@ const InfoSheet = ({ item }) => {
   //const infoParagraph = `This item is a ${material} ${style}, featuring a ${highestConfidenceColor.name} color (Hex: ${highestConfidenceColor.hex_code}), perfect for ${occasion}. It belongs to the ${category} category, made by ${brand}. Notably, it includes features like ${labelsText}.`;
   
   const bulletPoints = [
-    `Material: ${material}\n`,
-    `Style: ${style}\n`,
+    `${brand}\n`,
+    `${material}\n`,
+    `${style}\n`,
     `Color: ${highestConfidenceColor?.name} \n`,
     `Occasion: ${occasion}\n`,
     `Category: ${category}\n`,
-    `Brand: ${brand}\n`,
+    
     `Features: ${labelsText}`
   ];
 
   return (
-    <View className="bg-slate-500">
-      <Text className="font-mono font-bold text-xl" numberOfLines={1}>
-        {title || "Item Name"}
-      </Text>
-      <View className="flex-row items-center rounded-xl w-full">
-        <Text className="font-mono text-xs w-50" numberOfLines={3}>
+    <View style={styles.container}>
+      <View style={styles.topHalf} />
+      <View style={styles.bottomHalf} />
+      {/* <View className="absolute top-0 left-0 w-20 h-20 shadow-xl shadow-black"/> */}
+      
+      <Image
+        source={{ uri: thumbnail }}
+        style={styles.image}
+      />
+      {/* <LinearGradient
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 0}}
+        colors={[ 'transparent','gray']}
+        //opacity={0.3}
+        style={{ position: 'absolute', bottom: -30, left: 0, right: 230, height: 140, zIndex: 10, borderRadius: 10}}
+      /> */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.title} numberOfLines={1}>
+          {title || "Item Name"}
+        </Text>
+        <Text style={styles.bulletPoints} numberOfLines={3}>
           {bulletPoints}
         </Text>
-        {/* <View
-          style={{
-            // Width of the square
-            width: 50,
-            marginLeft: 'auto',
-            paddingRight: 10,
-            height: 50, // Height of the square
-            backgroundColor: "#" + highestConfidenceColor?.hex_code, // Set background color to the hex code
-            marginTop: 10, // Space above the square
-          }}
-        /> */}
-        
-          <Image
-            source={{ uri: thumbnail }}
-            style={{ width: 50, height: 50, borderRadius: 10, marginLeft: 'auto'}}
-          />
-        
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    marginBottom: 0,
+    marginLeft: 100,
+    marginRight: 20,
+    
+    // borderColor: 'black',
+    // borderWidth: 2,
+    // borderRadius: 10,
+    height: 90,
+    padding: 10,
+    position: 'relative',
+    flexDirection: 'column', // Change to column for vertical layout
+    alignItems: 'center',
+    shadowRadius: 10,
+    shadowOpacity: 0.9,
+    shadowColor: 'black',
+    shadowOffset: { width: 10, height: 3 },
+  },
+  topHalf: {
+    ...StyleSheet.absoluteFillObject,
+    height: '40%',
+    backgroundColor: '#4D766E',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    // shadowRadius: 0,
+    // shadowOpacity: 0.9,
+    // shadowColor: 'black',
+    // shadowOffset: { width: 10, height: 20 }
+  },
+  bottomHalf: {
+    ...StyleSheet.absoluteFillObject,
+    top: '40%',
+    backgroundColor: '#B6C2CE',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  image: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    backgroundColor: '#4D766E',
+    position: 'absolute',
+    top: -25,
+    left: -50,
+    zIndex: 1,
+    // borderWidth: 4,
+    // borderColor: '#323232',
+    
+
+  },
+  infoContainer: {
+    position: 'absolute',
+    top: -15,
+    left: -30,
+    zIndex: 20,
+    marginTop: 20, // Adjust this value based on the image height and padding
+    marginLeft: 100,
+  },
+  title: {
+    fontFamily: '-tahoma',
+    fontWeight: 'bold',
+    fontSize: 17,
+    color: '#FAFBFD',
+  },
+  bulletPoints: {
+    marginTop: 5,
+    zIndex: 20,
+    fontFamily: 'serif',
+    fontSize: 12,
+  },
+});
 
 export default InfoSheet;

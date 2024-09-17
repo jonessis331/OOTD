@@ -10,7 +10,7 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={{  tabBarStyle: {backgroundColor: '#2e353d'}, tabBarActiveTintColor: "black", tabBarShowLabel: false }}
+      screenOptions={{  tabBarStyle: {backgroundColor: '#323232'}, tabBarActiveTintColor: "#FAFBFD", tabBarShowLabel: false }}
       
     >
       <Tabs.Screen
@@ -39,7 +39,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="closet"
         options={{
-          headerTitle: "Your Closet",
+          headerTitle: "",
+          headerTintColor: '#FAFBFD',
+          headerStyle: {height: 60, backgroundColor: '#323232', borderBottomColor: 'transparent'},
+         // headerShadowVisible: true,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="book" size={26} color={color} />
           ),
