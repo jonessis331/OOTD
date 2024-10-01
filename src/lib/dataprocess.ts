@@ -53,7 +53,7 @@ export const createCompleteOutfitData = async (
         //console.warn(item, 'Processing Item'); // Log incoming item data each item being processed
         const openAITags = selectedTags[item.name] || {};
         const mergedTags = mergeTags(openAITags, item.tags);
-        console.warn('TEST', JSON.stringify(item, null, 2))
+       // console.warn('TEST', JSON.stringify(item, null, 2))
 
         return {
             item_id: item.name,

@@ -69,7 +69,7 @@ export function FeedScreen() {
 
   return (
     <FlatList
-      className="bg-gray-600"
+      className="bg-zinc-800"
       data={posts}
       contentContainerStyle={{
         gap: 10,
@@ -85,8 +85,8 @@ export function FeedScreen() {
 
 const DetailScreen = ({ route }) => {
   const { items = [], selectedItem } = route.params;
-  console.warn('selectedItem', selectedItem);
-  console.warn('items', items);
+  //console.warn('selectedItem', selectedItem);
+  //console.warn('items', items);
   return (
     <View className="self-center top-56 justify-center bg-[#B6C2CE] w-80 h-2/4 rounded-3xl">
       <View className="absolute top-0 rounded-t-3xl m-5 mb-10">

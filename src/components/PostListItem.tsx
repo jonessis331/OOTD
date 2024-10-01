@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   LayoutChangeEvent,
-  Animated,
-  PanResponder
+  PanResponder,
+  Pressable,
+  Animated, Easing
 } from "react-native";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { useState, useRef } from "react";
@@ -30,13 +31,16 @@ export default function PostListItem({ post }) {
   const { width, height } = useWindowDimensions();
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [showBoxes, setShowBoxes] = useState(false);
+  const [liked, setLiked] = useState(false)
   const translateX = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const scaleValue = useRef(new Animated.Value(1)).current; // Create an animated value
 
   const onImageLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setImageDimensions({ width, height });
   };
+
 
   const panResponder = useRef(
     PanResponder.create({
@@ -94,16 +98,37 @@ export default function PostListItem({ post }) {
     thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
   );
 
+  const handlePostLike = () => {
+    setLiked(prevLiked => !prevLiked); // Toggle the liked state
+
+    // Animate the scale
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 1.2, // Scale up
+        duration: 150,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.exp),
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1, // Scale back to original
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Optionally, add logic to handle the like action (e.g., API call)
+  };
+
   return (
-    <View className="bg-gray-600 mt-10">
+    <View className="bg-zinc-800 mt-10">
       {/*Header */}
       <View className="ml-3 w-60 mt-2 mb-4  opacity-80 rounded-3xl shadow-md shadow-black" >
       <View className="ml-2 flex-row items-center gap-2">
         <AdvancedImage
           cldImg={avatar}
-          className="w-14 aspect-square rounded-full border border-emerald-50"
+          className="w-12 aspect-square rounded-full border border-emerald-50"
         />
-        <Text className="ml-2 font-monofont-bold text-xl text-white">{post?.profiles?.username}</Text>
+        <Text className="ml-2 font-mono font-bold text-xl text-white">{post?.profiles?.username}</Text>
       </View>
       </View>
       {/**Post Image */}
@@ -117,9 +142,9 @@ export default function PostListItem({ post }) {
             {/* Content */}
             <AdvancedImage
               cldImg={image}
-              className="item-center aspect-[16/9] rounded-3xl self-center"
+              className="rounded-2xl"
               onLayout={onImageLayout}
-              style={{ width: '100%', height: undefined, aspectRatio: 9/15 }} // Adjust aspect ratio as needed
+              style={{ width: '94%', height: undefined, aspectRatio: 9/14, alignSelf: 'center' }} // Adjust aspect ratio as needed
             />
           </TouchableOpacity>
           {showBoxes && (
@@ -144,8 +169,12 @@ export default function PostListItem({ post }) {
         </Animated.View> */}
       </View>
       {/* Icons */}
-      <View className="flex-row gap-3 pl-5 pt-3 pr-">
-        <AntDesign name="hearto" color="white" size={22} />
+      <View className="flex-row gap-3 pl-5 pt-3">
+        <Pressable onPress={handlePostLike}>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <AntDesign name={liked ? "heart" : "hearto"} color="white" size={22} />
+          </Animated.View>
+        </Pressable>
         {/* <Ionicons name="share" size={20}/> */}
         {/* <Feather name="send" size={20} /> */}
         <Text>

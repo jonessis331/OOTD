@@ -24,7 +24,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { BlurView } from 'expo-blur';
 import PrettyPopup from "~/src/components/PrettyPopup";
 import Carousel, { TAnimationStyle } from "react-native-reanimated-carousel";
-import { interpolate } from "react-native-reanimated";
+import { interpolate,  useSharedValue  } from "react-native-reanimated";
 import RNFadedScrollView from 'rn-faded-scrollview';
 import {LinearGradient} from 'expo-linear-gradient';
 const { width, height } = Dimensions.get("window");
@@ -44,7 +44,10 @@ const ClosetScreen = ({ navigation }) => {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [pressedItem, setPressedItem] = useState<any>(null);
   const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity value
-
+  const topProgress = useSharedValue(0);
+  const bottomProgress = useSharedValue(0);
+  const shoeProgress = useSharedValue(0);
+  
   useEffect(() => {
     fetchOutfits();
   }, []);
@@ -242,14 +245,14 @@ const ClosetScreen = ({ navigation }) => {
               style={StyleSheet.absoluteFillObject}
             />
           
-            <LinearGradient
+            {/* <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 0, y: 1}}
               colors={[ 'transparent','#688990']}
               
 
               style={{ position: 'absolute', bottom: -450, left: 0, right: 0, height: 200, width: width }}
-            /> 
+            />  */}
           </View>
         ) : (
           <Text>No item selected</Text>
@@ -262,13 +265,6 @@ const ClosetScreen = ({ navigation }) => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View>
-                {/* <LinearGradient
-                start={{x: 1, y: 0}}
-                end={{x: 0, y: 0}}
-              colors={[ 'transparent','black']}
-              opacity={0.3}
-              style={{ position: 'absolute', bottom: 0, left: 0, right: 300, height: 100 }}
-            /> */}
               <TouchableOpacity onPress={() => handleItemPress(item)}>
                  <View style={styles.itemContainer}>
                 <Image
@@ -300,14 +296,6 @@ const ClosetScreen = ({ navigation }) => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View>
-                {/* <LinearGradient
-                start={{x: 1, y: 0}}
-                end={{x: 0, y: 0}}
-              colors={[ 'transparent','black']}
-              opacity={0.3}
-
-              style={{ position: 'absolute', bottom: 0, left: 0, right: 300, height: 100 }}
-            /> */}
               <TouchableOpacity onPress={() => handleItemPress(item)}>
                  <View style={styles.itemContainer}>
                 <Image
@@ -315,14 +303,6 @@ const ClosetScreen = ({ navigation }) => {
                   style={styles.image}
                 />
                 </View>
-                {/* <LinearGradient
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-              colors={[ 'transparent','black']}
-              opacity={0.3}
-
-              style={{ position: 'absolute', bottom: 0, left: 300, right: 0, height: 100 }}
-            /> */}
               </TouchableOpacity>
               </View>
             )}
@@ -346,33 +326,13 @@ const ClosetScreen = ({ navigation }) => {
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
                 <View>
-                  {/* <LinearGradient
-                  start={{x: 1, y: 0}}
-                  end={{x: 0, y: 0}}
-                colors={[ 'transparent','black']}
-                opacity={0.3}
-  
-                style={{ position: 'absolute', bottom: 0, left: 0, right: 300, height: 100 }}
-              /> */}
                 <TouchableOpacity onPress={() => handleItemPress(item)}>
                    <View style={styles.itemContainer}>
-                   {/* <View className="bg-slate-100 absolute bottom-0 left-0 right-0 h-96">
-                   </View> */}
                   <Image
                     source={{ uri: item.item_image_url }}
                     style={styles.image}
                   />
-                  
-
                   </View>
-                  {/* <LinearGradient
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 0}}
-                colors={[ 'transparent','black']}
-                opacity={0.3}
-  
-                style={{ position: 'absolute', bottom: 0, left: 300, right: 0, height: 100 }}
-              /> */}
                 </TouchableOpacity>
                 </View>
               )}

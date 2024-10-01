@@ -58,6 +58,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* <Tabs.Screen
+        name = 'carousel'
+        options = {{
+          headerTitle: "Test",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="user" size={26} color={color} />
+          ),
+        }}
+      /> */}
     </Tabs>
   );
 }

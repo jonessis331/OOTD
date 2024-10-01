@@ -88,6 +88,7 @@ const PieceComponent = ({ item, onItemSelect }: { item: DetectedItem, onItemSele
             <TextInput
               className="w-11 items-center bg-white"
               value={link}
+              
               onChangeText={setLink}
               onSubmitEditing={() => handleSelect(link)}
               returnKeyType="go"
