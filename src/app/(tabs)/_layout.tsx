@@ -1,6 +1,7 @@
 import { Redirect, Stack, Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useAuth } from "~/src/providers/AuthProvider";
+import testvw from "./testvw";
 
 export default function TabsLayout() {
   const { isAuthenticated } = useAuth();
@@ -58,15 +59,16 @@ export default function TabsLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name = 'carousel'
+      <Tabs.Screen
+        name = 'testvw'
+        //component = {testvw}
         options = {{
           headerTitle: "Test",
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="user" size={26} color={color} />
+            <FontAwesome name="info" size={26} color={color} />
           ),
         }}
-      /> */}
+      />
     </Tabs>
   );
 }
