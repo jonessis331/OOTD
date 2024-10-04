@@ -57,6 +57,7 @@ export default function testvw() {
     <View 
       style={{
         alignItems: "center",
+        backgroundColor: "green"
       }}
     >
       <Carousel
@@ -64,6 +65,7 @@ export default function testvw() {
         {...baseOptions}
         style={{
           width: PAGE_WIDTH, 
+          
           backgroundColor: 'yellow'
           
         }}
@@ -80,12 +82,15 @@ export default function testvw() {
           parallaxScrollingOffset: 300,
         }}
         renderItem={({ item }) => (
-          <Image
-            source={{ uri: item.image_url }}
-            style={{ width: PAGE_WIDTH*.3, height: PAGE_WIDTH * 0.6,}}
-            resizeMode="cover"
-          />
+          <View style={{ width: PAGE_WIDTH, justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={{ uri: item.image_url }}
+              style={{ width: PAGE_WIDTH * 0.3, height: PAGE_WIDTH * 0.3 }}
+              resizeMode="cover"
+            />
+          </View>
         )}
+        
       />
     </View>
   );

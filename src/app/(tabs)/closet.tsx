@@ -27,6 +27,7 @@ import Carousel, { TAnimationStyle } from "react-native-reanimated-carousel";
 import { interpolate,  useSharedValue  } from "react-native-reanimated";
 import RNFadedScrollView from 'rn-faded-scrollview';
 import {LinearGradient} from 'expo-linear-gradient';
+import TestVW from "~/src/components/TestVWProps";
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
@@ -123,15 +124,17 @@ const ClosetScreen = ({ navigation }) => {
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
     return (
-      <View>
-        <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
+        <View>
+        <TouchableOpacity onPress={() => handleItemPress(item)}>
+           <View style={styles.itemContainer}>
           <Image
             source={{ uri: item.item_image_url }}
             style={styles.image}
-            resizeMode="cover"
           />
+          </View>
+          
+        </TouchableOpacity>
         </View>
-      </View>
     );
   };
 
@@ -259,96 +262,15 @@ const ClosetScreen = ({ navigation }) => {
         )}
         <View className = "mt-[90%]">
         {tops.length > 0 && (
-          <FlatList
-            data={tops}
-            horizontal
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View>
-              <TouchableOpacity onPress={() => handleItemPress(item)}>
-                 <View style={styles.itemContainer}>
-                <Image
-                  source={{ uri: item.item_image_url }}
-                  style={styles.image}
-                />
-                </View>
-                
-              </TouchableOpacity>
-              </View>
-            )}
-            snapToInterval={width}
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.flatListContentContainer}
-            style={styles.flatListMain}
-            snapToAlignment="center"
-            onScroll={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / width);
-              setCurrentTopIndex(index);
-            }}
-          />
+           <TestVW items={tops} onIndexChange={setCurrentTopIndex} renderItem={renderItem} />
         )}
 
         {bottoms.length > 0 && (
-          <FlatList
-            data={bottoms}
-            horizontal
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View>
-              <TouchableOpacity onPress={() => handleItemPress(item)}>
-                 <View style={styles.itemContainer}>
-                <Image
-                  source={{ uri: item.item_image_url }}
-                  style={styles.image}
-                />
-                </View>
-              </TouchableOpacity>
-              </View>
-            )}
-            snapToInterval={width}
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ alignItems: "center" }}
-            snapToAlignment="center"
-            onScroll={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / width);
-              setCurrentBottomIndex(index);
-            }}
-          />
+           <TestVW items={bottoms} onIndexChange={setCurrentBottomIndex} renderItem={renderItem} />
         )}
 
         {shoes.length > 0 && (
-          <View>
-            <FlatList
-              data={shoes}
-              horizontal
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <View>
-                <TouchableOpacity onPress={() => handleItemPress(item)}>
-                   <View style={styles.itemContainer}>
-                  <Image
-                    source={{ uri: item.item_image_url }}
-                    style={styles.image}
-                  />
-                  </View>
-                </TouchableOpacity>
-                </View>
-              )}
-              snapToInterval={width}
-              decelerationRate="fast"
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ alignItems: "center" }}
-              snapToAlignment="center"
-              onScroll={(event) => {
-                const index = Math.round(
-                  event.nativeEvent.contentOffset.x / width
-                );
-                setCurrentShoeIndex(index);
-              }}
-            />
-          </View>
+           <TestVW items={shoes} onIndexChange={setCurrentShoeIndex} renderItem={renderItem} />
         )}
 
         </View>
@@ -466,7 +388,7 @@ const styles = StyleSheet.create({
     width: width, // Full width of the screen
     alignItems: 'center', // Center the image horizontally
     justifyContent: 'center', // Center the image vertically
-    marginTop: 10,
+    marginTop: 0,
     //backgroundColor: 'red',
     
    
