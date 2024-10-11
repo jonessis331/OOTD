@@ -1,0 +1,42 @@
+{
+    "data": {
+        "detected_items": [
+            {
+                "area": 0.13271463561096003,
+                "bounding_box": {
+                    "bottom": 0.5795843,
+                    "left": 0.2765454,
+                    "right": 0.7178208,
+                    "top": 0.2788319
+                },
+                "category": "clothing",
+                "detection_confidence": 0.82848036,
+                "name": "top"
+            },
+            {
+                "area": 0.20033570587621496,
+                "bounding_box": {
+                    "bottom": 0.9855841,
+                    "left": 0.22835684,
+                    "right": 0.7646695,
+                    "top": 0.61204135
+                },
+                "category": "clothing",
+                "detection_confidence": 0.78252035,
+                "name": "skirt"
+            },
+            {
+                "area": 0.38459545352625296,
+                "bounding_box": {
+                    "bottom": 0.9829521,
+                    "left": 0.23397274,
+                    "right": 0.7713232,
+                    "top": 0.26722655
+                },
+                "category": "clothing",
+                "detection_confidence": 0.6753489,
+                "name": "swimwear"
+            }
+        ]
+    }
+}

@@ -1,0 +1,476 @@
+[
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": [
+          "trousers",
+          "business",
+          "pockets"
+        ],
+        "deepTags": {
+          "data": {
+            "items": [
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.6633786
+              },
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.661624
+              },
+              {
+                "name": "pants",
+                "category": "clothing",
+                "confidence": 0.64688593
+              },
+              {
+                "name": "footwear",
+                "category": "shoes",
+                "confidence": 0.63405687
+              },
+              {
+                "name": "footwear",
+                "category": "shoes",
+                "confidence": 0.63206583
+              },
+              {
+                "name": "top",
+                "category": "clothing",
+                "confidence": 0.57388973
+              },
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.56074274
+              }
+            ],
+            "colors": [
+              {
+                "name": "eerie black",
+                "hex_code": "191212",
+                "confidence": 0.5667314
+              },
+              {
+                "name": "silver",
+                "hex_code": "cfc8c2",
+                "confidence": 0.39610752
+              },
+              {
+                "name": "platinum",
+                "hex_code": "ede8e5",
+                "confidence": 0.37846494
+              },
+              {
+                "name": "wood brown",
+                "hex_code": "bc9a76",
+                "confidence": 0.29625037
+              },
+              {
+                "name": "tan",
+                "hex_code": "d7b794",
+                "confidence": 0.2573187
+              }
+            ],
+            "labels": [
+              {
+                "name": "plain",
+                "confidence": 0.924905717,
+                "classification": "textile pattern",
+                "secondary_classification": null
+              },
+              {
+                "name": "shoe",
+                "confidence": 0.830307066,
+                "classification": "apparel",
+                "secondary_classification": "legs and feet"
+              },
+              {
+                "name": "sleeve",
+                "confidence": 0.825040698,
+                "classification": "garment parts",
+                "secondary_classification": null
+              },
+              {
+                "name": "symmetrical",
+                "confidence": 0.771807969,
+                "classification": "silhouette",
+                "secondary_classification": null
+              },
+              {
+                "name": "straight",
+                "confidence": 0.730467141,
+                "classification": "silhouette",
+                "secondary_classification": null
+              },
+              {
+                "name": "neckline",
+                "confidence": 0.684696436,
+                "classification": "garment parts",
+                "secondary_classification": null
+              },
+              {
+                "name": "set-in sleeve",
+                "confidence": 0.546026409,
+                "classification": "nickname",
+                "secondary_classification": null
+              },
+              {
+                "name": "maxi (length)",
+                "confidence": 0.536858737,
+                "classification": "length",
+                "secondary_classification": null
+              },
+              {
+                "name": "hip (length)",
+                "confidence": 0.527666,
+                "classification": "length",
+                "secondary_classification": null
+              },
+              {
+                "name": "normal waist",
+                "confidence": 0.509230375,
+                "classification": "waistline",
+                "secondary_classification": null
+              }
+            ]
+          }
+        },
+        "material": [
+          "lace",
+          "leather",
+          "cotton",
+          "cotton"
+        ],
+        "googleItem": {
+          "link": "https://prm.com/us/p/converse-trousers-wide-leg-carpenter-womens-brown-color-16034",
+          "title": "Converse trousers Wide Leg Carpenter women's brown color at PRM US",
+          "source": "PRM.com",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRzxVKNr-f-fxjj7jbRhbYFc7CO5jsTCHDdzxyp1O6ZmLFiMqcP"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": null,
+        "scraped_tags": null
+      }
+    },
+    "item_id": "pants",
+    "category": "unknown",
+    "googleItem": {
+      "link": "https://prm.com/us/p/converse-trousers-wide-leg-carpenter-womens-brown-color-16034",
+      "title": "Converse trousers Wide Leg Carpenter women's brown color at PRM US",
+      "source": "PRM.com",
+      "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRzxVKNr-f-fxjj7jbRhbYFc7CO5jsTCHDdzxyp1O6ZmLFiMqcP"
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_203,h_700,x_256,y_341/v1725836125/gtjyckf2kyr77ibroi5a.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": [
+          "sneakers",
+          "casual",
+          "blouse",
+          "vintage"
+        ],
+        "deepTags": {
+          "data": {
+            "items": [
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.82708395
+              },
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.7902112
+              },
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.6074059
+              },
+              {
+                "name": "shoe",
+                "category": "shoes",
+                "confidence": 0.6008676
+              }
+            ],
+            "colors": [
+              {
+                "name": "dark grey",
+                "hex_code": "32323b",
+                "confidence": 0.34636557
+              },
+              {
+                "name": "dark slate grey",
+                "hex_code": "2e3039",
+                "confidence": 0.29350555
+              },
+              {
+                "name": "eerie black",
+                "hex_code": "15151b",
+                "confidence": 0.2896358
+              },
+              {
+                "name": "gray",
+                "hex_code": "807b79",
+                "confidence": 0.054092932
+              },
+              {
+                "name": "davy's grey",
+                "hex_code": "524f56",
+                "confidence": 0.052853473
+              }
+            ],
+            "labels": [
+              {
+                "name": "symmetrical",
+                "confidence": 0.845349491,
+                "classification": "silhouette",
+                "secondary_classification": null
+              },
+              {
+                "name": "plain",
+                "confidence": 0.692613363,
+                "classification": "textile pattern",
+                "secondary_classification": null
+              },
+              {
+                "name": "printed",
+                "confidence": 0.660307,
+                "classification": "finishing technique",
+                "secondary_classification": null
+              }
+            ]
+          }
+        },
+        "material": [
+          "leather",
+          "lace",
+          "leather",
+          "leather",
+          "lace",
+          "leather",
+          "leather",
+          "leather",
+          "leather",
+          "lace"
+        ],
+        "googleItem": {
+          "link": "https://il.ebay.com/b/adidas-VL-Court-2-0-Sneakers-for-Men/15709/bn_7116773274",
+          "title": "adidas - VL Court 2.0 Sneakers for Men | eBay",
+          "source": "eBay",
+          "thumbnail": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTHNtboVcJnxz61lfxsG2-MpbXF6zdOR8x6hralFZDIiPnk_lm5"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": null,
+        "scraped_tags": null
+      }
+    },
+    "item_id": "shoe",
+    "category": "unknown",
+    "googleItem": {
+      "link": "https://il.ebay.com/b/adidas-VL-Court-2-0-Sneakers-for-Men/15709/bn_7116773274",
+      "title": "adidas - VL Court 2.0 Sneakers for Men | eBay",
+      "source": "eBay",
+      "thumbnail": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTHNtboVcJnxz61lfxsG2-MpbXF6zdOR8x6hralFZDIiPnk_lm5"
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_80,h_775,x_278,y_669/v1725836125/gtjyckf2kyr77ibroi5a.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {
+        "Brand": "",
+        "Other": [
+          "blouse",
+          "jewelry",
+          "t-shirt",
+          "trousers",
+          "shorts",
+          "blazer",
+          "oversized",
+          "jeans",
+          "patchwork",
+          "buttons",
+          "embroidery"
+        ],
+        "deepTags": {
+          "data": {
+            "items": [
+              {
+                "name": "top",
+                "category": "clothing",
+                "confidence": 0.6135135
+              },
+              {
+                "name": "shirt",
+                "category": "clothing",
+                "confidence": 0.5442251
+              }
+            ],
+            "colors": [
+              {
+                "name": "dark slate grey",
+                "hex_code": "23283a",
+                "confidence": 0.8248803
+              },
+              {
+                "name": "dark jungle green",
+                "hex_code": "1a1e30",
+                "confidence": 0.1569762
+              },
+              {
+                "name": "eerie black",
+                "hex_code": "12171f",
+                "confidence": 0.011716461
+              },
+              {
+                "name": "dark purple",
+                "hex_code": "28213c",
+                "confidence": 0.0014333287
+              },
+              {
+                "name": "charcoal",
+                "hex_code": "3e4356",
+                "confidence": 0.00020200456
+              }
+            ],
+            "labels": [
+              {
+                "name": "collar",
+                "confidence": 0.987801373,
+                "classification": "garment parts",
+                "secondary_classification": null
+              },
+              {
+                "name": "sleeve",
+                "confidence": 0.946859181,
+                "classification": "garment parts",
+                "secondary_classification": null
+              },
+              {
+                "name": "pocket",
+                "confidence": 0.943018198,
+                "classification": "garment parts",
+                "secondary_classification": null
+              },
+              {
+                "name": "single breasted",
+                "confidence": 0.924905717,
+                "classification": "opening type",
+                "secondary_classification": null
+              },
+              {
+                "name": "top",
+                "confidence": 0.913981259,
+                "classification": "apparel",
+                "secondary_classification": "upperbody"
+              },
+              {
+                "name": "set-in sleeve",
+                "confidence": 0.901636541,
+                "classification": "nickname",
+                "secondary_classification": null
+              },
+              {
+                "name": "shirt (collar)",
+                "confidence": 0.814123273,
+                "classification": "nickname",
+                "secondary_classification": null
+              },
+              {
+                "name": "wrist-length",
+                "confidence": 0.814123273,
+                "classification": "length",
+                "secondary_classification": null
+              },
+              {
+                "name": "symmetrical",
+                "confidence": 0.808470547,
+                "classification": "silhouette",
+                "secondary_classification": null
+              },
+              {
+                "name": "patch (pocket)",
+                "confidence": 0.744757652,
+                "classification": "nickname",
+                "secondary_classification": null
+              },
+              {
+                "name": "hip (length)",
+                "confidence": 0.555163085,
+                "classification": "length",
+                "secondary_classification": null
+              },
+              {
+                "name": "regular (fit)",
+                "confidence": 0.5,
+                "classification": "silhouette",
+                "secondary_classification": null
+              }
+            ]
+          }
+        },
+        "material": [
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "linen",
+          "polyester",
+          "polyester",
+          "cotton",
+          "cotton",
+          "cotton",
+          "wool",
+          "cotton",
+          "linen"
+        ],
+        "googleItem": {
+          "link": "https://www.percivalclo.com/products/quilted-classic-shirt-navy",
+          "title": "Men's Quilted Classic Shirt | Navy | Percival Menswear",
+          "source": "Percival Menswear",
+          "thumbnail": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQRwD12Fiq_dm9ts64U5iyfi4eTD79FlSj6sa2Avgv92HwOrNzS"
+        },
+        "openTagsOne": null,
+        "openTagsTwo": null,
+        "scraped_tags": null
+      }
+    },
+    "item_id": "outerwear",
+    "category": "unknown",
+    "googleItem": {
+      "link": "https://www.percivalclo.com/products/quilted-classic-shirt-navy",
+      "title": "Men's Quilted Classic Shirt | Navy | Percival Menswear",
+      "source": "Percival Menswear",
+      "thumbnail": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQRwD12Fiq_dm9ts64U5iyfi4eTD79FlSj6sa2Avgv92HwOrNzS"
+    },
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_305,h_377,x_205,y_2/v1725836125/gtjyckf2kyr77ibroi5a.jpg"
+  },
+  {
+    "tags": {
+      "deepTags": {},
+      "openAITags": {}
+    },
+    "item_id": "top",
+    "category": "unknown",
+    "googleItem": null,
+    "item_image_url": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_305,h_377,x_205,y_2/v1725836125/gtjyckf2kyr77ibroi5a.jpg"
+  }
+]

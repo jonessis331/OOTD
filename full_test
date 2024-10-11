@@ -1,0 +1,183 @@
+[59D[2K› Reloading apps
+[59D[2K[1miOS[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0
+% [22m[2m(0/1)[22m[59D[2K[1A[2K[32m[1miOS[22m Bundled [39m[2m94ms[22m[0m[2m node_modules/expo-router/entry.js (1 module)[22m[0m
+[1miOS[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0
+% [22m[2m(0/1)[22m[59D[2K[1A[2K[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:13 PM | INFO : Entering fetchOutfits function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:14 PM | INFO : Fetched outfits from Supabase 
+[
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {}
+]
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:14 PM | INFO : Leaving fetchOutfits
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:42 PM | INFO : Entering pickImage function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:56 PM | INFO : Entering function:pickImage with data of type: object: {
+  "canceled": false,
+  "assets": [
+    {
+      "type": "image",
+      "height": 819,
+      "uri": "file:///Users/jonathanessis/Library/Developer/CoreSimulator/Devices/F7BD26D1-953F-47E4-8D60-992AA5B... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:57 PM | INFO : Entering detectItems function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Fetched items from API 
+{
+  "data": {}
+}
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: top
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: bottom
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: shoe
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: shoe
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Duplicate item found: shoe
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: handbag
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: high heels
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: high heels
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Duplicate item found: high heels
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Normalized item name: shoe
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Duplicate item found: shoe
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Filtered unique items 
+[
+  {},
+  {},
+  {},
+  {},
+  {}
+]
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Leaving DetectItems
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Entering function:detectedItemsResponse with data of type: object: {
+  "data": {
+    "detected_items": [
+      {
+        "area": 0.034217834921875,
+        "bounding_box": {
+          "bottom": 0.39453125,
+          "left": 0.41015625,
+          "right": 0.58984375,
+... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Entering function:processDetectedItems with data of type: object: {
+  "detectedItems": [
+    {
+      "area": 0.034217834921875,
+      "bounding_box": {
+        "bottom": 0.39453125,
+        "left": 0.41015625,
+        "right": 0.58984375,
+        "top": 0.20410156
+ ... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:37:58 PM | INFO : Entering processDetectedItems function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:00 PM | INFO : Entering getDeepTags function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:01 PM | INFO : Leaving Get Deep Tags
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:01 PM | INFO : leaving processDetectedItem
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:04 PM | INFO : Entering getDeepTags function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:05 PM | INFO : Leaving Get Deep Tags
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:05 PM | INFO : leaving processDetectedItem
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:08 PM | INFO : Entering getDeepTags function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:09 PM | INFO : Leaving Get Deep Tags
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:09 PM | INFO : leaving processDetectedItem
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:15 PM | INFO : Entering getDeepTags function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:16 PM | INFO : Leaving Get Deep Tags
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:16 PM | INFO : leaving processDetectedItem
+[7m[37m[1m LOG [22m[39m[27m 3:38:16 PM | INFO : Entering getDeepTags function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:17 PM | INFO : Leaving Get Deep Tags
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:17 PM | INFO : leaving processDetectedItem
+[7m[37m[1m LOG [22m[39m[27m 3:38:17 PM | INFO : leaving pickImage
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:34 PM | INFO : Entering function:handleSelect with data of type: string: "https://www.amazon.com/Floerns-Striped-Waistband-Cropped-Workout/dp/B098N5QZC7"
+[59D[2K[7m[37m[1m LOG [22m[39m[27m Entering handleSelect function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:39 PM | INFO : Entering function:fetchAndParseWebpage Response with data of type: object: {
+  "paragraph": " style type text css navbar nav shop nav a hover color ff text decoration underline navbar nav search nav search facade navbar nav tools nav icon navbar nav shop nav icon navbar nav ... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:39 PM | INFO : Generating tags with OpenAI (TagsTwo)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:43 PM | INFO : Entering function:generateTagsTwo Response with data of type: object: {
+  "color": "black",
+  "name_of_item": "floerns women's striped print wide waistband cropped workout legging pants",
+  "material": "polyester, spandex",
+  "occasion": "work, leisure time, going out a... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:43 PM | INFO : Scraping with BeeScraper: https://www.amazon.com/Floerns-Striped-Waistband-Cropped-Workout/dp/B098N5QZC7
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:48 PM | INFO : leaving beescraper
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:48 PM | INFO : Entering function:scrapUrlWithBeeScraper Response with data of type: object: {
+  "microdata": [],
+  "json-ld": [],
+  "opengraph": [],
+  "dublincore": [
+    {
+      "elements": [
+        {
+          "name": "description",
+          "content": "Buy Floerns Women's Striped Print ... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:38:48 PM | INFO : Generating tags with OpenAI
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:54 PM | ERROR : Error generating OpenAI tags: JSON Parse error: Unexpected character: T
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:54 PM | INFO : Entering function:generateTags Response with data of type: object: null
+[7m[37m[1m LOG [22m[39m[27m 3:38:54 PM | INFO : Entering Scraping URL
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:57 PM | INFO : leaving Scrap Url (scraperapi)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:38:57 PM | INFO : Generating tags with OpenAI
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:02 PM | INFO : Entering function:scrapUrl Response with data of type: object: {
+  "name_of_item": "Floerns Women's Striped Print Wide Waistband Cropped Workout Legging Pants",
+  "color": null,
+  "material": "95% Polyester, 5% Spandex",
+  "occasion": "Work, leisure time, going o... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:02 PM | INFO : Entering function:handleItemSelect with data of type: object: {
+  "itemId": "top",
+  "googleItem": {
+    "link": "https://www.amazon.com/Floerns-Striped-Waistband-Cropped-Workout/dp/B098N5QZC7",
+    "title": "Floerns Women's Striped Print Wide Waistband Cropped ... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:39:02 PM | INFO : (handleItemSelct) Selected Tags For Item: 
+{
+  "itemId": "top",
+  "googleItem": {},
+  "tags": {}
+}
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:02 PM | INFO : leaving handleItemSelect
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:02 PM | INFO : Leaving handleSelect
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:58 PM | INFO : Entering function:handleSelect with data of type: string: "https://www.depop.com/products/ranaranarana-toe-cuff-white-block-heel/"
+[59D[2K[7m[37m[1m LOG [22m[39m[27m Entering handleSelect function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:59 PM | INFO : Entering function:fetchAndParseWebpage Response with data of type: object: {
+  "paragraph": "menuskip to main contentskip to footerdepop logolikessell nowsign uplog inmenswearshop by categorytopsbottomscoats jacketsshoesaccessoriesjewelryt shirtssalesee all menswearfeaturedh... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:39:59 PM | INFO : Generating tags with OpenAI (TagsTwo)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:05 PM | ERROR : Error generating OpenAI tags: JSON Parse error: Unexpected character: B
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:05 PM | INFO : Entering function:generateTagsTwo Response with data of type: object: null
+[7m[37m[1m LOG [22m[39m[27m 3:40:05 PM | INFO : Scraping with BeeScraper: https://www.depop.com/products/ranaranarana-toe-cuff-white-block-heel/
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:09 PM | INFO : leaving beescraper
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:09 PM | INFO : Entering function:scrapUrlWithBeeScraper Response with data of type: object: {
+  "microdata": [
+    {
+      "@type": "BreadcrumbList",
+      "@context": "https://schema.org",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://www.dep... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:40:09 PM | INFO : Generating tags with OpenAI
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:12 PM | INFO : Entering function:generateTags Response with data of type: object: {
+  "name_of_item": "Toe cuff white block heel leather mules. Labeled...",
+  "color": null,
+  "material": "leather",
+  "occasion": null,
+  "brand_name": "Topshop",
+  "style": "block heel",
+  "pattern"... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:40:12 PM | INFO : Entering Scraping URL
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:08 PM | ERROR : Error fetching data: Request failed with status code 500
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:08 PM | INFO : leaving Scrap Url (scraperapi)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:08 PM | ERROR : error tagging scraped: Request failed with status code 500
+[7m[37m[1m LOG [22m[39m[27m 3:41:08 PM | INFO : Leaving handleSelect
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : Entering createPost function
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : Entering function:createPost with data of type: object: {
+  "imageUrl": "https://res.cloudinary.com/dmhfubcfi/image/upload/v1725737862/xb9o5tfpalaqdtjg2hr5.jpg",
+  "items": [
+    {
+      "cropUrl": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : Entering function:before createCompleteOutfit with data of type: object: {
+  "items": "[{\"cropUrl\":\"https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_144,h_316,x_328,y_163/v1725737862/xb9o5tfpalaqdtjg2hr5.jpg\",\"area\":0.034217834921875,\"bounding_box\":{\"bot... (truncated)
+[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : Entering createCompleteOutfitData function
+[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : Entering function:createCompleteOutfitData with data of type: object: {
+  "items": [
+    {
+      "cropUrl": "https://res.cloudinary.com/dmhfubcfi/image/upload/c_crop,w_144,h_316,x_328,y_163/v1725737862/xb9o5tfpalaqdtjg2hr5.jpg",
+      "area": 0.034217834921875,
+      "b... (truncated)
+[59D[2K[7m[37m[1m LOG [22m[39m[27m 3:41:33 PM | INFO : leaving createPost

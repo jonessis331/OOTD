@@ -1,0 +1,142 @@
+{
+    "data": {
+        "colors": [
+            {
+                "confidence": 0.44024214,
+                "hex_code": "c8c2c1",
+                "name": "silver"
+            },
+            {
+                "confidence": 0.08250108,
+                "hex_code": "996e57",
+                "name": "sienna"
+            },
+            {
+                "confidence": 0.19708352,
+                "hex_code": "e1dee2",
+                "name": "gainsboro"
+            },
+            {
+                "confidence": 0.05997591,
+                "hex_code": "b0a6a0",
+                "name": "darkgray"
+            },
+            {
+                "confidence": 0.050757125,
+                "hex_code": "ba8b77",
+                "name": "rosybrown"
+            }
+        ],
+        "items": [
+            {
+                "category": "clothing",
+                "confidence": 0.964666,
+                "name": "outerwear"
+            }
+        ],
+        "labels": [
+            {
+                "classification": "textile pattern",
+                "confidence": 0.996142387,
+                "name": "plain",
+                "secondary_classification": null
+            },
+            {
+                "classification": "apparel",
+                "confidence": 0.981652856,
+                "name": "shoe",
+                "secondary_classification": "legs and feet"
+            },
+            {
+                "classification": "silhouette",
+                "confidence": 0.960035086,
+                "name": "symmetrical",
+                "secondary_classification": null
+            },
+            {
+                "classification": "apparel",
+                "confidence": 0.952709794,
+                "name": "pants",
+                "secondary_classification": "lowerbody"
+            },
+            {
+                "classification": "garment parts",
+                "confidence": 0.946760595,
+                "name": "sleeve",
+                "secondary_classification": null
+            },
+            {
+                "classification": "garment parts",
+                "confidence": 0.821663857,
+                "name": "neckline",
+                "secondary_classification": null
+            },
+            {
+                "classification": "length",
+                "confidence": 0.814849496,
+                "name": "maxi (length)",
+                "secondary_classification": null
+            },
+            {
+                "classification": "accessories",
+                "confidence": 0.749129236,
+                "name": "bag",
+                "secondary_classification": null
+            },
+            {
+                "classification": "silhouette",
+                "confidence": 0.705093503,
+                "name": "regular (fit)",
+                "secondary_classification": null
+            },
+            {
+                "classification": "apparel",
+                "confidence": 0.688484669,
+                "name": "top",
+                "secondary_classification": "upperbody"
+            },
+            {
+                "classification": "length",
+                "confidence": 0.654315829,
+                "name": "above the hip (length)",
+                "secondary_classification": null
+            },
+            {
+                "classification": "waistline",
+                "confidence": 0.617157459,
+                "name": "normal waist",
+                "secondary_classification": null
+            },
+            {
+                "classification": "silhouette",
+                "confidence": 0.600510955,
+                "name": "wide leg",
+                "secondary_classification": null
+            },
+            {
+                "classification": "length",
+                "confidence": 0.588211954,
+                "name": "floor (length)",
+                "secondary_classification": null
+            },
+            {
+                "classification": "nickname",
+                "confidence": 0.558625579,
+                "name": "set-in sleeve",
+                "secondary_classification": null
+            },
+            {
+                "classification": "opening type",
+                "confidence": 0.532715917,
+                "name": "fly (opening)",
+                "secondary_classification": null
+            },
+            {
+                "classification": "silhouette",
+                "confidence": 0.504947305,
+                "name": "loose (fit)",
+                "secondary_classification": null
+            }
+        ]
+    }
+}
