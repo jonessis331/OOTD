@@ -50,7 +50,24 @@ export type BoundingBox = {
     scraped_tags: string[]; // Add this line
     otherTags: string[]; // Add this line
   };
-
+  export type Outfit = {
+    id: string;
+    user_id: string;
+    outfit_image_url: string;
+    outfit_image_public_id: string;
+    date_created: string;
+    items: Item[];
+    is_public: boolean;
+  };
+  export type ImageUrl = string;
+  
+  export type Item = {
+    item_id: string;
+    item_image_url: string;
+    googleItem?: SimilarItem;
+    tags?: any;
+    bounding_box: any;
+  };
 
   export const synonymGroups: { [key: string]: string[] } = {
     "top": ["top", "shirt", "blouse", "t-shirt", "tee"],

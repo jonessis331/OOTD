@@ -14,7 +14,7 @@ import { log, logIncomingData } from "~/src/utils/config";;
  */
 export const mergeTags = (openAITags: any, deepTags: any): any => {
     log.info("Entering simple mergeTags function");
-    logIncomingData({ openAITags, deepTags }, 'mergeTags'); // Log incoming data
+    //logIncomingData({ openAITags, deepTags }, 'mergeTags'); // Log incoming data
     const mergedTags = {
         openAITags: openAITags || {},  // Include all tags from OpenAI
        // deepTags: deepTags.data || {}, // Include all tags from the deep tagging service
@@ -39,47 +39,44 @@ export const createCompleteOutfitData = async (
     user_id: any
 ): Promise<any> => {
     log.info("Entering createCompleteOutfitData function");
-    logIncomingData({ items, imageUrl, selectedTags }, 'createCompleteOutfitData'); // Log incoming data
-    //console.warn('hello')
-    const outfitMetadata: OutfitMetadata = {
-        outfit_id: 'defualt',
-        user_id: user_id,
-        outfit_image_url: imageUrl,
-        outfit_image_public_id: publicId,
-    };
-    //console.warn(outfitMetadata, "outfitMetadata")
-
-    const processedItems = await Promise.all(items.map(async (item) => {
-        //console.warn(item, 'Processing Item'); // Log incoming item data each item being processed
-        const openAITags = selectedTags[item.name] || {};
-        const mergedTags = mergeTags(openAITags, item.tags);
-        // console.warn('TEST', JSON.stringify(item, null, 2))
-
-        return {
-            item_id: item.name,
-            item_image_url: item.cropUrl,               
-            category: mergedTags.deepTags.category || mergedTags.openAITags.category || "unknown",
-            tags: openAITags,
-            googleItem: selectedTags[item.name]?.googleItem || null, // Ensure googleItem is included
-            bounding_box: item.bounding_box,
+    try {
+        const outfitMetadata: OutfitMetadata = {
+            outfit_id: 'defualt',
+            user_id: user_id,
+            outfit_image_url: imageUrl,
+            outfit_image_public_id: publicId,
         };
-    }));
-    
 
-    const outfitData = {
-        user_id: outfitMetadata.user_id,
-        outfit_image_url: outfitMetadata.outfit_image_url,
-        outfit_image_public_id: outfitMetadata.outfit_image_public_id,
-        date_created: new Date().toISOString(),
-        items: processedItems,
-        additional_info: {},
-        
-    };
-    
-    logIncomingData(outfitData, "outfitData")
-    // Save outfit data to Supabase
-    log.warn("Leaving CreateCompleteOutifitData")
-    await saveOutfitData(outfitData);
+        const processedItems = await Promise.all(items.map(async (item) => {
+            const openAITags = selectedTags[item.name] || {};
+            const mergedTags = mergeTags(openAITags, item.tags);
 
-    return outfitData;
+            return {
+                item_id: item.name,
+                item_image_url: item.cropUrl,               
+                category: mergedTags?.deepTags?.category || mergedTags?.openAITags?.category || "unknown",
+                tags: openAITags,
+                googleItem: selectedTags[item.name]?.googleItem || null,
+                bounding_box: item.bounding_box,
+            };
+        }));
+
+        const outfitData = {
+            user_id: outfitMetadata?.user_id,
+            outfit_image_url: outfitMetadata?.outfit_image_url,
+            outfit_image_public_id: outfitMetadata?.outfit_image_public_id,
+            date_created: new Date().toISOString(),
+            items: processedItems,
+            additional_info: {},
+        };
+
+        logIncomingData(outfitData, "outfitData");
+        log.warn("Leaving CreateCompleteOutfitData");
+        await saveOutfitData(outfitData);
+
+        return outfitData;
+    } catch (error) {
+        log.error("Error in createCompleteOutfitData:", error);
+        throw error; // Rethrow the error after logging it
+    }
 };

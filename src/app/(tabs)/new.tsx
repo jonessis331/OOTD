@@ -26,7 +26,7 @@ import { fetchGoogleLensResults } from "~/src/lib/googlelens";
 import { scrapUrl, scrapUrlWithBeeScraper } from "~/src/lib/scraperapi";
 import { generateTags, generateTagsTwo } from "~/src/lib/openai";
 import { createCompleteOutfitData } from "~/src/lib/dataprocess";
-import { DetectedItem, normalizeItemName, OutfitMetadata } from "~/src/utils/dataTypes";
+import { DetectedItem, ImageUrl, normalizeItemName, OutfitMetadata } from "~/src/utils/dataTypes";
 import deepTagsMock from "~/mock_data/deep_tags.json";
 import googleLensMock from "~/mock_data/google_lens_response.json";
 import mockDetectedItems from "~/mock_data/detected_items.json";
@@ -34,10 +34,6 @@ import mockResponse from "~/mock_data/mock_response.json";
 
 import { fetchAndParseWebpage, fetchProductInfo } from "~/src/lib/experiment";
 import { useMockData } from '~/src/utils/config';
-
-
-type ImageUrl = string;
-
 
 
 export default function New() {
@@ -192,8 +188,8 @@ export default function New() {
       return;
     }
     try {
-      await makeImagePublic(publicId);
-      logIncomingData({ items: JSON.stringify(items), imageUrl, selectedTags: JSON.stringify(selectedTags) }, "before createCompleteOutfit");
+      //await makeImagePublic(publicId);
+      //logIncomingData({ items: JSON.stringify(items), imageUrl, selectedTags: JSON.stringify(selectedTags) }, "before createCompleteOutfit");
       //console.warn(user?.id, "user id")
       await createCompleteOutfitData(items, imageUrl, publicId, selectedTags, user?.id);
     } catch (error) {

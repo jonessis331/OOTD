@@ -88,6 +88,8 @@ export default function ProfileScreen() {
     } catch (error) {
       console.error("Error updating profile:", error);
       Alert.alert("Error updating profile");
+
+      
     }
   };
 
