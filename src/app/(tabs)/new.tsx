@@ -64,8 +64,18 @@ export default function New() {
     log.info("Entering processDetectedItems function");
 
     const enrichedItems: DetectedItem[] = [];
+    const itemNameCounters: { [key: string]: number } = {}; // Counter for item names
 
     for (const item of detectedItems) {
+      // Update item name counters
+      const lowerCaseItemName = item.name.toLowerCase();
+      if (itemNameCounters[lowerCaseItemName]) {
+        itemNameCounters[lowerCaseItemName] += 1;
+      } else {
+        itemNameCounters[lowerCaseItemName] = 1;
+      }
+      const itemId = `${lowerCaseItemName}_${itemNameCounters[lowerCaseItemName]}`;
+
       const { bounding_box } = item;
       const cropUrl = `${imageUrl.replace(
         "/upload/",
@@ -87,6 +97,7 @@ export default function New() {
         }
 
         enrichedItems.push({
+          itemId,
           cropUrl,
           ...item,
           similarItems: googleLensResults.visual_matches || [],
@@ -96,6 +107,7 @@ export default function New() {
       } catch (error) {
         log.error(`Error processing item ${item.name}:`, error);
         enrichedItems.push({
+          itemId,
           ...item,
           similarItems: [],
           tags: [],
@@ -113,7 +125,7 @@ export default function New() {
     const lowerCaseItemId = itemId.toLowerCase(); // Ensure consistent item IDs
     setSelectedSimilarItems((prevState) => ({
       ...prevState,
-      [lowerCaseItemId]: similarItem,
+      [itemId]: similarItem,
     }));
   };
 
@@ -215,25 +227,29 @@ export default function New() {
     try {
       const itemIds = Object.keys(selectedSimilarItems);
       const processingPromises = itemIds.map(async (itemId) => {
-        const similarItem = selectedSimilarItems[itemId];
-        const lowerCaseItemId = itemId.toLowerCase();
+        try {
+          const similarItem = selectedSimilarItems[itemId];
 
-        const processedData = await processSimilarItem(
-          similarItem,
-          lowerCaseItemId
-        );
+          const processedData = await processSimilarItem(similarItem, itemId);
 
-        return { itemId: lowerCaseItemId, processedData };
+          return { itemId, processedData };
+        } catch (error) {
+          log.error(`Error processing item ${itemId}:`, error);
+          return null; // Return null if there's an error
+        }
       });
 
       const results = await Promise.all(processingPromises);
 
-      const tagsUpdates = {};
-      const googleItemsUpdates = {};
+      const tagsUpdates: { [key: string]: any } = {};
+      const googleItemsUpdates: { [key: string]: SimilarItem } = {};
 
-      results.forEach(({ itemId, processedData }) => {
-        tagsUpdates[itemId] = processedData.tags;
-        googleItemsUpdates[itemId] = processedData.googleItem;
+      results.forEach((result) => {
+        if (result) {
+          const { itemId, processedData } = result;
+          tagsUpdates[itemId] = processedData.tags;
+          googleItemsUpdates[itemId] = processedData.googleItem;
+        }
       });
 
       // Update state once after all processing is done
@@ -290,7 +306,7 @@ export default function New() {
         source: similarItem.source,
       });
 
-      const item = items.find((item) => item.name.toLowerCase() === itemId);
+      const item = items.find((item) => item.itemId === itemId);
 
       const deepTags = similarItem.thumbnail
         ? await getDeepTags(similarItem.thumbnail ?? "")

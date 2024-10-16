@@ -15,6 +15,7 @@ export type SimilarItem = {
 };
 
 export type DetectedItem = {
+  itemId: string;
   area: number;
   bounding_box: BoundingBox;
   category: string;

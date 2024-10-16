@@ -36,39 +36,32 @@ export const createCompleteOutfitData = async (
 ): Promise<any> => {
   log.info("Entering createCompleteOutfitData function");
   try {
-    const outfitMetadata: OutfitMetadata = {
-      outfit_id: "default",
+    const processedItems = items.map((item) => {
+      const itemId = item.itemId; // Use unique itemId
+      const openAITags = selectedTags[itemId] || {};
+      const itemGoogleItem = googleItems[itemId] || null;
+
+      delete openAITags.googleItem; // Ensure googleItem is not duplicated in tags
+
+      const mergedTags = mergeTags(openAITags, item.tags);
+
+      return {
+        item_id: itemId,
+        item_image_url: item.cropUrl,
+        category:
+          mergedTags?.deepTags?.category ||
+          mergedTags?.openAITags?.category ||
+          "unknown",
+        tags: openAITags,
+        googleItem: itemGoogleItem,
+        bounding_box: item.bounding_box,
+      };
+    });
+
+    const outfitData = {
       user_id: user_id,
       outfit_image_url: imageUrl,
       outfit_image_public_id: publicId,
-    };
-
-    const processedItems = await Promise.all(
-      items.map(async (item) => {
-        const lowerCaseItemName = item.name.toLowerCase(); // Ensure consistent item IDs
-        const openAITags = selectedTags[lowerCaseItemName] || {};
-        delete openAITags.googleItem; // Ensure googleItem is not duplicated in tags
-
-        const mergedTags = mergeTags(openAITags, item.tags);
-
-        return {
-          item_id: lowerCaseItemName,
-          item_image_url: item.cropUrl,
-          category:
-            mergedTags?.deepTags?.category ||
-            mergedTags?.openAITags?.category ||
-            "unknown",
-          tags: openAITags,
-          googleItem: googleItems[lowerCaseItemName] || null,
-          bounding_box: item.bounding_box,
-        };
-      })
-    );
-
-    const outfitData = {
-      user_id: outfitMetadata?.user_id,
-      outfit_image_url: outfitMetadata?.outfit_image_url,
-      outfit_image_public_id: outfitMetadata?.outfit_image_public_id,
       date_created: new Date().toISOString(),
       items: processedItems,
       additional_info: {},

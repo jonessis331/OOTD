@@ -15,9 +15,10 @@ const PieceComponent = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSelect = (similarItem: SimilarItem) => {
-    const lowerCaseItemName = item.name.toLowerCase(); // Ensure consistent item IDs
+    //const lowerCaseItemName = item.name.toLowerCase(); // Ensure consistent item IDs
+    const itemId = item.itemId;
     onItemSelect({
-      itemId: lowerCaseItemName,
+      itemId,
       similarItem,
     });
     setIsExpanded(false);
