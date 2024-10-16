@@ -213,30 +213,40 @@ export default function New() {
   const handleContinue = async () => {
     setIsProcessingItems(true);
     try {
-      for (const itemId in selectedSimilarItems) {
+      const itemIds = Object.keys(selectedSimilarItems);
+      const processingPromises = itemIds.map(async (itemId) => {
         const similarItem = selectedSimilarItems[itemId];
-        const lowerCaseItemId = itemId.toLowerCase(); // Ensure consistent item IDs
+        const lowerCaseItemId = itemId.toLowerCase();
 
         const processedData = await processSimilarItem(
           similarItem,
           lowerCaseItemId
         );
 
-        // Update selectedTags and googleItems
-        setSelectedTags((prevTags) => ({
-          ...prevTags,
-          [lowerCaseItemId]: {
-            ...processedData.tags,
-          },
-        }));
+        return { itemId: lowerCaseItemId, processedData };
+      });
 
-        setGoogleItems((prevGoogleItems) => ({
-          ...prevGoogleItems,
-          [lowerCaseItemId]: processedData.googleItem,
-        }));
-      }
+      const results = await Promise.all(processingPromises);
+
+      const tagsUpdates = {};
+      const googleItemsUpdates = {};
+
+      results.forEach(({ itemId, processedData }) => {
+        tagsUpdates[itemId] = processedData.tags;
+        googleItemsUpdates[itemId] = processedData.googleItem;
+      });
+
+      // Update state once after all processing is done
+      setSelectedTags((prevTags) => ({
+        ...prevTags,
+        ...tagsUpdates,
+      }));
+
+      setGoogleItems((prevGoogleItems) => ({
+        ...prevGoogleItems,
+        ...googleItemsUpdates,
+      }));
     } catch (error) {
-      // Handle error
       log.error("Error processing items:", error);
     } finally {
       setIsProcessingItems(false);
