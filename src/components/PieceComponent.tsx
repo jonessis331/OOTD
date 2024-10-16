@@ -20,6 +20,7 @@ const PieceComponent = ({
       itemId: lowerCaseItemName,
       similarItem,
     });
+    setIsExpanded(false);
   };
 
   return (
