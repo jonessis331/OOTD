@@ -11,27 +11,26 @@ import {
   Animated, // Import Animated
   Easing, // Import Easing
 } from "react-native";
-import {  } from 'react-native-reanimated-carousel';
+import {} from "react-native-reanimated-carousel";
 import React, { useState, useEffect } from "react";
 import { supabase } from "~/src/lib/supabase";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import InfoSheet from "~/src/components/InfoSheet";
-import RectangleComponent from '~/src/components/RectangleComponent';
+import RectangleComponent from "~/src/components/RectangleComponent";
 import SmallItemImageOnly from "~/src/components/SmallItem";
 import ItemInfoPopups from "~/src/components/ItemInfoPopups";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { BlurView } from 'expo-blur';
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { BlurView } from "expo-blur";
 import PrettyPopup from "~/src/components/PrettyPopup";
 import Carousel, { TAnimationStyle } from "react-native-reanimated-carousel";
-import { interpolate,  useSharedValue  } from "react-native-reanimated";
-import RNFadedScrollView from 'rn-faded-scrollview';
-import {LinearGradient} from 'expo-linear-gradient';
+import { interpolate, useSharedValue } from "react-native-reanimated";
+import RNFadedScrollView from "rn-faded-scrollview";
+import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
-
 
 const ClosetScreen = ({ navigation }) => {
   const [tops, setTops] = useState<any[]>([]);
@@ -48,7 +47,7 @@ const ClosetScreen = ({ navigation }) => {
   const topProgress = useSharedValue(0);
   const bottomProgress = useSharedValue(0);
   const shoeProgress = useSharedValue(0);
-  
+
   useEffect(() => {
     fetchOutfits();
   }, []);
@@ -72,12 +71,15 @@ const ClosetScreen = ({ navigation }) => {
   }, [pressedItem]);
 
   const addPage = () => {
-    navigation.navigate('Accessories', { accessories, onAdd: handleAddItem });
+    navigation.navigate("Accessories", { accessories, onAdd: handleAddItem });
   };
 
   const fetchOutfits = async () => {
     try {
-      const { data, error } = await supabase.from("outfits").select("*").order('date_created', { ascending: false });
+      const { data, error } = await supabase
+        .from("outfits")
+        .select("*")
+        .order("date_created", { ascending: false });
 
       if (error) {
         console.error("Error fetching outfits:", error);
@@ -89,9 +91,18 @@ const ClosetScreen = ({ navigation }) => {
       setShoes(getCategoryItems(["shoe"], data));
 
       // Filter for accessories and other items that are NOT tops, bottoms, or shoes
-      const excludedCategories = ["top", "shirt", "bottom", "shorts", "pants", "shoe"];
-      const allItems = data.flatMap(outfit => outfit.items);
-      const filteredAccessories = allItems.filter(item => !excludedCategories.includes(item.item_id));
+      const excludedCategories = [
+        "top",
+        "shirt",
+        "bottom",
+        "shorts",
+        "pants",
+        "shoe",
+      ];
+      const allItems = data.flatMap((outfit) => outfit.items);
+      const filteredAccessories = allItems.filter(
+        (item) => !excludedCategories.includes(item.item_id)
+      );
 
       setAccessories(filteredAccessories); // Set accessories to the filtered items
     } catch (error) {
@@ -109,8 +120,8 @@ const ClosetScreen = ({ navigation }) => {
   };
 
   const handleAddItem = (item: any) => {
-    setSelectedItems(prevItems => [...prevItems, item]);
-    setAccessories(prevAccessories => [...prevAccessories, item]); // Add this line
+    setSelectedItems((prevItems) => [...prevItems, item]);
+    setAccessories((prevAccessories) => [...prevAccessories, item]); // Add this line
     setShowRectangle(false);
   };
 
@@ -119,22 +130,26 @@ const ClosetScreen = ({ navigation }) => {
   };
 
   const handleRemoveItem = (item: any) => {
-    setSelectedItems(prevItems => prevItems.filter(i => i.id !== item.id));
+    setSelectedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
   };
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
+    console.log(item?.tags?.deepTags?.googleItem?.n_background_thumbnail);
     return (
-        <View>
+      <View>
         <TouchableOpacity onPress={() => handleItemPress(item)}>
-           <View style={styles.itemContainer}>
-          <Image
-            source={{ uri: item.item_image_url }}
-            style={styles.image}
-          />
+          <View style={styles.itemContainer}>
+            <Image
+              source={{
+                uri:
+                  item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
+                  item.item_image_url,
+              }}
+              style={styles.image}
+            />
           </View>
-          
         </TouchableOpacity>
-        </View>
+      </View>
     );
   };
 
@@ -180,7 +195,7 @@ const ClosetScreen = ({ navigation }) => {
     return (
       <View key={index} className="flex-1  justify-center px-4">
         <InfoSheet item={item.item} />
-        {item.type === 'selected' && (
+        {item.type === "selected" && (
           <TouchableOpacity
             style={styles.removeButton}
             onPress={() => handleRemoveItem(item.item)}
@@ -191,14 +206,16 @@ const ClosetScreen = ({ navigation }) => {
       </View>
     );
   };
-  
 
   const carouselData = [
-    { type: 'top', item: tops[currentTopIndex] },
-    { type: 'bottom', item: bottoms[currentBottomIndex] },
-    { type: 'shoes', item: shoes[currentShoeIndex] },
+    { type: "top", item: tops[currentTopIndex] },
+    { type: "bottom", item: bottoms[currentBottomIndex] },
+    { type: "shoes", item: shoes[currentShoeIndex] },
     ...(selectedItems.length > 0
-      ? selectedItems.map((selectedItem) => ({ type: 'selected', item: selectedItem }))
+      ? selectedItems.map((selectedItem) => ({
+          type: "selected",
+          item: selectedItem,
+        }))
       : []),
   ];
 
@@ -207,14 +224,16 @@ const ClosetScreen = ({ navigation }) => {
       {pressedItem && (
         <Animated.View style={[styles.popupContainer, { opacity: fadeAnim }]}>
           <BlurView intensity={20} style={styles.blurView}>
-            <TouchableOpacity style={styles.overlay} onPress={() => setPressedItem(null)} />
+            <TouchableOpacity
+              style={styles.overlay}
+              onPress={() => setPressedItem(null)}
+            />
             <PrettyPopup item={pressedItem} />
           </BlurView>
         </Animated.View>
       )}
-      
-      <ScrollView style={styles.container}>
 
+      <ScrollView style={styles.container}>
         {showRectangle && (
           <RectangleComponent
             items={accessories}
@@ -233,21 +252,21 @@ const ClosetScreen = ({ navigation }) => {
         currentShoeIndex < shoes.length ? (
           <View className="m-0 mb-0 rounded-x">
             {/* <ScrollView showsVerticalScrollIndicator={false} className = 'w-full h-[44%] mt-3 mb-9 '> */}
-            
+
             <Carousel
               data={carouselData}
               renderItem={renderCarouselItem}
               sliderWidth={width}
               itemWidth={ITEM_WIDTH}
-              layout={'default'}
+              layout={"default"}
               customAnimation={animationStyle}
               vertical
               loop={false}
               pagingEnabled={false}
-              height={ITEM_HEIGHT*3.7}
+              height={ITEM_HEIGHT * 3.7}
               style={StyleSheet.absoluteFillObject}
             />
-          
+
             {/* <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 0, y: 1}}
@@ -260,21 +279,31 @@ const ClosetScreen = ({ navigation }) => {
         ) : (
           <Text>No item selected</Text>
         )}
-        <View className = "mt-[90%]">
-        {tops.length > 0 && (
-           <TestVW items={tops} onIndexChange={setCurrentTopIndex} renderItem={renderItem} />
-        )}
+        <View className="mt-[90%]">
+          {tops.length > 0 && (
+            <TestVW
+              items={tops}
+              onIndexChange={setCurrentTopIndex}
+              renderItem={renderItem}
+            />
+          )}
 
-        {bottoms.length > 0 && (
-           <TestVW items={bottoms} onIndexChange={setCurrentBottomIndex} renderItem={renderItem} />
-        )}
+          {bottoms.length > 0 && (
+            <TestVW
+              items={bottoms}
+              onIndexChange={setCurrentBottomIndex}
+              renderItem={renderItem}
+            />
+          )}
 
-        {shoes.length > 0 && (
-           <TestVW items={shoes} onIndexChange={setCurrentShoeIndex} renderItem={renderItem} />
-        )}
-
+          {shoes.length > 0 && (
+            <TestVW
+              items={shoes}
+              onIndexChange={setCurrentShoeIndex}
+              renderItem={renderItem}
+            />
+          )}
         </View>
-        
 
         <Text className="pl-2 mt-7 font-mono font-semibold">Accessories</Text>
         <FlatList
@@ -285,7 +314,10 @@ const ClosetScreen = ({ navigation }) => {
           } // Fallback to index if no id
           renderItem={({ item }) => (
             <View style={styles.itemContainer}>
-             <Image source={{uri: item.item_image_url}} style={{width: 30, height: 30}} /> 
+              <Image
+                source={{ uri: item.item_image_url }}
+                style={{ width: 30, height: 30 }}
+              />
             </View>
           )}
           ListHeaderComponent={
@@ -319,7 +351,7 @@ const ClosetScreen = ({ navigation }) => {
 };
 
 const AccessoriesScreen = ({ route, navigation }) => {
-    const { accessories, onAdd, addPage } = route.params;
+  const { accessories, onAdd, addPage } = route.params;
 
   return (
     <RectangleComponent items={accessories} onClose={addPage} onAdd={onAdd} />
@@ -328,10 +360,18 @@ const AccessoriesScreen = ({ route, navigation }) => {
 
 export default function Closet() {
   return (
-    <NavigationContainer independent={true} >
-      <Stack.Navigator initialRouteName="ClosetScreen" >
-        <Stack.Screen name="something"  options={{headerShown: false}} component={ClosetScreen}/>
-        <Stack.Screen name="Accessories" options={{headerShown: false, headerTransparent: true}} component={AccessoriesScreen} />
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="ClosetScreen">
+        <Stack.Screen
+          name="something"
+          options={{ headerShown: false }}
+          component={ClosetScreen}
+        />
+        <Stack.Screen
+          name="Accessories"
+          options={{ headerShown: false, headerTransparent: true }}
+          component={AccessoriesScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -344,17 +384,17 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   popupContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     zIndex: 1000, // Ensure it is above other elements
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   overlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -363,14 +403,14 @@ const styles = StyleSheet.create({
   },
   blurView: {
     flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    position: 'absolute',
+    position: "absolute",
     right: 200,
     marginBottom: 0,
   },
@@ -382,50 +422,47 @@ const styles = StyleSheet.create({
     // //backgroundColor: "black",
     //borderWidth: 1,
     //borderColor: 'black',
-    
   },
   itemContainer: {
     width: width, // Full width of the screen
-    alignItems: 'center', // Center the image horizontally
-    justifyContent: 'center', // Center the image vertically
+    alignItems: "center", // Center the image horizontally
+    justifyContent: "center", // Center the image vertically
     marginTop: 0,
     //backgroundColor: 'red',
-    
-   
+
     //backgroundColor: "transparent",
   },
   flatListMain: {
     flex: 1,
-    backgroundColor: 'transparent', // Make the FlatList background transparent
-    
+    backgroundColor: "transparent", // Make the FlatList background transparent
   },
- 
+
   image: {
     width: 95,
     height: 95,
     borderRadius: 10,
-  //   marginVertical: 0,
-  //   //Shadow properties for iOS
-  //   shadowColor: 'black',
-  //   shadowOffset: {
-  //     width: 10,
-  //     height: 20, // Vertical offset
-  //   },
-  //   shadowOpacity: 0.9, // Opacity of the shadow
-  //   shadowRadius: 10, // Radius of the shadow
-  //   // Android shadow properties
-  //   elevation: 10, // Elevation for Android
-  //  //borderWidth: 2,
-  //   //borderColor: '#FAFBFD',
+    //   marginVertical: 0,
+    //   //Shadow properties for iOS
+    //   shadowColor: 'black',
+    //   shadowOffset: {
+    //     width: 10,
+    //     height: 20, // Vertical offset
+    //   },
+    //   shadowOpacity: 0.9, // Opacity of the shadow
+    //   shadowRadius: 10, // Radius of the shadow
+    //   // Android shadow properties
+    //   elevation: 10, // Elevation for Android
+    //  //borderWidth: 2,
+    //   //borderColor: '#FAFBFD',
   },
   bubble: {
     width: 50,
-    aspectRatio: 4/4,
-    position: 'absolute', // Position the bubble absolutely
+    aspectRatio: 4 / 4,
+    position: "absolute", // Position the bubble absolutely
     top: -60, // Adjust as needed to place it above the image
-    left: '48%', // Center horizontally
+    left: "48%", // Center horizontally
     transform: [{ translateX: 30 }], // Adjust for centering
-    backgroundColor: 'purple', // Bubble background color
+    backgroundColor: "purple", // Bubble background color
     padding: 8, // Bubble padding
     borderRadius: 40, // Bubble border radius
     zIndex: 1, // Ensure the bubble is on a higher z-axis
@@ -433,39 +470,37 @@ const styles = StyleSheet.create({
   flatList: {
     height: 40,
     flexGrow: 0,
-    backgroundColor:  "#688990",
+    backgroundColor: "#688990",
   },
   createOutfitButton: {
-    backgroundColor:'#4D766E' ,
-    alignSelf: 'center',
-    width: '50%',
+    backgroundColor: "#4D766E",
+    alignSelf: "center",
+    width: "50%",
     padding: 5,
     height: 30,
     borderRadius: 30,
-    alignItems: 'center',
+    alignItems: "center",
     //marginBottom: 10,
   },
   createOutfitButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 220,
     right: 40,
-    backgroundColor: 'black',
+    backgroundColor: "black",
     padding: 10,
     borderRadius: 15,
     maxHeight: 40,
   },
   removeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   carouselItem: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
-

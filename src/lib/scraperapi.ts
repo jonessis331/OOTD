@@ -16,7 +16,7 @@ export const scrapUrl = async (cropUrl: string) => {
     log.error("Error fetching data:", error);
     throw error;
   } finally {
-    log.info("leaving Scrap Url (scraperapi)")
+    log.info("leaving Scrap Url (scraperapi)");
   }
 };
 
@@ -25,7 +25,8 @@ export const scrapUrlWithBeeScraper = async (productUrl: string) => {
   try {
     const response = await axios.get("https://app.scrapingbee.com/api/v1/", {
       params: {
-        api_key: "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
+        api_key:
+          "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
         url: productUrl,
         json_response: "true",
       },
@@ -35,6 +36,6 @@ export const scrapUrlWithBeeScraper = async (productUrl: string) => {
     log.error("Error in BeeScraper:", error);
     throw error;
   } finally {
-    log.info("leaving beescraper")
+    log.info("leaving beescraper");
   }
 };

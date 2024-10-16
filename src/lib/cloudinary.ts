@@ -13,7 +13,7 @@ export const uploadImage = async (file: string) => {
   const options = {
     upload_preset: "default",
     unsigned: true,
-   // access_mode: "authenticated", // Set access mode to authenticated
+    // access_mode: "authenticated", // Set access mode to authenticated
   };
   return new Promise<UploadApiResponse>(async (resolve, reject) => {
     await upload(cld, {
@@ -36,10 +36,14 @@ export const makeImagePublic = async (publicId: string) => {
   formdata.append("access_mode", "public");
 
   const requestOptions = {
-    method: 'POST',
+    method: "POST",
     body: formdata,
     headers: {
-      Authorization: `Basic ${btoa(process.env.EXPO_PUBLIC_CLOUDINARY_API_KEY + ':' + process.env.EXPO_PUBLIC_CLOUDINARY_API_SECRET)}`,
+      Authorization: `Basic ${btoa(
+        process.env.EXPO_PUBLIC_CLOUDINARY_API_KEY +
+          ":" +
+          process.env.EXPO_PUBLIC_CLOUDINARY_API_SECRET
+      )}`,
     },
   };
 
@@ -48,7 +52,29 @@ export const makeImagePublic = async (publicId: string) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.warn('Error:', error);
+    console.warn("Error:", error);
     throw error;
   }
+};
+
+export const uploadNoBackground = async (fileUrl: string) => {
+  const options = {
+    upload_preset: "default",
+    unsigned: true,
+    transformation: [{ effect: "remove_background" }],
+  };
+
+  return new Promise<UploadApiResponse>(async (resolve, reject) => {
+    await upload(cld, {
+      file: fileUrl,
+      options: options,
+      callback: (error, response) => {
+        if (error || !response) {
+          reject(error);
+        } else {
+          resolve(response);
+        }
+      },
+    });
+  });
 };
