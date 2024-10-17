@@ -30,6 +30,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
 import { cld } from "~/src/lib/cloudinary";
 import { AdvancedImage } from "cloudinary-react-native";
+import { backgroundRemoval } from "@cloudinary/url-gen/actions/effect";
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
@@ -136,24 +137,27 @@ const ClosetScreen = ({ navigation }) => {
   };
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
-    const image = cld.image(
-      item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
-        item.item_image_url
-    );
-    console.log(item?.tags?.deepTags?.googleItem?.n_background_thumbnail);
+    let image = null;
+    if (item?.googleItem?.n_background_thumbnail) {
+      image = cld
+        .image(item.googleItem?.n_background_thumbnail)
+        .effect(backgroundRemoval())
+        .format("png"); // Ensure the format supports transparency
+    }
+
+    console.log(item?.tags.googleItem, " goooooooogllll");
     return (
       <View>
         <TouchableOpacity onPress={() => handleItemPress(item)}>
           <View style={styles.itemContainer}>
-            <AdvancedImage
-              cldImg={image}
-              // source={{
-              //   uri:
-              //     item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
-              //     item.item_image_url,
-              // }}
-              style={styles.image}
-            />
+            {item?.googleItem?.n_background_thumbnail ? (
+              <AdvancedImage cldImg={image} style={styles.image} />
+            ) : (
+              <Image
+                source={{ uri: item.item_image_url }}
+                style={styles.image}
+              />
+            )}
           </View>
         </TouchableOpacity>
       </View>
@@ -435,7 +439,7 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center the image horizontally
     justifyContent: "center", // Center the image vertically
     marginTop: 0,
-    //backgroundColor: 'red',
+    //backgroundColor: "red",
 
     //backgroundColor: "transparent",
   },
@@ -448,6 +452,7 @@ const styles = StyleSheet.create({
     width: 95,
     height: 95,
     borderRadius: 10,
+    // backgroundColor: "green",
     //   marginVertical: 0,
     //   //Shadow properties for iOS
     //   shadowColor: 'black',
