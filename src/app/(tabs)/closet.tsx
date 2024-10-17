@@ -28,6 +28,8 @@ import { interpolate, useSharedValue } from "react-native-reanimated";
 import RNFadedScrollView from "rn-faded-scrollview";
 import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
+import { cld } from "~/src/lib/cloudinary";
+import { AdvancedImage } from "cloudinary-react-native";
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
@@ -134,17 +136,22 @@ const ClosetScreen = ({ navigation }) => {
   };
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
+    const image = cld.image(
+      item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
+        item.item_image_url
+    );
     console.log(item?.tags?.deepTags?.googleItem?.n_background_thumbnail);
     return (
       <View>
         <TouchableOpacity onPress={() => handleItemPress(item)}>
           <View style={styles.itemContainer}>
-            <Image
-              source={{
-                uri:
-                  item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
-                  item.item_image_url,
-              }}
+            <AdvancedImage
+              cldImg={image}
+              // source={{
+              //   uri:
+              //     item.tags?.deepTags?.googleItem?.n_background_thumbnail ||
+              //     item.item_image_url,
+              // }}
               style={styles.image}
             />
           </View>

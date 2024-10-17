@@ -227,15 +227,13 @@ export default function New() {
     try {
       const itemIds = Object.keys(selectedSimilarItems);
       const processingPromises = itemIds.map(async (itemId) => {
+        const similarItem = selectedSimilarItems[itemId];
         try {
-          const similarItem = selectedSimilarItems[itemId];
-
           const processedData = await processSimilarItem(similarItem, itemId);
-
           return { itemId, processedData };
         } catch (error) {
           log.error(`Error processing item ${itemId}:`, error);
-          return null; // Return null if there's an error
+          return { itemId, processedData: null }; // Return null data but include itemId
         }
       });
 
@@ -245,14 +243,13 @@ export default function New() {
       const googleItemsUpdates: { [key: string]: SimilarItem } = {};
 
       results.forEach((result) => {
-        if (result) {
-          const { itemId, processedData } = result;
+        const { itemId, processedData } = result;
+        if (processedData) {
           tagsUpdates[itemId] = processedData.tags;
           googleItemsUpdates[itemId] = processedData.googleItem;
         }
       });
 
-      // Update state once after all processing is done
       setSelectedTags((prevTags) => ({
         ...prevTags,
         ...tagsUpdates,
@@ -262,8 +259,13 @@ export default function New() {
         ...prevGoogleItems,
         ...googleItemsUpdates,
       }));
+
+      if (Object.keys(tagsUpdates).length === 0) {
+        Alert.alert("Failed to process items. Please try again.");
+      }
     } catch (error) {
       log.error("Error processing items:", error);
+      Alert.alert("An error occurred while processing items.");
     } finally {
       setIsProcessingItems(false);
     }
@@ -286,14 +288,12 @@ export default function New() {
       let openTagsOne;
       if (!similarItem.link.includes("amazon")) {
         const scrappedINFO = await scrapUrlWithBeeScraper(similarItem.link);
-        openTagsOne = (await generateTags({
+        openTagsOne = await generateTags({
           paragraph: JSON.stringify(scrappedINFO),
           link: similarItem.link,
           title: similarItem.title,
           source: similarItem.source,
-        }))
-          ? scrappedINFO
-          : null;
+        });
       } else {
         openTagsOne = null;
       }
@@ -312,9 +312,7 @@ export default function New() {
         ? await getDeepTags(similarItem.thumbnail ?? "")
         : await getDeepTags(item?.cropUrl ?? "");
 
-      const background_response = await uploadNoBackground(
-        similarItem.thumbnail
-      );
+      const background_response = await uploadImage(similarItem.thumbnail);
 
       const processedData = {
         googleItem: {

@@ -13,7 +13,7 @@ const PieceComponent = ({
   onItemSelect: (selectedItemData: any) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const [openCropUrl, setopenCropUrl] = useState("");
   const handleSelect = (similarItem: SimilarItem) => {
     //const lowerCaseItemName = item.name.toLowerCase(); // Ensure consistent item IDs
     const itemId = item.itemId;
@@ -33,6 +33,7 @@ const PieceComponent = ({
               source={{ uri: item.cropUrl }}
               className="w-24 aspect-square rounded-full"
             />
+
             <Text className="text-3xl font-mono font-extrabold">
               {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
             </Text>
