@@ -30,7 +30,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
 import { cld } from "~/src/lib/cloudinary";
 import { AdvancedImage } from "cloudinary-react-native";
-import { backgroundRemoval } from "@cloudinary/url-gen/actions/effect";
+import {
+  backgroundRemoval,
+  dropShadow,
+} from "@cloudinary/url-gen/actions/effect";
+import { Picker } from "@react-native-picker/picker";
+
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
@@ -50,6 +55,9 @@ const ClosetScreen = ({ navigation }) => {
   const topProgress = useSharedValue(0);
   const bottomProgress = useSharedValue(0);
   const shoeProgress = useSharedValue(0);
+  const [categories, setCategories] = useState<string[]>([]); // To store selected categories
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // For dropdown selection
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Control dropdown visibility
 
   useEffect(() => {
     fetchOutfits();
@@ -122,6 +130,13 @@ const ClosetScreen = ({ navigation }) => {
     }, []);
   };
 
+  const handleAddCategory = (category: string) => {
+    if (selectedCategory && !categories.includes(selectedCategory)) {
+      setCategories((prev) => [...prev, selectedCategory]);
+    }
+    setIsDropdownOpen(false); // Close dropdown after selection
+  };
+
   const handleAddItem = (item: any) => {
     setSelectedItems((prevItems) => [...prevItems, item]);
     setAccessories((prevAccessories) => [...prevAccessories, item]); // Add this line
@@ -136,13 +151,59 @@ const ClosetScreen = ({ navigation }) => {
     setSelectedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
   };
 
+  const renderCategoryCarousel = (category: string) => {
+    let data = [];
+    let setCurrentIndex: any;
+    switch (category) {
+      case "tops":
+        data = tops;
+        setCurrentIndex = setTops;
+        break;
+      case "bottoms":
+        data = bottoms;
+        setCurrentIndex = setBottoms;
+        break;
+      case "shoes":
+        data = shoes;
+        setCurrentIndex = setShoes;
+        break;
+      default:
+        break;
+    }
+
+    return (
+      <View key={category}>
+        <Text>{category}</Text>
+        <TestVW
+          items={data}
+          onIndexChange={setCurrentIndex && renderCarouselItem}
+          renderItem={renderItem}
+        />
+        {/* Add a remove button */}
+        <TouchableOpacity
+          onPress={() => handleRemoveCategory(category)}
+          style={styles.removeButton}
+        >
+          <Text style={styles.removeButtonText}>Remove {category}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  // Remove a category
+  const handleRemoveCategory = (categoryToRemove: string) => {
+    setCategories((prev) =>
+      prev.filter((category) => category !== categoryToRemove)
+    );
+  };
+
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
     let image = null;
     if (item?.googleItem?.n_background_thumbnail) {
       image = cld
         .image(item.googleItem?.n_background_thumbnail)
         .effect(backgroundRemoval())
-        .format("png"); // Ensure the format supports transparency
+        .format("png") // Ensure the format supports transparency
+        .effect(dropShadow().azimuth(183).elevation(70).spread(60));
     }
 
     console.log(item?.tags.googleItem, " goooooooogllll");
@@ -291,7 +352,7 @@ const ClosetScreen = ({ navigation }) => {
           <Text>No item selected</Text>
         )}
         <View className="mt-[90%]">
-          {tops.length > 0 && (
+          {/* {tops.length > 0 && (
             <TestVW
               items={tops}
               onIndexChange={setCurrentTopIndex}
@@ -312,10 +373,42 @@ const ClosetScreen = ({ navigation }) => {
               items={shoes}
               onIndexChange={setCurrentShoeIndex}
               renderItem={renderItem}
-            />
-          )}
-        </View>
+            /> */}
+          {/* )} */}
 
+          {/* Button to Toggle Dropdown */}
+          <TouchableOpacity
+            onPress={() => setIsDropdownOpen((prev) => !prev)}
+            style={styles.addButton}
+          >
+            <Text style={styles.addButtonText}>+ Add Category</Text>
+          </TouchableOpacity>
+
+          {/* Dropdown Picker for Categories */}
+          {isDropdownOpen && (
+            <View style={styles.dropdownContainer}>
+              <Picker
+                selectedValue={selectedCategory}
+                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Select Category" value={null} />
+                <Picker.Item label="Tops" value="tops" />
+                <Picker.Item label="Bottoms" value="bottoms" />
+                <Picker.Item label="Shoes" value="shoes" />
+              </Picker>
+              <TouchableOpacity
+                onPress={handleAddCategory}
+                style={styles.addButton}
+              >
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Render Carousels based on selected categories */}
+          {categories.map((category) => renderCategoryCarousel(category))}
+        </View>
         <Text className="pl-2 mt-7 font-mono font-semibold">Accessories</Text>
         <FlatList
           data={accessories}
@@ -499,9 +592,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   removeButton: {
-    position: "absolute",
-    top: 220,
-    right: 40,
+    // position: "absolute",
+    // top: 220,
+    // right: 40,
     backgroundColor: "black",
     padding: 10,
     borderRadius: 15,
@@ -514,5 +607,16 @@ const styles = StyleSheet.create({
   carouselItem: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  addButton: {
+    backgroundColor: "#4D766E",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    margin: 10,
+  },
+  addButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
