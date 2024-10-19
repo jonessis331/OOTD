@@ -8,7 +8,8 @@ const PAGE_WIDTH = width;
 
 interface TestVWProps {
   items: { image_url: string }[];
-  onIndexChange: (index: number) => void;
+  onIndexChange: (index: number, selectedItem: any) => void;
+
   renderItem: (item: { image_url: string }) => JSX.Element;
   onScrollBegin?: () => void;
   onScrollEnd?: () => void;
@@ -19,26 +20,59 @@ const TestVW: React.FC<TestVWProps> = ({
   onIndexChange,
   renderItem,
   onScrollBegin,
+
   onScrollEnd,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
+  const lastIndex = useRef<number>(-1);
 
-  // Handle index changes safely
-  const handleIndexChange = (
-    absoluteProgress: number,
-    relativeProgress: number
-  ) => {
-    const newIndex = Math.round(relativeProgress); // Use only relative progress for index calculation
-    //console.log("Relative Progress:", relativeProgress); // Debug log
+  const handleProgressChange = (_: number, absoluteProgress: number) => {
+    const currentIndex = Math.round(absoluteProgress);
 
-    // Ensure we are not repeatedly setting the same index
-    if (newIndex !== currentIndex) {
-      setCurrentIndex(newIndex);
-      onIndexChange(newIndex); // Notify parent component
+    if (
+      currentIndex !== lastIndex.current &&
+      currentIndex >= 0 &&
+      currentIndex < items.length
+    ) {
+      lastIndex.current = currentIndex;
+      const selectedItem = items[currentIndex];
+      onIndexChange(currentIndex, selectedItem);
     }
   };
+
+  // Handle index changes safely
+  // const handleIndexChange = (
+  //   absoluteProgress: number,
+  //   relativeProgress: number
+  // ) => {
+  //   const newIndex = Math.round(relativeProgress); // Use only relative progress for index calculation
+  //   //console.log("Relative Progress:", relativeProgress); // Debug log
+
+  //   // Ensure we are not repeatedly setting the same index
+  //   if (newIndex !== currentIndex) {
+  //     setCurrentIndex(newIndex);
+  //     onIndexChange(newIndex); // Notify parent component
+  //   }
+  // };
+
+  // let lastIndex = useRef<number>(0).current;
+
+  // const handleScroll = (event: any) => {
+  //   const offsetX = event.nativeEvent.contentOffset.x;
+  //   const currentIndex = Math.round(offsetX / width);
+
+  //   if (
+  //     currentIndex !== lastIndex &&
+  //     currentIndex >= 0 &&
+  //     currentIndex < items.length
+  //   ) {
+  //     lastIndex = currentIndex;
+  //     const selectedItem = items[currentIndex];
+  //     onProgressChange(currentIndex, selectedItem);
+  //   }
+  // };
 
   const baseOptions = {
     vertical: false,
@@ -61,10 +95,11 @@ const TestVW: React.FC<TestVWProps> = ({
         pagingEnabled
         snapEnabled
         autoPlay={false}
-        onSnapToItem={(index) => {
-          const selectedItem = items[index];
-          onIndexChange(index, selectedItem); // Pass both index and selected item
-        }}
+        onProgressChange={handleProgressChange}
+        // onSnapToItem={(index) => {
+        //   const selectedItem = items[index];
+        //   onIndexChange(index, selectedItem); // Pass both index and selected item
+        // }}
         onScrollStart={() => {
           if (onScrollBegin) {
             onScrollBegin();

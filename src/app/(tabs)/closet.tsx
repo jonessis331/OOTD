@@ -9,7 +9,8 @@ import {
   Pressable,
   ScrollView,
   Animated, // Import Animated
-  Easing, // Import Easing
+  Easing,
+  TouchableWithoutFeedback, // Import Easing
 } from "react-native";
 import {} from "react-native-reanimated-carousel";
 import React, { useState, useEffect } from "react";
@@ -198,11 +199,13 @@ const ClosetScreen = ({ navigation }) => {
   //     ].filter(Boolean)
   //   ); // Filter out null values to avoid issues
   // };
-
-  const handleIndexChange = (category, index, selectedItem) => {
-    setCurrentIndices((prev) => ({ ...prev, [category]: index }));
-    setCurrentItems((prev) => ({ ...prev, [category]: selectedItem }));
-  };
+  const handleIndexChange = React.useCallback(
+    (category: string, index: number, selectedItem: any) => {
+      setCurrentIndices((prev) => ({ ...prev, [category]: index }));
+      setCurrentItems((prev) => ({ ...prev, [category]: selectedItem }));
+    },
+    []
+  );
 
   // Trigger the update when indices change
   // useEffect(() => {
@@ -237,7 +240,10 @@ const ClosetScreen = ({ navigation }) => {
             setFocusedCategory(category);
           }}
           onScrollEnd={() => {
-            setFocusedCategory(null);
+            // Delay resetting focusedCategory to null
+            setTimeout(() => {
+              setFocusedCategory(null);
+            }, 1000); // Hold zoomed-in view for 1 second after scrolling ends
           }}
           renderItem={renderItem}
         />
@@ -246,7 +252,7 @@ const ClosetScreen = ({ navigation }) => {
           onPress={() => handleRemoveCategory(category)}
           style={styles.smallRemoveButton}
         >
-          <Text style={styles.removeButtonText}>- {category}</Text>
+          <Text style={styles.removeButtonText}>-</Text>
         </TouchableOpacity>
       </View>
     );
@@ -280,7 +286,7 @@ const ClosetScreen = ({ navigation }) => {
 
     return (
       <View>
-        <TouchableOpacity onPress={() => handleItemPress(item)}>
+        <TouchableWithoutFeedback onPress={() => handleItemPress(item)}>
           <View style={styles.itemContainer}>
             {item?.googleItem?.n_background_thumbnail ? (
               <AdvancedImage cldImg={image} style={styles.image} />
@@ -291,7 +297,7 @@ const ClosetScreen = ({ navigation }) => {
               />
             )}
           </View>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
       </View>
     );
   };
@@ -418,6 +424,8 @@ const ClosetScreen = ({ navigation }) => {
             /> */}
           {/* )} */}
 
+          {/* Render Carousels based on selected categories */}
+          {categories.map((category) => renderCategoryCarousel(category))}
           {/* Button to Toggle Dropdown */}
           <TouchableOpacity
             onPress={() => setIsDropdownOpen((prev) => !prev)}
@@ -447,9 +455,6 @@ const ClosetScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           )}
-
-          {/* Render Carousels based on selected categories */}
-          {categories.map((category) => renderCategoryCarousel(category))}
         </View>
         <Text className="pl-2 mt-7 font-mono font-semibold">Accessories</Text>
         <FlatList

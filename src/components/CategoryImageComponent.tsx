@@ -1,7 +1,14 @@
 // CategoryImageComponent.tsx
 
 import React, { useRef, useEffect } from "react";
-import { Animated, Image, View, StyleSheet, Dimensions } from "react-native";
+import {
+  Animated,
+  Image,
+  View,
+  StyleSheet,
+  Dimensions,
+  Easing,
+} from "react-native";
 import InfoSheet from "~/src/components/InfoSheet";
 
 const { width, height } = Dimensions.get("window");
@@ -94,15 +101,20 @@ const CategoryImageComponent: React.FC<CategoryImageComponentProps> = ({
     },
     shoes: {
       scale: 1.75,
-      focalX: 0.7,
-      focalY: 0.75,
+      focalX: 0.8,
+      focalY: 0.65,
     },
   };
 
   useEffect(() => {
     let region = zoomRegions["default"];
+    let animationDelay = 0;
+
     if (focusedCategory && zoomRegions[focusedCategory]) {
       region = zoomRegions[focusedCategory];
+    } else {
+      // Delay zooming out when focusedCategory becomes null
+      animationDelay = 1000; // Hold zoomed-in view for 1 second
     }
 
     const { scale: toScale, focalX, focalY } = region;
@@ -113,17 +125,23 @@ const CategoryImageComponent: React.FC<CategoryImageComponentProps> = ({
     Animated.parallel([
       Animated.timing(scale, {
         toValue: toScale,
-        duration: 300,
+        duration: 600,
+        delay: animationDelay,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
       Animated.timing(translateX, {
         toValue: toTranslateX,
-        duration: 300,
+        duration: 600,
+        delay: animationDelay,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: toTranslateY,
-        duration: 300,
+        duration: 600,
+        delay: animationDelay,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
     ]).start();
