@@ -74,8 +74,8 @@ const InfoSheet = ({ item }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topHalf} />
-      <View style={styles.bottomHalf} />
+      {/* <View style={styles.topHalf} />
+      <View style={styles.bottomHalf} /> */}
       {/* <View className="absolute top-0 left-0 w-20 h-20 shadow-xl shadow-black"/> */}
 
       <Image source={{ uri: thumbnail }} style={styles.image} />

@@ -1,109 +1,15 @@
-import * as React from "react";
-import { Image, View, StyleSheet, Dimensions } from "react-native";
+import React, { useRef, useEffect, useState } from "react";
 import {
-  useSharedValue,
-  interpolate,
-  Extrapolation,
-} from "react-native-reanimated";
-import Carousel, {
-  ICarouselInstance,
-  Pagination,
-} from "react-native-reanimated-carousel";
-import posts from "~/assets/data/posts.json";
+  Animated,
+  Image,
+  View,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 
 const { width, height } = Dimensions.get("window");
-// import { SBItem } from "../../components/SBItem";
-// import SButton from "../../components/SButton";
-// import { ElementsText, window } from "../../constants";
-// const { width, height } = Dimensions.get("window");
-// const PAGE_WIDTH = width ;
-// const IMAGE_WIDTH = PAGE_WIDTH * 0.6; // Adjust the size of the main image
-// const colors = [
-//   "#26292E",
-//   "#899F9C",
-//   "#B3C680",
-//   "#5C6265",
-//   "#F5D399",
-//   "#F1F1F1",
-// ];
-
-// export default function testvw() {
-//   const [isVertical, setIsVertical] = React.useState(false);
-//   const [autoPlay, setAutoPlay] = React.useState(false);
-//   const [pagingEnabled, setPagingEnabled] = React.useState<boolean>(true);
-//   const [snapEnabled, setSnapEnabled] = React.useState<boolean>(true);
-//   const progress = useSharedValue<number>(0);
-//   const baseOptions = isVertical
-//     ? ({
-//         vertical: true,
-//         width: PAGE_WIDTH * 0.86,
-//         height: PAGE_WIDTH * 0.6,
-//       } as const)
-//     : ({
-//         vertical: false,
-//         width: PAGE_WIDTH,
-//         height: PAGE_WIDTH * 0.6,
-//       } as const);
-
-//   const ref = React.useRef<ICarouselInstance>(null);
-
-//   const onPressPagination = (index: number) => {
-//     ref.current?.scrollTo({
-//       /**
-//        * Calculate the difference between the current index and the target index
-//        * to ensure that the carousel scrolls to the nearest index
-//        */
-//       count: index - progress.value,
-//       animated: true,
-//     });
-//   };
-
-//   return (
-//     <View
-//       style={{
-//         alignItems: "center",
-//         backgroundColor: "green"
-//       }}
-//     >
-//       <Carousel
-//         ref={ref}
-//         {...baseOptions}
-//         style={{
-//           width: PAGE_WIDTH,
-
-//           backgroundColor: 'yellow'
-
-//         }}
-//         data = {posts}
-//         loop
-//         pagingEnabled={pagingEnabled}
-//         snapEnabled={snapEnabled}
-//         autoPlay={autoPlay}
-//         autoPlayInterval={1500}
-//         onProgressChange={progress}
-//         mode="parallax"
-//         modeConfig={{
-//           parallaxScrollingScale: 0.9,
-//           parallaxScrollingOffset: 300,
-//         }}
-//         renderItem={({ item }) => (
-//           <View style={{ width: PAGE_WIDTH, justifyContent: 'center', alignItems: 'center' }}>
-//             <Image
-//               source={{ uri: item.image_url }}
-//               style={{ width: PAGE_WIDTH * 0.3, height: PAGE_WIDTH * 0.3 }}
-//               resizeMode="cover"
-//             />
-//           </View>
-//         )}
-
-//       />
-//     </View>
-//   );
-// }
-
-interface CategoryImageComponentProps {
-  categories: string[];
-}
 
 const images = {
   "default.png": require("~/assets/default.png"),
@@ -157,15 +63,211 @@ const getImageFilename = (categories: string[]) => {
   return "default.png";
 };
 
-const CategoryImageComponent: React.FC<CategoryImageComponentProps> = ({
-  categories,
-}) => {
+const CategoryImageComponent: React.FC = () => {
+  const [categories, setCategories] = useState<string[]>([]);
+  const [currentItems, setCurrentItems] = useState<{ [category: string]: any }>(
+    {
+      tops: null,
+      bottoms: null,
+      shoes: null,
+    }
+  );
+  const [focusedCategory, setFocusedCategory] = useState<string | null>(null);
+
+  // Example data for currentItems
+  const exampleItems = {
+    tops: {
+      item_image_url:
+        "https://via.placeholder.com/400x600/FF0000/FFFFFF?text=Top",
+    },
+    bottoms: {
+      item_image_url:
+        "https://via.placeholder.com/400x600/00FF00/FFFFFF?text=Bottom",
+    },
+    shoes: {
+      item_image_url:
+        "https://via.placeholder.com/400x600/0000FF/FFFFFF?text=Shoes",
+    },
+  };
+
+  // Function to toggle categories for testing
+  const toggleCategory = (category: string) => {
+    setCategories((prevCategories) => {
+      if (prevCategories.includes(category)) {
+        return prevCategories.filter((cat) => cat !== category);
+      } else {
+        return [...prevCategories, category];
+      }
+    });
+
+    // Update currentItems with example data when category is added
+    setCurrentItems((prevItems) => {
+      if (categories.includes(category)) {
+        // Remove the item
+        return { ...prevItems, [category]: null };
+      } else {
+        // Add the item
+        return { ...prevItems, [category]: exampleItems[category] };
+      }
+    });
+  };
+
+  // Function to simulate focusing on a category
+  const focusCategory = (category: string | null) => {
+    setFocusedCategory(category);
+  };
+
   const imageFilename = getImageFilename(categories);
   const imageSource = images[imageFilename];
 
+  const scale = useRef(new Animated.Value(1)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  const zoomRegions = {
+    default: {
+      scale: 1,
+      translateX: 0,
+      translateY: 0,
+    },
+    tops: {
+      scale: 1.5,
+      translateX: 0,
+      translateY: -height * 0.1,
+    },
+    bottoms: {
+      scale: 1.5,
+      translateX: 0,
+      translateY: 0,
+    },
+    shoes: {
+      scale: 1.5,
+      translateX: 0,
+      translateY: height * 0.1,
+    },
+  };
+
+  useEffect(() => {
+    let region = zoomRegions["default"];
+    if (focusedCategory && zoomRegions[focusedCategory]) {
+      region = zoomRegions[focusedCategory];
+    }
+
+    Animated.parallel([
+      Animated.timing(scale, {
+        toValue: region.scale,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateX, {
+        toValue: region.translateX,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: region.translateY,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [focusedCategory]);
+
   return (
     <View style={styles.container}>
-      <Image source={imageSource} style={styles.image} resizeMode="contain" />
+      <Animated.Image
+        source={imageSource}
+        style={[
+          styles.image,
+          {
+            transform: [{ scale }, { translateX }, { translateY }],
+          },
+        ]}
+        resizeMode="contain"
+      />
+
+      {/* Overlay active items */}
+      {categories.includes("tops") && currentItems["tops"] && (
+        <Animated.View
+          style={[
+            styles.overlayTop,
+            {
+              transform: [{ scale }, { translateX }, { translateY }],
+            },
+          ]}
+        >
+          <Image
+            source={{ uri: currentItems["tops"].item_image_url }}
+            style={styles.itemImage}
+          />
+        </Animated.View>
+      )}
+      {categories.includes("bottoms") && currentItems["bottoms"] && (
+        <Animated.View
+          style={[
+            styles.overlayBottom,
+            {
+              transform: [{ scale }, { translateX }, { translateY }],
+            },
+          ]}
+        >
+          <Image
+            source={{ uri: currentItems["bottoms"].item_image_url }}
+            style={styles.itemImage}
+          />
+        </Animated.View>
+      )}
+      {categories.includes("shoes") && currentItems["shoes"] && (
+        <Animated.View
+          style={[
+            styles.overlayShoes,
+            {
+              transform: [{ scale }, { translateX }, { translateY }],
+            },
+          ]}
+        >
+          <Image
+            source={{ uri: currentItems["shoes"].item_image_url }}
+            style={styles.itemImage}
+          />
+        </Animated.View>
+      )}
+
+      {/* Buttons to toggle categories */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            categories.includes("tops") && styles.buttonActive,
+          ]}
+          onPress={() => toggleCategory("tops")}
+          onLongPress={() => focusCategory("tops")}
+          onPressOut={() => focusCategory(null)}
+        >
+          <Text style={styles.buttonText}>Toggle Tops</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            categories.includes("bottoms") && styles.buttonActive,
+          ]}
+          onPress={() => toggleCategory("bottoms")}
+          onLongPress={() => focusCategory("bottoms")}
+          onPressOut={() => focusCategory(null)}
+        >
+          <Text style={styles.buttonText}>Toggle Bottoms</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            categories.includes("shoes") && styles.buttonActive,
+          ]}
+          onPress={() => toggleCategory("shoes")}
+          onLongPress={() => focusCategory("shoes")}
+          onPressOut={() => focusCategory(null)}
+        >
+          <Text style={styles.buttonText}>Toggle Shoes</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -173,13 +275,54 @@ const CategoryImageComponent: React.FC<CategoryImageComponentProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: width,
-    height: height * 0.4, // Adjust as needed
+    height: height * 0.6, // Adjust as needed
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden", // Ensure content doesn't spill out
   },
   image: {
     width: width,
+    height: "70%",
+  },
+  itemImage: {
+    width: width,
     height: "100%",
+    resizeMode: "contain",
+  },
+  overlayTop: {
+    position: "absolute",
+    top: 0,
+    width: width,
+    height: "70%",
+  },
+  overlayBottom: {
+    position: "absolute",
+    top: 0,
+    width: width,
+    height: "70%",
+  },
+  overlayShoes: {
+    position: "absolute",
+    top: 0,
+    width: width,
+    height: "70%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  button: {
+    backgroundColor: "#4D766E",
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+  },
+  buttonActive: {
+    backgroundColor: "#2D4F46",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

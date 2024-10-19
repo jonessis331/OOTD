@@ -35,6 +35,7 @@ import {
   dropShadow,
 } from "@cloudinary/url-gen/actions/effect";
 import { Picker } from "@react-native-picker/picker";
+import CategoryImageComponent from "~/src/components/CategoryImageComponent";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
@@ -50,7 +51,7 @@ const ClosetScreen = ({ navigation }) => {
   const [currentShoeIndex, setCurrentShoeIndex] = useState(0);
   const [currentIndices, setCurrentIndices] = useState({});
   const [currentItems, setCurrentItems] = useState({});
-
+  const [focusedCategory, setFocusedCategory] = useState<string | null>(null);
   const [showRectangle, setShowRectangle] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [pressedItem, setPressedItem] = useState<any>(null);
@@ -232,6 +233,12 @@ const ClosetScreen = ({ navigation }) => {
           onIndexChange={(index, selectedItem) =>
             handleIndexChange(category, index, selectedItem)
           }
+          onScrollBegin={() => {
+            setFocusedCategory(category);
+          }}
+          onScrollEnd={() => {
+            setFocusedCategory(null);
+          }}
           renderItem={renderItem}
         />
         {/* Add a remove button */}
@@ -249,6 +256,16 @@ const ClosetScreen = ({ navigation }) => {
     setCategories((prev) =>
       prev.filter((category) => category !== categoryToRemove)
     );
+    setCurrentIndices((prev) => {
+      const updated = { ...prev };
+      delete updated[categoryToRemove];
+      return updated;
+    });
+    setCurrentItems((prev) => {
+      const updated = { ...prev };
+      delete updated[categoryToRemove];
+      return updated;
+    });
   };
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
@@ -370,39 +387,12 @@ const ClosetScreen = ({ navigation }) => {
             onAdd={handleAddItem}
           />
         )}
-        {carouselData.length > 0 ? (
-          <View className="m-0 mb-0 rounded-x">
-            {/* <ScrollView showsVerticalScrollIndicator={false} className = 'w-full h-[44%] mt-3 mb-9 '> */}
-            {carouselData.map((data, index) =>
-              renderCarouselItem({ data, index })
-            )}
+        <CategoryImageComponent
+          categories={categories}
+          currentItems={currentItems}
+          focusedCategory={focusedCategory}
+        />
 
-            {/* <Carousel
-              data={carouselData}
-              renderItem={renderCarouselItem}
-              sliderWidth={width}
-              itemWidth={ITEM_WIDTH}
-              layout={"default"}
-              customAnimation={animationStyle}
-              vertical
-              loop={false}
-              pagingEnabled={false}
-              height={ITEM_HEIGHT * 3.7}
-              style={StyleSheet.absoluteFillObject}
-            /> */}
-
-            {/* <LinearGradient
-                start={{x: 0, y: 0}}
-                end={{x: 0, y: 1}}
-              colors={[ 'transparent','#688990']}
-              
-
-              style={{ position: 'absolute', bottom: -450, left: 0, right: 0, height: 200, width: width }}
-            />  */}
-          </View>
-        ) : (
-          <Text>No item selected</Text>
-        )}
         <View className="mt-[10%]">
           {/* {tops.length > 0 && (
             <TestVW

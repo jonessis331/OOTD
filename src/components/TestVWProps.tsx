@@ -10,12 +10,16 @@ interface TestVWProps {
   items: { image_url: string }[];
   onIndexChange: (index: number) => void;
   renderItem: (item: { image_url: string }) => JSX.Element;
+  onScrollBegin?: () => void;
+  onScrollEnd?: () => void;
 }
 
 const TestVW: React.FC<TestVWProps> = ({
   items,
   onIndexChange,
   renderItem,
+  onScrollBegin,
+  onScrollEnd,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef<ICarouselInstance>(null);
@@ -60,6 +64,16 @@ const TestVW: React.FC<TestVWProps> = ({
         onSnapToItem={(index) => {
           const selectedItem = items[index];
           onIndexChange(index, selectedItem); // Pass both index and selected item
+        }}
+        onScrollStart={() => {
+          if (onScrollBegin) {
+            onScrollBegin();
+          }
+        }}
+        onScrollEnd={() => {
+          if (onScrollEnd) {
+            onScrollEnd();
+          }
         }}
         //onProgressChange={handleIndexChange}
         //onProgressChange={(_, relativeProgress) => handleIndexChange(0, relativeProgress)} // Only pass relative progress for now
