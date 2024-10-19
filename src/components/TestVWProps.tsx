@@ -12,15 +12,22 @@ interface TestVWProps {
   renderItem: (item: { image_url: string }) => JSX.Element;
 }
 
-const TestVW: React.FC<TestVWProps> = ({ items, onIndexChange, renderItem }) => {
+const TestVW: React.FC<TestVWProps> = ({
+  items,
+  onIndexChange,
+  renderItem,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
 
   // Handle index changes safely
-  const handleIndexChange = (absoluteProgress: number, relativeProgress: number) => {
+  const handleIndexChange = (
+    absoluteProgress: number,
+    relativeProgress: number
+  ) => {
     const newIndex = Math.round(relativeProgress); // Use only relative progress for index calculation
-    console.log("Relative Progress:", relativeProgress); // Debug log
+    //console.log("Relative Progress:", relativeProgress); // Debug log
 
     // Ensure we are not repeatedly setting the same index
     if (newIndex !== currentIndex) {
@@ -32,11 +39,11 @@ const TestVW: React.FC<TestVWProps> = ({ items, onIndexChange, renderItem }) => 
   const baseOptions = {
     vertical: false,
     width: PAGE_WIDTH,
-    height: 100
+    height: 100,
   };
 
   return (
-    <View 
+    <View
       style={{
         alignItems: "center",
         //backgroundColor: "green"
@@ -50,6 +57,11 @@ const TestVW: React.FC<TestVWProps> = ({ items, onIndexChange, renderItem }) => 
         pagingEnabled
         snapEnabled
         autoPlay={false}
+        onSnapToItem={(index) => {
+          const selectedItem = items[index];
+          onIndexChange(index, selectedItem); // Pass both index and selected item
+        }}
+        //onProgressChange={handleIndexChange}
         //onProgressChange={(_, relativeProgress) => handleIndexChange(0, relativeProgress)} // Only pass relative progress for now
         //onProgressChange = {progress}
         //onSnapToItem = {index}

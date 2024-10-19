@@ -48,6 +48,9 @@ const ClosetScreen = ({ navigation }) => {
   const [currentTopIndex, setCurrentTopIndex] = useState(0);
   const [currentBottomIndex, setCurrentBottomIndex] = useState(0);
   const [currentShoeIndex, setCurrentShoeIndex] = useState(0);
+  const [currentIndices, setCurrentIndices] = useState({});
+  const [currentItems, setCurrentItems] = useState({});
+
   const [showRectangle, setShowRectangle] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [pressedItem, setPressedItem] = useState<any>(null);
@@ -133,6 +136,28 @@ const ClosetScreen = ({ navigation }) => {
   const handleAddCategory = (category: string) => {
     if (selectedCategory && !categories.includes(selectedCategory)) {
       setCategories((prev) => [...prev, selectedCategory]);
+
+      // Initialize current index and item for the new category
+      let data = [];
+      switch (selectedCategory) {
+        case "tops":
+          data = tops;
+          break;
+        case "bottoms":
+          data = bottoms;
+          break;
+        case "shoes":
+          data = shoes;
+          break;
+        default:
+          data = [];
+          break;
+      }
+
+      if (data.length > 0) {
+        setCurrentIndices((prev) => ({ ...prev, [selectedCategory]: 0 }));
+        setCurrentItems((prev) => ({ ...prev, [selectedCategory]: data[0] }));
+      }
     }
     setIsDropdownOpen(false); // Close dropdown after selection
   };
@@ -151,21 +176,49 @@ const ClosetScreen = ({ navigation }) => {
     setSelectedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
   };
 
+  // const updateCarouselData = () => {
+  //   setCarouselData(
+  //     [
+  //       tops[currentTopIndex]
+  //         ? { type: "top", item: tops[currentTopIndex] }
+  //         : null,
+  //       bottoms[currentBottomIndex]
+  //         ? { type: "bottom", item: bottoms[currentBottomIndex] }
+  //         : null,
+  //       shoes[currentShoeIndex]
+  //         ? { type: "shoes", item: shoes[currentShoeIndex] }
+  //         : null,
+  //       ...(selectedItems.length > 0
+  //         ? selectedItems.map((selectedItem) => ({
+  //             type: "selected",
+  //             item: selectedItem,
+  //           }))
+  //         : []),
+  //     ].filter(Boolean)
+  //   ); // Filter out null values to avoid issues
+  // };
+
+  const handleIndexChange = (category, index, selectedItem) => {
+    setCurrentIndices((prev) => ({ ...prev, [category]: index }));
+    setCurrentItems((prev) => ({ ...prev, [category]: selectedItem }));
+  };
+
+  // Trigger the update when indices change
+  // useEffect(() => {
+  //   updateCarouselData();
+  // }, [currentTopIndex, currentBottomIndex, currentShoeIndex, selectedItems]);
+
   const renderCategoryCarousel = (category: string) => {
     let data = [];
-    let setCurrentIndex: any;
     switch (category) {
       case "tops":
         data = tops;
-        setCurrentIndex = setTops;
         break;
       case "bottoms":
         data = bottoms;
-        setCurrentIndex = setBottoms;
         break;
       case "shoes":
         data = shoes;
-        setCurrentIndex = setShoes;
         break;
       default:
         break;
@@ -173,18 +226,20 @@ const ClosetScreen = ({ navigation }) => {
 
     return (
       <View key={category}>
-        <Text>{category}</Text>
+        {/* <Text>{category}</Text> */}
         <TestVW
           items={data}
-          onIndexChange={setCurrentIndex && renderCarouselItem}
+          onIndexChange={(index, selectedItem) =>
+            handleIndexChange(category, index, selectedItem)
+          }
           renderItem={renderItem}
         />
         {/* Add a remove button */}
         <TouchableOpacity
           onPress={() => handleRemoveCategory(category)}
-          style={styles.removeButton}
+          style={styles.smallRemoveButton}
         >
-          <Text style={styles.removeButtonText}>Remove {category}</Text>
+          <Text style={styles.removeButtonText}>- {category}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -206,7 +261,6 @@ const ClosetScreen = ({ navigation }) => {
         .effect(dropShadow().azimuth(183).elevation(70).spread(60));
     }
 
-    console.log(item?.tags.googleItem, " goooooooogllll");
     return (
       <View>
         <TouchableOpacity onPress={() => handleItemPress(item)}>
@@ -241,36 +295,40 @@ const ClosetScreen = ({ navigation }) => {
   const ITEM_HEIGHT = 120;
   const PAGE_HEIGHT = height - headerHeight;
 
-  const animationStyle: TAnimationStyle = React.useCallback(
-    (value: number) => {
-      "worklet";
+  // const animationStyle: TAnimationStyle = React.useCallback(
+  //   (value: number) => {
+  //     "worklet";
 
-      const translateY = interpolate(
-        value,
-        [-1, 0, 1],
-        [-ITEM_HEIGHT, 0, ITEM_HEIGHT]
-      );
-      const right = interpolate(
-        value,
-        [-1, -0.2, 1],
-        [RIGHT_OFFSET / 2, RIGHT_OFFSET, RIGHT_OFFSET / 3]
-      );
-      return {
-        transform: [{ translateY }],
-        right,
-      };
-    },
-    [RIGHT_OFFSET]
-  );
+  //     const translateY = interpolate(
+  //       value,
+  //       [-1, 0, 1],
+  //       [-ITEM_HEIGHT, 0, ITEM_HEIGHT]
+  //     );
+  //     const right = interpolate(
+  //       value,
+  //       [-1, -0.2, 1],
+  //       [RIGHT_OFFSET / 2, RIGHT_OFFSET, RIGHT_OFFSET / 3]
+  //     );
+  //     return {
+  //       transform: [{ translateY }],
+  //       right,
+  //     };
+  //   },
+  //   [RIGHT_OFFSET]
+  // );
 
-  const renderCarouselItem = ({ item, index }) => {
+  const renderCarouselItem = ({ data, index }) => {
+    const { type, item } = data;
     return (
-      <View key={index} className="flex-1  justify-center px-4">
-        <InfoSheet item={item.item} />
-        {item.type === "selected" && (
+      <View
+        key={index}
+        style={{ flex: 1, justifyContent: "center", paddingHorizontal: 16 }}
+      >
+        {item && <InfoSheet item={item} />}
+        {type === "selected" && (
           <TouchableOpacity
             style={styles.removeButton}
-            onPress={() => handleRemoveItem(item.item)}
+            onPress={() => handleRemoveItem(item)}
           >
             <Text style={styles.removeButtonText}>Remove</Text>
           </TouchableOpacity>
@@ -279,17 +337,16 @@ const ClosetScreen = ({ navigation }) => {
     );
   };
 
-  const carouselData = [
-    { type: "top", item: tops[currentTopIndex] },
-    { type: "bottom", item: bottoms[currentBottomIndex] },
-    { type: "shoes", item: shoes[currentShoeIndex] },
-    ...(selectedItems.length > 0
-      ? selectedItems.map((selectedItem) => ({
-          type: "selected",
-          item: selectedItem,
-        }))
-      : []),
-  ];
+  const carouselData = categories
+    .map((category) => {
+      const item = currentItems[category];
+      if (item) {
+        return { type: category, item: item };
+      } else {
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   return (
     <View style={{ flex: 1 }}>
@@ -313,19 +370,14 @@ const ClosetScreen = ({ navigation }) => {
             onAdd={handleAddItem}
           />
         )}
-        {tops.length > 0 &&
-        bottoms.length > 0 &&
-        shoes.length > 0 &&
-        currentTopIndex >= 0 &&
-        currentTopIndex < tops.length &&
-        currentBottomIndex >= 0 &&
-        currentBottomIndex < bottoms.length &&
-        currentShoeIndex >= 0 &&
-        currentShoeIndex < shoes.length ? (
+        {carouselData.length > 0 ? (
           <View className="m-0 mb-0 rounded-x">
             {/* <ScrollView showsVerticalScrollIndicator={false} className = 'w-full h-[44%] mt-3 mb-9 '> */}
+            {carouselData.map((data, index) =>
+              renderCarouselItem({ data, index })
+            )}
 
-            <Carousel
+            {/* <Carousel
               data={carouselData}
               renderItem={renderCarouselItem}
               sliderWidth={width}
@@ -337,7 +389,7 @@ const ClosetScreen = ({ navigation }) => {
               pagingEnabled={false}
               height={ITEM_HEIGHT * 3.7}
               style={StyleSheet.absoluteFillObject}
-            />
+            /> */}
 
             {/* <LinearGradient
                 start={{x: 0, y: 0}}
@@ -351,7 +403,7 @@ const ClosetScreen = ({ navigation }) => {
         ) : (
           <Text>No item selected</Text>
         )}
-        <View className="mt-[90%]">
+        <View className="mt-[10%]">
           {/* {tops.length > 0 && (
             <TestVW
               items={tops}
@@ -599,6 +651,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 15,
     maxHeight: 40,
+  },
+  smallRemoveButton: {
+    backgroundColor: "black",
+    maxHeight: 20,
+    maxWidth: "20%",
   },
   removeButtonText: {
     color: "white",
