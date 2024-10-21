@@ -40,6 +40,7 @@ import CategoryImageComponent from "~/src/components/CategoryImageComponent";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
+import { rgbaColor } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
@@ -280,18 +281,29 @@ const ClosetScreen = ({ navigation }) => {
   };
   // Remove a category
   const handleRemoveCategory = (categoryToRemove: string) => {
-    setCategories((prev) =>
-      prev.filter((category) => category !== categoryToRemove)
-    );
-    setCurrentIndices((prev) => {
-      const updated = { ...prev };
-      delete updated[categoryToRemove];
-      return updated;
+    setCategories((prevCategories) => {
+      const updatedCategories = prevCategories.filter(
+        (category) => category !== categoryToRemove
+      );
+
+      // Check if the categories array is empty after the removal
+      if (updatedCategories.length === 0) {
+        toggleRemoveMode(); // Call this when no categories are left
+      }
+
+      return updatedCategories;
     });
+
+    setCurrentIndices((prev) => {
+      const updatedIndices = { ...prev };
+      delete updatedIndices[categoryToRemove];
+      return updatedIndices;
+    });
+
     setCurrentItems((prev) => {
-      const updated = { ...prev };
-      delete updated[categoryToRemove];
-      return updated;
+      const updatedItems = { ...prev };
+      delete updatedItems[categoryToRemove];
+      return updatedItems;
     });
   };
 
@@ -763,6 +775,8 @@ const styles = StyleSheet.create({
     height: 280,
     width: 390,
     borderRadius: 180,
+    borderColor: "maroon",
+    borderWidth: 20,
     // shadowRadius: 30,
     // shadowColor: "black",
     // shadowOffset: 20,
