@@ -456,13 +456,13 @@ const ClosetScreen = ({ navigation }) => {
                 /* No function */
               }}
             >
-              <FontAwesome name="question" size={15} color="white" />
+              <FontAwesome name="question" size={15} color="gray" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.toolbarButton}
               onPress={() => toggleRemoveMode()}
             >
-              <FontAwesome name="toggle-on" size={15} color="white" />
+              <FontAwesome name="trash" size={15} color="gray" />
             </TouchableOpacity>
           </View>
 
@@ -473,13 +473,13 @@ const ClosetScreen = ({ navigation }) => {
               style={styles.toolbarButton}
               onPress={() => setIsDropdownOpen((prev) => !prev)}
             >
-              <FontAwesome name="plus" size={15} color="white" />
+              <FontAwesome name="plus" size={15} color="gray" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.toolbarButton}
               onPress={() => createOutfit()}
             >
-              <FontAwesome name="check" size={15} color="white" />
+              <FontAwesome name="check" size={15} color="gray" />
             </TouchableOpacity>
           </View>
           {/* )} */}
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    height: "7%", // Adjusted as per your requirement
+    height: 44, // Adjusted as per your requirement
     backgroundColor: "lightgray",
     paddingHorizontal: 10,
     shadowColor: "black", // Shadow color
