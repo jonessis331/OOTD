@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback, // Import Easing
 } from "react-native";
 import {} from "react-native-reanimated-carousel";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "~/src/lib/supabase";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import InfoSheet from "~/src/components/InfoSheet";
@@ -37,6 +37,9 @@ import {
 } from "@cloudinary/url-gen/actions/effect";
 import { Picker } from "@react-native-picker/picker";
 import CategoryImageComponent from "~/src/components/CategoryImageComponent";
+import DraggableFlatList, {
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
@@ -63,6 +66,15 @@ const ClosetScreen = ({ navigation }) => {
   const [categories, setCategories] = useState<string[]>([]); // To store selected categories
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // For dropdown selection
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Control dropdown visibility
+  const [isDragActive, setIsDragActive] = useState(false);
+  const screenOpacity = isDragActive ? 0.5 : 1;
+  const [isOverTrash, setIsOverTrash] = useState(false);
+  const trashRef = useRef<View>(null);
+  const [isRemoveMode, setIsRemoveMode] = useState(false);
+
+  const toggleRemoveMode = () => {
+    setIsRemoveMode((prevState) => !prevState);
+  };
 
   useEffect(() => {
     fetchOutfits();
@@ -176,6 +188,10 @@ const ClosetScreen = ({ navigation }) => {
 
   const handleRemoveItem = (item: any) => {
     setSelectedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
+    if (selectedItems.length === 0) {
+      console.log("isempty");
+      toggleRemoveMode();
+    }
   };
 
   // const updateCarouselData = () => {
@@ -231,6 +247,7 @@ const ClosetScreen = ({ navigation }) => {
     return (
       <View key={category}>
         {/* <Text>{category}</Text> */}
+
         <TestVW
           items={data}
           onIndexChange={(index, selectedItem) =>
@@ -248,12 +265,16 @@ const ClosetScreen = ({ navigation }) => {
           renderItem={renderItem}
         />
         {/* Add a remove button */}
-        <TouchableOpacity
-          onPress={() => handleRemoveCategory(category)}
-          style={styles.smallRemoveButton}
-        >
-          <Text style={styles.removeButtonText}>-</Text>
-        </TouchableOpacity>
+        {isRemoveMode && (
+          <View style={styles.removeButtonWrapper}>
+            <Pressable
+              onPress={() => handleRemoveCategory(category)}
+              style={styles.smallRemoveButton}
+            >
+              <Text style={styles.removeButtonText}>-</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
     );
   };
@@ -384,6 +405,31 @@ const ClosetScreen = ({ navigation }) => {
           </BlurView>
         </Animated.View>
       )}
+      {isDropdownOpen && (
+        <View style={styles.dropdownOverlay}>
+          <BlurView intensity={50} style={styles.dropdownBlurView}>
+            <View style={styles.dropdownContent}>
+              <Picker
+                selectedValue={selectedCategory}
+                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                style={styles.picker}
+                itemStyle={styles.pickerItem}
+              >
+                {/* <Picker.Item label="Select Category" value={null} /> */}
+                <Picker.Item label="Tops" value="tops" />
+                <Picker.Item label="Bottoms" value="bottoms" />
+                <Picker.Item label="Shoes" value="shoes" />
+              </Picker>
+              <TouchableOpacity
+                onPress={handleAddCategory}
+                style={styles.addButton}
+              >
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </BlurView>
+        </View>
+      )}
 
       <ScrollView style={styles.container}>
         {showRectangle && (
@@ -398,8 +444,47 @@ const ClosetScreen = ({ navigation }) => {
           currentItems={currentItems}
           focusedCategory={focusedCategory}
         />
+        <View style={styles.toolbar}>
+          {/* horizontal toolbar with smallRemoveButton styling buttons for toggleRemoveMode, same buttonstyle for a Add category button , and a create outfit button 
+          there should be two of the buttons on either side the order is 
+          for now just put a no function one and then the toggleRemoveMode, and then on the other side we do add category then createOutfit, I want to put Icons in most of these smallRemoveButton sytle */}
+          {/* Left Side Buttons */}
+          <View style={styles.toolbarLeft}>
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => {
+                /* No function */
+              }}
+            >
+              <FontAwesome name="question" size={15} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => toggleRemoveMode()}
+            >
+              <FontAwesome name="toggle-on" size={15} color="white" />
+            </TouchableOpacity>
+          </View>
 
-        <View className="mt-[10%]">
+          {/* Right Side Buttons */}
+          {/* {!isDropdownOpen && ( */}
+          <View style={styles.toolbarRight}>
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => setIsDropdownOpen((prev) => !prev)}
+            >
+              <FontAwesome name="plus" size={15} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => createOutfit()}
+            >
+              <FontAwesome name="check" size={15} color="white" />
+            </TouchableOpacity>
+          </View>
+          {/* )} */}
+        </View>
+        <View className="mt-[8%]">
           {/* {tops.length > 0 && (
             <TestVW
               items={tops}
@@ -426,37 +511,8 @@ const ClosetScreen = ({ navigation }) => {
 
           {/* Render Carousels based on selected categories */}
           {categories.map((category) => renderCategoryCarousel(category))}
-          {/* Button to Toggle Dropdown */}
-          <TouchableOpacity
-            onPress={() => setIsDropdownOpen((prev) => !prev)}
-            style={styles.addButton}
-          >
-            <Text style={styles.addButtonText}>+ Add Category</Text>
-          </TouchableOpacity>
-
-          {/* Dropdown Picker for Categories */}
-          {isDropdownOpen && (
-            <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={selectedCategory}
-                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Select Category" value={null} />
-                <Picker.Item label="Tops" value="tops" />
-                <Picker.Item label="Bottoms" value="bottoms" />
-                <Picker.Item label="Shoes" value="shoes" />
-              </Picker>
-              <TouchableOpacity
-                onPress={handleAddCategory}
-                style={styles.addButton}
-              >
-                <Text style={styles.addButtonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
-        <Text className="pl-2 mt-7 font-mono font-semibold">Accessories</Text>
+        {/* <Text className="pl-2 mt-7 font-mono font-semibold">Accessories</Text>
         <FlatList
           data={accessories}
           horizontal
@@ -490,13 +546,22 @@ const ClosetScreen = ({ navigation }) => {
           style={styles.flatList}
         />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={createOutfit}
           style={styles.createOutfitButton}
         >
           <Text style={styles.createOutfitButtonText}>Create Outfit</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
+      {/* {isDragActive && (
+        <View style={styles.trashContainer} ref={trashRef}>
+          <FontAwesome
+            name="trash"
+            size={40}
+            color={isOverTrash ? "red" : "gray"}
+          />
+        </View>
+      )} */}
     </View>
   );
 };
@@ -531,7 +596,7 @@ export default function Closet() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#688990",
+    backgroundColor: "lightgray",
     padding: 0,
   },
   popupContainer: {
@@ -647,13 +712,75 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     maxHeight: 40,
   },
-  smallRemoveButton: {
+  toolbar: {
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    height: "7%", // Adjusted as per your requirement
+    backgroundColor: "lightgray",
+    paddingHorizontal: 10,
+    shadowColor: "black", // Shadow color
+    shadowOffset: {
+      width: 0, // Horizontal shadow offset
+      height: 4, // Vertical shadow offset
+    },
+    shadowOpacity: 0.5, // Shadow opacity (0 to 1)
+    shadowRadius: 3.84, // Shadow blur radius
+    // Android shadow (elevation)
+    elevation: 5, // Higher number means stronger shadow
+  },
+  toolbarLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  toolbarRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  toolbarButton: {
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "black",
-    maxHeight: 20,
-    maxWidth: "20%",
+    height: 30,
+    width: 30,
+    borderRadius: 20,
+    marginHorizontal: 5,
+  },
+
+  smallRemoveButton: {
+    //position: "absolute",
+    bottom: 0,
+    //justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: "darkred",
+    opacity: 10,
+    height: 280,
+    width: 390,
+    borderRadius: 180,
+    // shadowRadius: 30,
+    // shadowColor: "black",
+    // shadowOffset: 20,
+  },
+  removeButtonWrapper: {
+    position: "absolute",
+    //backgroundColor: "green",
+    bottom: 10,
+    borderRadius: 190,
+    alignItems: "center",
+    alignSelf: "center",
+    height: 70,
+    overflow: "hidden",
+    opacity: 0.3,
   },
   removeButtonText: {
+    alignContent: "center",
     color: "white",
+    fontSize: 50,
     fontWeight: "bold",
   },
   carouselItem: {
@@ -661,14 +788,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addButton: {
+    marginVertical: "auto",
     backgroundColor: "#4D766E",
     padding: 10,
     borderRadius: 10,
-    alignItems: "center",
+    //alignItems: "center",
     margin: 10,
   },
   addButtonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  dropdownOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dim the background for overlay effect
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdownBlurView: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdownContent: {
+    width: "80%", // Adjust this to fit within the black lines
+    minHeight: "50%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: "black",
   },
 });

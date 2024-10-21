@@ -49,6 +49,7 @@
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-draggable-flatlist": "^4.0.1",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-get-random-values": "^1.11.0",
     "react-native-html-parser": "^0.1.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-logs": "^5.1.0",
