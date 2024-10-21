@@ -454,6 +454,7 @@ const ClosetScreen = ({ navigation }) => {
               style={styles.toolbarButton}
               onPress={() => {
                 /* No function */
+                // generateOutfit(); // this eventually with trigger animated carousels and calculate compatibility of users items recommending outfit
               }}
             >
               <FontAwesome name="question" size={15} color="gray" />
