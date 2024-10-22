@@ -29,9 +29,9 @@ import { interpolate, useSharedValue } from "react-native-reanimated";
 import RNFadedScrollView from "rn-faded-scrollview";
 import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
-import { cld } from "~/src/lib/cloudinary";
+import { cld, removeBackground } from "~/src/lib/cloudinary";
 import { AdvancedImage } from "cloudinary-react-native";
-import { removeBackground } from "react-native-background-remover";
+//import { removeBackground } from "react-native-background-remover";
 import {
   backgroundRemoval,
   dropShadow,
@@ -315,7 +315,7 @@ const ClosetScreen = ({ navigation }) => {
     // );
     if (item?.googleItem?.n_background_thumbnail) {
       const imgUrl = `https://res.cloudinary.com/dmhfubcfi/image/upload/f_auto,q_auto/${item?.googleItem?.n_background_thumbnail}`;
-      //image = removeBackground(imgUrl);
+      image = removeBackground(imgUrl);
       console.log(imgUrl);
       image = cld
         .image(item.googleItem?.n_background_thumbnail)

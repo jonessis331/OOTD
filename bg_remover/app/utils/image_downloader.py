@@ -1,12 +1,19 @@
 import io
 from PIL import Image
-import aiohttp
+import requests  # Ensure 'requests' is imported
+import logging
 
-async def download_image(image_url: str) -> Image.Image:
-    async with aiohttp.ClientSession() as session:
-        async with session.get(image_url) as response:
-            if response.status != 200:
-                raise Exception(f"Failed to download image. Status code: {response.status}")
-            data = await response.read()
-            image = Image.open(io.BytesIO(data)).convert("RGBA")
-            return image
+logger = logging.getLogger(__name__)
+
+def download_image(image_url: str) -> Image.Image:
+    try:
+        response = requests.get(image_url)
+        if response.status_code != 200:
+            logger.error(f"Failed to download image. Status code: {response.status_code}")
+            raise Exception(f"Failed to download image. Status code: {response.status_code}")
+        data = response.content
+        image = Image.open(io.BytesIO(data)).convert("RGBA")
+        return image
+    except Exception as e:
+        logger.exception(f"Error downloading image from URL: {image_url}")
+        raise

@@ -1,7 +1,8 @@
 import { Cloudinary } from "@cloudinary/url-gen";
+import axios from "axios";
 import { upload } from "cloudinary-react-native";
 import { UploadApiResponse } from "cloudinary-react-native/lib/typescript/src/api/upload/model/params/upload-params";
-
+//import { removeBackground } from 'services/api';
 // Create and configure your Cloudinary instance.
 export const cld = new Cloudinary({
   cloud: {
@@ -61,7 +62,7 @@ export const uploadNoBackground = async (fileUrl: string) => {
   const options = {
     upload_preset: "default",
     unsigned: true,
-    transformation: [{ effect: "remove_background" }],
+    //transformation: [{ effect: "remove_background" }],
   };
 
   return new Promise<UploadApiResponse>(async (resolve, reject) => {
@@ -77,4 +78,23 @@ export const uploadNoBackground = async (fileUrl: string) => {
       },
     });
   });
+};
+
+const API_BASE_URL = "http://localhost:8000"; // Update with your backend URL
+
+export const removeBackground = async (imageUrl: string): Promise<string> => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/remove-background`,
+      { image_url: imageUrl },
+      { responseType: "blob" }
+    );
+
+    const blob = response.data;
+    const imageUri = URL.createObjectURL(blob);
+    return imageUri;
+  } catch (error) {
+    console.error("API call error:", error);
+    throw error;
+  }
 };
