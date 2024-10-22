@@ -31,6 +31,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import TestVW from "~/src/components/TestVWProps";
 import { cld } from "~/src/lib/cloudinary";
 import { AdvancedImage } from "cloudinary-react-native";
+import { removeBackground } from "react-native-background-remover";
 import {
   backgroundRemoval,
   dropShadow,
@@ -309,7 +310,13 @@ const ClosetScreen = ({ navigation }) => {
 
   const renderItem = (item: any, setCurrentIndex: Function, index: number) => {
     let image = null;
+    // const backgroundRemovedImageURI = removeBackground(
+    //   item?.googleItem?.n_background_thumbnail
+    // );
     if (item?.googleItem?.n_background_thumbnail) {
+      const imgUrl = `https://res.cloudinary.com/dmhfubcfi/image/upload/f_auto,q_auto/${item?.googleItem?.n_background_thumbnail}`;
+      //image = removeBackground(imgUrl);
+      console.log(imgUrl);
       image = cld
         .image(item.googleItem?.n_background_thumbnail)
         .effect(backgroundRemoval())
@@ -807,7 +814,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4D766E",
     padding: 10,
     borderRadius: 10,
-    //alignItems: "center",
+    alignItems: "center",
     margin: 10,
   },
   addButtonText: {
@@ -822,8 +829,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 1000,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Dim the background for overlay effect
-    justifyContent: "center",
-    alignItems: "center",
+    //justifyContent: "center",
+    //alignItems: "center",
   },
   dropdownBlurView: {
     flex: 1,
@@ -832,12 +839,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dropdownContent: {
-    width: "80%", // Adjust this to fit within the black lines
+    width: "70%", // Adjust this to fit within the black lines
     minHeight: "50%",
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: "center",
+    //alignItems: "center",
   },
   picker: {
     height: 50,

@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     height: height * 0.4, // Adjust as needed
     alignItems: "center",
     justifyContent: "center",
+
     overflow: "hidden", // Ensure content doesn't spill out
   },
   image: {
