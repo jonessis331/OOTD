@@ -14,6 +14,7 @@ class ImageURLRequest(BaseModel):
 def remove_background_endpoint(request: ImageURLRequest):
     try:
         output_io = remove_background_service(request.image_url)
+        print('type of ', type(output_io))
         output_io.seek(0)
         return Response(content=output_io.read(), media_type="image/png")
     except Exception as e:

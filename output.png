@@ -1,1 +1,1 @@
-{"detail":"object Image can't be used in 'await' expression"}
+{"detail":"'coroutine' object has no attribute 'seek'"}
