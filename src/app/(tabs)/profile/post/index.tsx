@@ -1,23 +1,47 @@
 // app/(tabs)/profile/post/index.tsx
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, useRef } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
-import { View, FlatList, Dimensions } from "react-native";
+import { View, FlatList } from "react-native";
 import { supabase } from "~/src/lib/supabase";
 import PostListItem from "~/src/components/PostListItem";
 import { useAuth } from "~/src/providers/AuthProvider";
 
 export default function PostCarousel() {
-  const { index } = useLocalSearchParams();
+  const { index, type } = useLocalSearchParams();
   const [posts, setPosts] = useState([]);
   const { user } = useAuth();
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from("outfits")
-        .select("*, profiles (*)")
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
+      let data;
+      let error;
+      if (type === "userPosts") {
+        ({ data, error } = await supabase
+          .from("outfits")
+          .select("*, profiles (*)")
+          .eq("user_id", user?.id)
+          .order("created_at", { ascending: false }));
+      } else if (type === "likedPosts") {
+        ({ data, error } = await supabase
+          .from("outfit_likes")
+          .select(
+            `
+            outfit_id,
+            outfits:outfit_id (
+              *,
+              profiles (*)
+            )
+          `
+          )
+          .eq("user_id", user.id));
+        if (data) {
+          data = data.map((item) => item.outfits);
+        }
+      } else {
+        // Handle other types if necessary
+      }
 
       if (error) {
         console.error("Error fetching posts:", error);
@@ -28,32 +52,28 @@ export default function PostCarousel() {
     };
 
     fetchPosts();
-  }, [user]);
+  }, [user, type]);
 
-  if (posts.length === 0) return null;
-
-  const windowWidth = Dimensions.get("window").width;
+  useEffect(() => {
+    if (flatListRef.current && posts.length > 0) {
+      flatListRef.current.scrollToIndex({
+        index: parseInt(index, 10),
+        animated: false,
+      });
+    }
+  }, [posts]);
 
   return (
     <>
       <Stack.Screen options={{ headerShown: true, headerTitle: "" }} />
-      <FlatList
-        data={posts}
-        horizontal
-        pagingEnabled
-        initialScrollIndex={parseInt(index, 10)}
-        getItemLayout={(data, index) => ({
-          length: windowWidth,
-          offset: windowWidth * index,
-          index,
-        })}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={{ width: windowWidth }}>
-            <PostListItem post={item} />
-          </View>
-        )}
-      />
+      <View style={{ flex: 1 }}>
+        <FlatList
+          ref={flatListRef}
+          data={posts}
+          renderItem={({ item }) => <PostListItem post={item} />}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
     </>
   );
 }

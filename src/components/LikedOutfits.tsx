@@ -58,7 +58,9 @@ export default function LikedOutfits() {
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => router.push(`/profile/post/${item.id}`)}>
       <Image
-        source={{ uri: item.outfit_image_url }}
+        source={{
+          uri: item.outfit_image_url,
+        }}
         style={{ width: imageSize, height: imageSize }}
       />
     </TouchableOpacity>

@@ -7,17 +7,18 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Animated,
 } from "react-native";
 import { useAuth } from "~/src/providers/AuthProvider";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "~/src/lib/supabase";
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "~/src/lib/cloudinary";
 import YourPostsScreen from "~/src/app/(tabs)/profile/index";
 import LikedScreen from "src/app/(tabs)/profile/liked";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function ProfileLayout() {
   const { user } = useAuth();
   const router = useRouter();
@@ -28,6 +29,17 @@ export default function ProfileLayout() {
   const [image, setImage] = useState(null);
   const [username, setUsername] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showSegmentedControl, setShowSegmentedControl] = useState(true);
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Animate the SegmentedControl based on showSegmentedControl state
+    Animated.timing(translateY, {
+      toValue: showSegmentedControl ? 0 : -50, // Adjust -50 to the height of your SegmentedControl
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [showSegmentedControl]);
 
   useEffect(() => {
     const fetchProfileAndStats = async () => {
@@ -83,59 +95,84 @@ export default function ProfileLayout() {
     console.log("isPressed");
   };
   return (
-    <View style={{ flex: 1 }}>
-      {/* Header with profile info and settings button */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => {
-            handleThis;
-            //router.push("/app(tabs)/profile/settings");
-          }}
-          style={styles.settingsButton}
-        >
-          <FontAwesome name="cog" size={24} color="#000" />
-        </Pressable>
-        <View style={styles.profileInfo}>
-          {image ? (
-            <AdvancedImage cldImg={image} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, { backgroundColor: "#green" }]} />
-          )}
-          <Text style={styles.username}>{username}</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>{outfits.length}</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>{totalLikesReceived}</Text>
-              <Text style={styles.statLabel}>Likes</Text>
-            </View>
-            <View style={styles.stat}>
-              <Text style={styles.statNumber}>{totalPiecesUploaded}</Text>
-              <Text style={styles.statLabel}>Pieces</Text>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          {/* Header with profile info and settings button */}
+          <View style={styles.header}>
+            <Pressable
+              onPress={() => {
+                handleThis();
+                //router.push("/app(tabs)/profile/settings");
+              }}
+              style={styles.settingsButton}
+            >
+              <FontAwesome name="cog" size={24} color="#000" />
+            </Pressable>
+            <View style={styles.profileInfo}>
+              {image ? (
+                <AdvancedImage cldImg={image} style={styles.avatar} />
+              ) : (
+                <View style={[styles.avatar, { backgroundColor: "black" }]} />
+              )}
+              <Text style={styles.username}>{username}</Text>
+              <View style={styles.statsContainer}>
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>{outfits.length}</Text>
+                  <Text style={styles.statLabel}>Posts</Text>
+                </View>
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>{totalLikesReceived}</Text>
+                  <Text style={styles.statLabel}>Likes</Text>
+                </View>
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>{totalPiecesUploaded}</Text>
+                  <Text style={styles.statLabel}>Pieces</Text>
+                </View>
+              </View>
             </View>
           </View>
+          {/* Animated Segmented Control */}
+          {showSegmentedControl && (
+            <Animated.View
+              style={{
+                transform: [{ translateY }],
+                zIndex: -10,
+              }}
+            >
+              <SegmentedControl
+                values={["Your Posts", "Liked"]}
+                selectedIndex={selectedIndex}
+                onChange={(event) => {
+                  setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+                }}
+                style={{ margin: 10 }}
+              />
+            </Animated.View>
+          )}
+          {/* Render the selected screen, pass setShowSegmentedControl */}
+          {selectedIndex === 0 ? (
+            <YourPostsScreen
+              setShowSegmentedControl={setShowSegmentedControl}
+            />
+          ) : (
+            <LikedScreen setShowSegmentedControl={setShowSegmentedControl} />
+          )}
         </View>
-      </View>
-      {/* Segmented Control for "Your Posts" and "Liked" */}
-      <SegmentedControl
-        values={["Your Posts", "Liked"]}
-        selectedIndex={selectedIndex}
-        onChange={(event) => {
-          setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
-        }}
-        style={{ margin: 10 }}
-      />
-
-      {/* Render the selected screen */}
-      {selectedIndex === 0 ? <YourPostsScreen /> : <LikedScreen />}
-    </View>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { padding: 20, backgroundColor: "#fff", position: "relative" },
+  header: {
+    padding: 20,
+    backgroundColor: "#fff",
+    position: "relative",
+    borderBottomColor: "black",
+    borderBottomWidth: 2,
+  },
   settingsButton: {
     position: "absolute",
     top: 20,

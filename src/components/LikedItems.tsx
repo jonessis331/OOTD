@@ -1,6 +1,14 @@
 // src/components/LikedItems.js
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, TouchableOpacity, Dimensions } from "react-native";
+import {
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+  View,
+  Text,
+} from "react-native";
 import { useAuth } from "~/src/providers/AuthProvider";
 import { supabase } from "~/src/lib/supabase";
 import { useRouter } from "expo-router";
@@ -9,9 +17,11 @@ export default function LikedItems() {
   const { user } = useAuth();
   const router = useRouter();
   const [likedItems, setLikedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLikedItems = async () => {
+      setLoading(true);
       const { data } = await supabase
         .from("item_likes")
         .select(
@@ -23,8 +33,8 @@ export default function LikedItems() {
         )
       `
         )
-        .eq("user_id", user.id);
-      console.log(data);
+        .eq("user_id", user.id)
+        .not("item_id", "is", null);
 
       const itemsArray = data.map((itemLike) => {
         const outfitItems = itemLike.outfits.items;
@@ -39,8 +49,8 @@ export default function LikedItems() {
 
       setLikedItems(itemsArray);
     };
-
     fetchLikedItems();
+    setLoading(false);
   }, [user]);
 
   const numColumns = 3;
@@ -55,11 +65,33 @@ export default function LikedItems() {
       }
     >
       <Image
-        source={{ uri: item.googleItem?.thumbnail || item.item_image_url }}
+        source={{
+          uri:
+            item.googleItem?.thumbnail ||
+            item.googleItem?.n_background_local ||
+            item.item_image_url ||
+            "https://res.cloudinary.com/dmhfubcfi/image/upload/v1729185488/wajmzkli0qvmopaukvqe.jpg",
+        }}
         style={{ width: imageSize, height: imageSize }}
       />
     </TouchableOpacity>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.messageContainer}>
+        <Text style={styles.messageText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (likedItems.length === 0) {
+    return (
+      <View style={styles.messageContainer}>
+        <Text style={styles.messageText}>No liked items yet.</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -72,3 +104,8 @@ export default function LikedItems() {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  messageContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  messageText: { fontSize: 18, color: "#888" },
+});
