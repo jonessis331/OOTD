@@ -315,8 +315,11 @@ const ClosetScreen = ({ navigation }) => {
     // );
     if (item?.googleItem?.n_background_thumbnail) {
       const imgUrl = `https://res.cloudinary.com/dmhfubcfi/image/upload/f_auto,q_auto/${item?.googleItem?.n_background_thumbnail}`;
-      image = removeBackground(imgUrl);
-      console.log(imgUrl);
+      //image = removeBackground(imgUrl); <- THIS FUNCTION WORKS BUT SHOULDNT BE CALLED HERE
+      // THIS WHOLE FUNCTION NEEDS TO BE REDONE, but I believe I am now processeing the thumnbail and removing backgorund
+      // and then storing it, so all I should have to do is just retreive it
+      // its uploaded when a new item is uploaded
+      //console.log(image);
       image = cld
         .image(item.googleItem?.n_background_thumbnail)
         .effect(backgroundRemoval())

@@ -16,7 +16,11 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import Button from "~/src/components/Button";
 import PieceComponent from "~/src/components/PieceComponent";
-import { uploadImage, uploadNoBackground } from "~/src/lib/cloudinary";
+import {
+  removeBackground,
+  uploadImage,
+  uploadNoBackground,
+} from "~/src/lib/cloudinary";
 import { detectItems } from "~/src/lib/lykdat";
 import { fetchGoogleLensResults } from "~/src/lib/googlelens";
 import { createCompleteOutfitData } from "~/src/lib/dataprocess";
@@ -313,10 +317,14 @@ export default function New() {
         : await getDeepTags(item?.cropUrl ?? "");
 
       const background_response = await uploadImage(similarItem.thumbnail);
-
+      //const n_background = await
+      const local_n_background = await removeBackground(
+        background_response.url
+      );
       const processedData = {
         googleItem: {
           n_background_thumbnail: background_response.public_id,
+          n_background_local: local_n_background.url,
           link: similarItem.link,
           title: similarItem.title,
           source: similarItem.source,

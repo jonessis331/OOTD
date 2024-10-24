@@ -84,15 +84,20 @@ const API_BASE_URL = "http://localhost:8000"; // Update with your backend URL
 
 export const removeBackground = async (imageUrl: string): Promise<string> => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/remove-background`,
-      { image_url: imageUrl },
-      { responseType: "blob" }
-    );
+    console.log("here");
+    const response = await axios.post(`${API_BASE_URL}/remove-background`, {
+      image_url: imageUrl,
+    });
 
     const blob = response.data;
-    const imageUri = URL.createObjectURL(blob);
-    return imageUri;
+    const base64Image = response.data.image_data;
+    //console.log(base64Image);
+    const responseCloud = await uploadImage(
+      `data:image/png;base64,${base64Image}`
+    );
+
+    console.log(responseCloud);
+    return responseCloud.url;
   } catch (error) {
     console.error("API call error:", error);
     throw error;
