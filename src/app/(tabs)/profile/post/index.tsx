@@ -21,7 +21,7 @@ export default function PostCarousel() {
         ({ data, error } = await supabase
           .from("outfits")
           .select("*, profiles (*)")
-          .eq("user_id", user?.id)
+          .eq("user_id", userId || user?.id)
           .order("created_at", { ascending: false }));
       } else if (type === "likedPosts") {
         ({ data, error } = await supabase
@@ -53,15 +53,6 @@ export default function PostCarousel() {
 
     fetchPosts();
   }, [user, type]);
-
-  useEffect(() => {
-    if (flatListRef.current && posts.length > 0) {
-      flatListRef.current.scrollToIndex({
-        index: parseInt(index, 10),
-        animated: false,
-      });
-    }
-  }, [posts]);
 
   return (
     <>

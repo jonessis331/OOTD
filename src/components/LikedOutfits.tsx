@@ -19,6 +19,13 @@ export default function LikedOutfits() {
   const [likedOutfits, setLikedOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const handlePress = (index) => {
+    router.push({
+      pathname: "/profile/post",
+      params: { index: index.toString(), type: "likedPosts" },
+    });
+  };
+
   useEffect(() => {
     const fetchLikedOutfits = async () => {
       setLoading(true);
@@ -55,8 +62,8 @@ export default function LikedOutfits() {
   const numColumns = 3;
   const imageSize = Dimensions.get("window").width / numColumns;
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => router.push(`/profile/post/${item.id}`)}>
+  const renderItem = ({ item, index }) => (
+    <TouchableOpacity onPress={() => handlePress(index)}>
       <Image
         source={{
           uri: item.outfit_image_url,

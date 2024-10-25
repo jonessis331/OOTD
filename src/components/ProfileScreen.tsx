@@ -1,28 +1,28 @@
-// app/(tabs)/profile/_layout.tsx
-import { Tabs, Stack, useRouter, Link } from "expo-router";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
-  Pressable,
   Animated,
 } from "react-native";
 import { useAuth } from "~/src/providers/AuthProvider";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useEffect, useRef, useState } from "react";
 import { supabase } from "~/src/lib/supabase";
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "~/src/lib/cloudinary";
 import YourPostsScreen from "~/src/app/(tabs)/profile/index";
-import LikedScreen from "src/app/(tabs)/profile/liked";
+import LikedScreen from "~/src/app/(tabs)/profile/liked";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter, Stack } from "expo-router";
 
-export default function ProfileLayout() {
+export default function ProfileScreen({ userId }) {
   const { user } = useAuth();
   const router = useRouter();
+  const isCurrentUser = !userId || userId === user?.id;
+
   const [profile, setProfile] = useState(null);
   const [totalLikesReceived, setTotalLikesReceived] = useState(0);
   const [totalPiecesUploaded, setTotalPiecesUploaded] = useState(0);
@@ -34,9 +34,8 @@ export default function ProfileLayout() {
   const translateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animate the SegmentedControl based on showSegmentedControl state
     Animated.timing(translateY, {
-      toValue: showSegmentedControl ? 0 : -50, // Adjust -50 to the height of your SegmentedControl
+      toValue: showSegmentedControl ? 0 : -50,
       duration: 200,
       useNativeDriver: true,
     }).start();
@@ -45,35 +44,31 @@ export default function ProfileLayout() {
   useEffect(() => {
     const fetchProfileAndStats = async () => {
       try {
-        // Fetch profile
+        const profileId = userId || user?.id;
         const { data: profileData } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", user?.id)
+          .eq("id", profileId)
           .single();
 
         setProfile(profileData);
         setUsername(profileData.username);
         const image = cld.image(profileData.avatar_url);
         setImage(image);
-        console.log(image);
 
-        // Fetch user's outfits
         const { data: outfitsData } = await supabase
           .from("outfits")
           .select("*")
-          .eq("user_id", user?.id);
+          .eq("user_id", profileId);
 
         setOutfits(outfitsData);
 
-        // Calculate total pieces uploaded
         const pieces = outfitsData.reduce(
           (acc, outfit) => acc + (outfit.items ? outfit.items.length : 0),
           0
         );
         setTotalPiecesUploaded(pieces);
 
-        // Fetch total likes received
         const outfitIds = outfitsData.map((o) => o.id);
         if (outfitIds.length > 0) {
           const { count } = await supabase
@@ -88,36 +83,33 @@ export default function ProfileLayout() {
       }
     };
 
-    if (user?.id) {
+    if (user?.id || userId) {
       fetchProfileAndStats();
     }
-  }, [user]);
-  const handleThis = async () => {
-    console.log("isPressed");
-  };
+  }, [user, userId]);
+
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle: "profile",
+        }}
+      />
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           {/* Header with profile info and settings button */}
           <View style={styles.header}>
-            <Pressable
-              onPress={() => {
-                console.log("Navigating to settings");
-                try {
-                  router.push("/profile/settings.tsx");
-                } catch (error) {
-                  console.log(error);
-                }
-              }}
-              style={styles.settingsButton}
-            >
-              <FontAwesome name="cog" size={24} color="#000" />
-            </Pressable>
-            <Link href="./settings">
-              <FontAwesome name="cog" size={24} color="#000" />
-            </Link>
+            {isCurrentUser && (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push("/(tabs)/profile/settings");
+                }}
+                style={styles.settingsButton}
+              >
+                <FontAwesome name="cog" size={24} color="#000" />
+              </TouchableOpacity>
+            )}
             <View style={styles.profileInfo}>
               {image ? (
                 <AdvancedImage cldImg={image} style={styles.avatar} />
@@ -141,7 +133,7 @@ export default function ProfileLayout() {
               </View>
             </View>
           </View>
-          {/* Animated Segmented Control */}
+          {/* Segmented Control */}
           {showSegmentedControl && (
             <Animated.View
               style={{
@@ -151,7 +143,11 @@ export default function ProfileLayout() {
               }}
             >
               <SegmentedControl
-                values={["Your Posts", "Liked"]}
+                values={
+                  isCurrentUser
+                    ? ["Your Posts", "Liked"]
+                    : ["Outfits", "Pieces"]
+                }
                 selectedIndex={selectedIndex}
                 onChange={(event) => {
                   setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
@@ -164,9 +160,15 @@ export default function ProfileLayout() {
           {selectedIndex === 0 ? (
             <YourPostsScreen
               setShowSegmentedControl={setShowSegmentedControl}
+              userId={userId}
             />
           ) : (
-            <LikedScreen setShowSegmentedControl={setShowSegmentedControl} />
+            isCurrentUser && (
+              <LikedScreen
+                setShowSegmentedControl={setShowSegmentedControl}
+                userId={userId}
+              />
+            )
           )}
         </View>
       </SafeAreaView>

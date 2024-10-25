@@ -5,34 +5,21 @@ import { useAuth } from "~/src/providers/AuthProvider";
 import { supabase } from "~/src/lib/supabase";
 import { useRouter } from "expo-router";
 
-export default function YourPostsScreen({ setShowSegmentedControl, userId }) {
+export default function YourPostsScreen({ setShowSegmentedControl }) {
   const { user } = useAuth();
   const router = useRouter();
   const [outfits, setOutfits] = useState([]);
   const lastOffsetY = useRef(0);
 
-  // Inside YourPostsScreen component
-  const scrollThreshold = 50;
-  let lastScrollTime = 0;
-
   const onScroll = (event) => {
     const currentOffsetY = event.nativeEvent.contentOffset.y;
-    const deltaY = currentOffsetY - lastOffsetY.current;
-    const currentTime = Date.now();
+    const direction = currentOffsetY > lastOffsetY.current ? "down" : "up";
+    lastOffsetY.current = currentOffsetY;
 
-    if (
-      Math.abs(deltaY) > scrollThreshold &&
-      currentTime - lastScrollTime > 200
-    ) {
-      const direction = deltaY > 0 ? "down" : "up";
-      lastOffsetY.current = currentOffsetY;
-      lastScrollTime = currentTime;
-
-      if (direction === "down") {
-        setShowSegmentedControl(false);
-      } else {
-        setShowSegmentedControl(true);
-      }
+    if (direction === "down") {
+      setShowSegmentedControl(false);
+    } else {
+      setShowSegmentedControl(true);
     }
   };
 

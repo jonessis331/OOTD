@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import { useState, useRef, useEffect } from "react";
-
+import { useRouter } from "expo-router";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "cloudinary-react-native";
 
@@ -39,7 +39,7 @@ export default function PostListItem({ post }) {
   const translateX = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current; // Create an animated value
-
+  const router = useRouter();
   const onImageLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setImageDimensions({ width, height });
@@ -171,17 +171,32 @@ export default function PostListItem({ post }) {
   return (
     <View className="bg-zinc-800 mt-10">
       {/*Header */}
-      <View className="ml-3 w-60 mt-2 mb-4  opacity-80 rounded-3xl shadow-md shadow-black">
-        <View className="ml-2 flex-row items-center gap-2">
-          <AdvancedImage
-            cldImg={avatar}
-            className="w-12 aspect-square rounded-full border border-emerald-50"
-          />
-          <Text className="ml-2 font-mono font-bold text-xl text-white">
-            {post?.profiles?.username}
-          </Text>
+      <TouchableOpacity
+        onPress={() => {
+          if (post?.profiles?.id === user?.id) {
+            // Navigate to profile tab
+            console.log("if", post.profiles.id, user.id);
+            router.push("/(tabs)/profile");
+          } else {
+            // Navigate to the user's profile screen, passing the userId
+            console.log("this");
+            console.log(post.profiles);
+            router.push(`/user/${post?.profiles?.id}`);
+          }
+        }}
+      >
+        <View className="ml-3 w-60 mt-2 mb-4  opacity-80 rounded-3xl shadow-md shadow-black">
+          <View className="ml-2 flex-row items-center gap-2">
+            <AdvancedImage
+              cldImg={avatar}
+              className="w-12 aspect-square rounded-full border border-emerald-50"
+            />
+            <Text className="ml-2 font-mono font-bold text-xl text-white">
+              {post?.profiles?.username}
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
       {/**Post Image */}
       <View className="shadow-xl shadow-black">
         {/* <Animated.View
