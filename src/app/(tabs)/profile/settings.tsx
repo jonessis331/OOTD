@@ -92,7 +92,7 @@ export default function SettingsScreen() {
           {image ? (
             <Image source={{ uri: image }} style={styles.avatar} />
           ) : (
-            <View style={[styles.avatar, { backgroundColor: "#ccc" }]} />
+            <View style={[styles.avatar, { backgroundColor: "black" }]} />
           )}
         </TouchableOpacity>
         <TextInput

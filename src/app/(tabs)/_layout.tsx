@@ -11,17 +11,20 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={{  tabBarStyle: {backgroundColor: '#323232'}, tabBarActiveTintColor: "#FAFBFD", tabBarShowLabel: false }}
-      
+      screenOptions={{
+        tabBarStyle: { backgroundColor: "#323232" },
+        tabBarActiveTintColor: "#FAFBFD",
+        tabBarShowLabel: false,
+      }}
     >
       <Tabs.Screen
         name="index"
         options={{
           //headerTitle: "For you",
-          
-          headerStyle: {height: "0%"},
+
+          headerStyle: { height: "0%" },
           headerTintColor: "black",
-        
+
           tabBarIcon: ({ color }) => (
             <FontAwesome name="home" size={24} color={color} />
           ),
@@ -41,9 +44,13 @@ export default function TabsLayout() {
         name="closet"
         options={{
           headerTitle: "",
-          headerTintColor: '#FAFBFD',
-          headerStyle: {height: 60, backgroundColor: '#323232', borderBottomColor: 'transparent'},
-         // headerShadowVisible: true,
+          headerTintColor: "#FAFBFD",
+          headerStyle: {
+            height: 60,
+            backgroundColor: "#323232",
+            borderBottomColor: "transparent",
+          },
+          // headerShadowVisible: true,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="book" size={26} color={color} />
           ),
@@ -54,21 +61,22 @@ export default function TabsLayout() {
         name="profile"
         options={{
           headerTitle: "Profile",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user" size={26} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name = 'testvw'
+      {/* <Tabs.Screen
+        name="testvw"
         //component = {testvw}
-        options = {{
+        options={{
           headerTitle: "Test",
           tabBarIcon: ({ color }) => (
             <FontAwesome name="info" size={26} color={color} />
           ),
         }}
-      />
+      /> */}
     </Tabs>
   );
 }

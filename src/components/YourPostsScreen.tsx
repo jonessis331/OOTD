@@ -1,11 +1,10 @@
-// app/(tabs)/profile/index.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { FlatList, Image, TouchableOpacity, Dimensions } from "react-native";
 import { useAuth } from "~/src/providers/AuthProvider";
 import { supabase } from "~/src/lib/supabase";
 import { useRouter } from "expo-router";
 
-export default function YourPostsScreen({ setShowSegmentedControl }) {
+export default function YourPostsScreen({ setShowSegmentedControl, userId }) {
   const { user } = useAuth();
   const router = useRouter();
   const [outfits, setOutfits] = useState([]);
@@ -28,7 +27,7 @@ export default function YourPostsScreen({ setShowSegmentedControl }) {
       const { data: outfitsData } = await supabase
         .from("outfits")
         .select("*")
-        .eq("user_id", user?.id);
+        .eq("user_id", userId || user?.id);
 
       setOutfits(outfitsData);
     };

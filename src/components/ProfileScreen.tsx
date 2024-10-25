@@ -12,17 +12,17 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { supabase } from "~/src/lib/supabase";
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "~/src/lib/cloudinary";
-import YourPostsScreen from "~/src/app/(tabs)/profile/index";
+import YourPostsScreen from "~/src/components/YourPostsScreen";
 import LikedScreen from "~/src/app/(tabs)/profile/liked";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, Stack } from "expo-router";
+import PiecesScreen from "./PiecesScreen";
 
 export default function ProfileScreen({ userId }) {
   const { user } = useAuth();
   const router = useRouter();
   const isCurrentUser = !userId || userId === user?.id;
-
   const [profile, setProfile] = useState(null);
   const [totalLikesReceived, setTotalLikesReceived] = useState(0);
   const [totalPiecesUploaded, setTotalPiecesUploaded] = useState(0);
@@ -92,12 +92,13 @@ export default function ProfileScreen({ userId }) {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
+          headerShown: false,
+
           headerTitle: "profile",
         }}
       />
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <View style={{ flex: 0 }}>
           {/* Header with profile info and settings button */}
           <View style={styles.header}>
             {isCurrentUser && (
@@ -162,13 +163,16 @@ export default function ProfileScreen({ userId }) {
               setShowSegmentedControl={setShowSegmentedControl}
               userId={userId}
             />
+          ) : isCurrentUser ? (
+            <LikedScreen
+              setShowSegmentedControl={setShowSegmentedControl}
+              userId={userId}
+            />
           ) : (
-            isCurrentUser && (
-              <LikedScreen
-                setShowSegmentedControl={setShowSegmentedControl}
-                userId={userId}
-              />
-            )
+            <PiecesScreen
+              setShowSegmentedControl={setShowSegmentedControl}
+              userId={userId}
+            />
           )}
         </View>
       </SafeAreaView>

@@ -40,6 +40,7 @@ export default function PostListItem({ post }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current; // Create an animated value
   const router = useRouter();
+
   const onImageLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setImageDimensions({ width, height });
@@ -81,18 +82,17 @@ export default function PostListItem({ post }) {
     })
   ).current;
 
-  // Use the image with public ID, 'front_face'.
-  //console.log('hello', post)
-  const image = cld.image(post.outfit_image_public_id);
+  // Handle avatar only if it exists
+  const avatar = post?.profiles?.avatar_url
+    ? cld.image(post?.profiles?.avatar_url)
+    : null;
 
-  image.resize(
-    thumbnail()
-      .width(width)
-      .aspectRatio(2 / 3)
-  );
-  //.gravity(focusOn(FocusOn.face()))) // Crop the image, focusing on the face.
-  //.roundCorners(byRadius(100)); // Round the corners.
-  ////console.warn("HELLO", typeof(post?.user))
+  if (avatar) {
+    avatar.resize(
+      thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
+    );
+  }
+
   const toggleOutfitLike = async (outfitId: string) => {
     if (!user) return;
 
@@ -140,11 +140,17 @@ export default function PostListItem({ post }) {
     fetchLikedOutfit();
   }, [user, post.id]);
 
-  const avatar = cld.image(post?.profiles?.avatar_url);
-  // Apply the transformation.
-  avatar.resize(
-    thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face()))
-  );
+  const postImage = post?.outfit_image_public_id
+    ? cld.image(post.outfit_image_public_id)
+    : null;
+
+  if (postImage) {
+    postImage.resize(
+      thumbnail()
+        .width(width)
+        .aspectRatio(2 / 3)
+    );
+  }
 
   const handlePostLike = () => {
     setLiked(!liked);
@@ -170,83 +176,66 @@ export default function PostListItem({ post }) {
 
   return (
     <View className="bg-zinc-800 mt-10">
-      {/*Header */}
+      {/* Header */}
       <TouchableOpacity
         onPress={() => {
           if (post?.profiles?.id === user?.id) {
             // Navigate to profile tab
-            console.log("if", post.profiles.id, user.id);
             router.push("/(tabs)/profile");
           } else {
             // Navigate to the user's profile screen, passing the userId
-            console.log("this");
-            console.log(post.profiles);
             router.push(`/user/${post?.profiles?.id}`);
           }
         }}
       >
-        <View className="ml-3 w-60 mt-2 mb-4  opacity-80 rounded-3xl shadow-md shadow-black">
+        <View className="ml-3 w-60 mt-2 mb-4 opacity-80 rounded-3xl shadow-md shadow-black">
           <View className="ml-2 flex-row items-center gap-2">
-            <AdvancedImage
-              cldImg={avatar}
-              className="w-12 aspect-square rounded-full border border-emerald-50"
-            />
+            {avatar && (
+              <AdvancedImage
+                cldImg={avatar}
+                className="w-12 aspect-square rounded-full border border-emerald-50"
+              />
+            )}
             <Text className="ml-2 font-mono font-bold text-xl text-white">
               {post?.profiles?.username}
             </Text>
           </View>
         </View>
       </TouchableOpacity>
-      {/**Post Image */}
+
+      {/* Post Image */}
       <View className="shadow-xl shadow-black">
-        {/* <Animated.View
-          {...panResponder.panHandlers}
-          style={{ transform: [{ translateX }] }}
-        > */}
         <View>
           <TouchableOpacity
             onPress={() => setShowBoxes(!showBoxes)}
             activeOpacity={1}
           >
             {/* Content */}
-            <AdvancedImage
-              cldImg={image}
-              className="rounded-2xl"
-              onLayout={onImageLayout}
-              style={{
-                width: "94%",
-                height: undefined,
-                aspectRatio: 9 / 14,
-                alignSelf: "center",
-              }} // Adjust aspect ratio as needed
-            />
+            {postImage && (
+              <AdvancedImage
+                cldImg={postImage}
+                className="rounded-2xl"
+                onLayout={onImageLayout}
+                style={{
+                  width: "94%",
+                  height: undefined,
+                  aspectRatio: 9 / 14,
+                  alignSelf: "center",
+                }} // Adjust aspect ratio as needed
+              />
+            )}
           </TouchableOpacity>
-          {showBoxes && (
+          {showBoxes && post.items && (
             <ItemInfoPopups
               items={post.items}
               imageWidth={imageDimensions.width}
               imageHeight={imageDimensions.height}
-              outfitId={post.id} // Add this line
+              outfitId={post.id}
             />
           )}
         </View>
-        {/* </Animated.View> */}
-        {/* <Animated.View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: width,
-            width: width,
-            height: height,
-            backgroundColor: "slategray",//'#4D766E',
-            opacity,
-            transform: [{ translateX }]
-            
-          }}
-        >
-          <ItemInfoPopupGridItem items={post.items} />
-        </Animated.View> */}
       </View>
+
       {/* Icons */}
       <View className="flex-row gap-3 pl-5 pt-3">
         <Pressable onPress={handlePostLike}>
@@ -258,8 +247,6 @@ export default function PostListItem({ post }) {
             />
           </Animated.View>
         </Pressable>
-        {/* <Ionicons name="share" size={20}/> */}
-        {/* <Feather name="send" size={20} /> */}
         <Text>{post?.outfit_caption}</Text>
         <Feather name="share" color="white" size={22} className="" />
       </View>

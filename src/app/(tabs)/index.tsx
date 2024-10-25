@@ -35,7 +35,7 @@ export const fetchOutfits = async () => {
       throw error;
     }
 
-    log.info("Fetched outfits from Supabase", data); // Log fetched data
+    log.info("Fetched outfits from Supabase"); //, data); // Log fetched data
     return data;
   } catch (error) {
     log.error("Error in fetchOutfits:", error); // Log the error

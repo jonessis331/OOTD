@@ -50,7 +50,7 @@ export default function LikedOutfits() {
         setLoading(false);
         return;
       }
-
+      console.log(data);
       const likedOutfitsArray = data.map((item) => item.outfits);
       setLikedOutfits(likedOutfitsArray);
       setLoading(false);
