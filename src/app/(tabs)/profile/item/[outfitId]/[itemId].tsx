@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import { supabase } from "~/src/lib/supabase";
+import InfoSheet from "~/src/components/InfoSheet";
+import PrettyPopup from "~/src/components/PrettyPopup";
 
 export default function ItemDetail() {
   const { outfitId, itemId } = useLocalSearchParams();
@@ -30,6 +32,8 @@ export default function ItemDetail() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <InfoSheet item={item} />
+      <PrettyPopup item={item} />
       <Image
         source={{ uri: item.googleItem?.thumbnail || item.item_image_url }}
         style={styles.image}

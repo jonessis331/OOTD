@@ -10,7 +10,8 @@ import {
   ScrollView,
   Animated, // Import Animated
   Easing,
-  TouchableWithoutFeedback, // Import Easing
+  TouchableWithoutFeedback,
+  Modal, // Import Easing
 } from "react-native";
 import {} from "react-native-reanimated-carousel";
 import React, { useState, useEffect, useRef } from "react";
@@ -416,17 +417,24 @@ const ClosetScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFCF1" }}>
-      {pressedItem && (
-        <Animated.View style={[styles.popupContainer, { opacity: fadeAnim }]}>
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={!!pressedItem}
+        onRequestClose={() => setPressedItem(null)}
+      >
+        <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
           <BlurView intensity={20} style={styles.blurView}>
-            <TouchableOpacity
-              style={styles.overlay}
-              onPress={() => setPressedItem(null)}
-            />
+            {/* Overlay to dismiss the modal when pressed outside the popup */}
+            <TouchableWithoutFeedback onPress={() => setPressedItem(null)}>
+              <View style={styles.overlay} />
+            </TouchableWithoutFeedback>
+
+            {/* PrettyPopup is rendered above the overlay */}
             <PrettyPopup item={pressedItem} />
           </BlurView>
         </Animated.View>
-      )}
+      </Modal>
       {isDropdownOpen && (
         <View style={styles.dropdownOverlay}>
           <BlurView intensity={50} style={styles.dropdownBlurView}>
@@ -622,13 +630,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFCF1",
     padding: 0,
   },
-  popupContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1000, // Ensure it is above other elements
+  // popupContainer: {
+  //   position: "absolute",
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   bottom: 0,
+  //   zIndex: 1001, // Ensure it is above other elements
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  // },
+  modalContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -639,6 +652,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 1000,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   blurView: {
     flex: 1,
