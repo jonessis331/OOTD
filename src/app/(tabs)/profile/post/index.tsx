@@ -56,8 +56,8 @@ export default function PostCarousel() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: true, headerTitle: "" }} />
-      <View style={{ flex: 1 }}>
+      <Stack.Screen options={{ headerShown: false, headerTitle: "" }} />
+      <View style={{ flex: 1, backgroundColor: "#FFFCF1" }}>
         <FlatList
           ref={flatListRef}
           data={posts}

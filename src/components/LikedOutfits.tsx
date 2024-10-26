@@ -12,6 +12,8 @@ import {
 import { useAuth } from "~/src/providers/AuthProvider";
 import { supabase } from "~/src/lib/supabase";
 import { useRouter } from "expo-router";
+import { AdvancedImage } from "cloudinary-react-native";
+import { cld } from "../lib/cloudinary";
 
 export default function LikedOutfits() {
   const { user } = useAuth();
@@ -50,8 +52,8 @@ export default function LikedOutfits() {
         setLoading(false);
         return;
       }
-      console.log(data);
       const likedOutfitsArray = data.map((item) => item.outfits);
+      console.log(likedOutfitsArray);
       setLikedOutfits(likedOutfitsArray);
       setLoading(false);
     };
@@ -62,16 +64,18 @@ export default function LikedOutfits() {
   const numColumns = 3;
   const imageSize = Dimensions.get("window").width / numColumns;
 
-  const renderItem = ({ item, index }) => (
-    <TouchableOpacity onPress={() => handlePress(index)}>
-      <Image
-        source={{
-          uri: item.outfit_image_url,
-        }}
-        style={{ width: imageSize, height: imageSize }}
-      />
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item, index }) => {
+    console.log("isRendering:", index, item.outfit_image_public_id); // Log the item and index to see if it renders
+    const image = cld.image(item.outfit_image_public_id);
+    return (
+      <TouchableOpacity onPress={() => handlePress(index)}>
+        <AdvancedImage
+          cldImg={image}
+          style={{ width: imageSize, height: imageSize }}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
@@ -101,6 +105,11 @@ export default function LikedOutfits() {
 }
 
 const styles = StyleSheet.create({
-  messageContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  messageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
   messageText: { fontSize: 18, color: "#888" },
 });

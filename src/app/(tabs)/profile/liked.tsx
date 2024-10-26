@@ -9,7 +9,7 @@ export default function LikedScreen() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 0 }}>
       <SegmentedControl
         values={["Outfits", "Items"]}
         selectedIndex={selectedIndex}

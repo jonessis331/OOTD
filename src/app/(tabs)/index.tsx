@@ -73,7 +73,7 @@ export function FeedScreen() {
 
   return (
     <FlatList
-      className="bg-zinc-800"
+      className="bg-[#FFFCF1]"
       data={posts}
       contentContainerStyle={{
         gap: 10,

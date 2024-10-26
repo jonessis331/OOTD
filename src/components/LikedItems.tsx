@@ -67,8 +67,8 @@ export default function LikedItems() {
       <Image
         source={{
           uri:
-            item.googleItem?.thumbnail ||
             item.googleItem?.n_background_local ||
+            item.googleItem?.thumbnail ||
             item.item_image_url ||
             "https://res.cloudinary.com/dmhfubcfi/image/upload/v1729185488/wajmzkli0qvmopaukvqe.jpg",
         }}

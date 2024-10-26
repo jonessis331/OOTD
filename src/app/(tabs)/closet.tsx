@@ -42,7 +42,7 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { rgbaColor } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
-
+import { SafeAreaView } from "react-native";
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Make the item width 70% of the screen width for better visibility
 const Stack = createStackNavigator();
@@ -415,7 +415,7 @@ const ClosetScreen = ({ navigation }) => {
     .filter(Boolean);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFCF1" }}>
       {pressedItem && (
         <Animated.View style={[styles.popupContainer, { opacity: fadeAnim }]}>
           <BlurView intensity={20} style={styles.blurView}>
@@ -585,7 +585,7 @@ const ClosetScreen = ({ navigation }) => {
           />
         </View>
       )} */}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -619,7 +619,7 @@ export default function Closet() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgray",
+    backgroundColor: "#FFFCF1",
     padding: 0,
   },
   popupContainer: {
@@ -744,7 +744,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: 44, // Adjusted as per your requirement
-    backgroundColor: "lightgray",
+    backgroundColor: "#FFFCF1",
     paddingHorizontal: 10,
     shadowColor: "black", // Shadow color
     shadowOffset: {

@@ -12,8 +12,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: { backgroundColor: "#323232" },
-        tabBarActiveTintColor: "#FAFBFD",
+        tabBarStyle: { backgroundColor: "#1B1B1B" },
+        tabBarActiveTintColor: "#CBCBCB",
         tabBarShowLabel: false,
       }}
     >
@@ -34,7 +34,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="new"
         options={{
-          headerTitle: "Create post",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="plus-square-o" size={24} color={color} />
           ),
@@ -43,6 +43,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="closet"
         options={{
+          headerShown: false,
           headerTitle: "",
           headerTintColor: "#FAFBFD",
           headerStyle: {

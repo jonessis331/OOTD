@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Pressable,
+  SafeAreaView,
 } from "react-native";
 
 import { useAuth } from "~/src/providers/AuthProvider";
@@ -349,52 +350,64 @@ export default function New() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : (
-        <>
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              className="w-dvw aspect-[2/3] rounded-2xl"
-            />
-          ) : (
-            <PlaceholderImage />
-          )}
-          <Text onPress={pickImage} className="text-blue-500 font-bold mt-5">
-            Change
-          </Text>
-          <TextInput
-            value={caption}
-            onChangeText={setCaption}
-            placeholder="What is on your mind"
-            className="bg-white w-full p-3 rounded-xl mt-5"
-          />
-          {items.map((item, index) => (
-            <PieceComponent
-              key={index}
-              item={item}
-              onItemSelect={handleItemSelect}
-            />
-          ))}
-        </>
-      )}
-      <View className="mt-5 w-full">
-        {Object.keys(selectedSimilarItems).length > 0 && !isProcessingItems && (
-          <Button width="100%" title="Continue" onPress={handleContinue} />
-        )}
-        {isProcessingItems && (
-          <ActivityIndicator size="large" color="#0000ff" />
-        )}
-        {!isProcessingItems && (
+    <SafeAreaView className="bg-[#FFFCF1]">
+      <ScrollView
+        contentContainerStyle={{
+          padding: 20,
+          backgroundColor: "#FFFCF1",
+          height: "100%",
+        }}
+      >
+        {isLoading ? (
+          <LoadingIndicator />
+        ) : (
           <>
-            <Button width="100%" title="Share" onPress={createPost} />
-            <Button width="100%" title="Cancel" onPress={handleCancel} />
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                className="w-dvw aspect-[2/3] rounded-2xl self-center"
+              />
+            ) : (
+              <PlaceholderImage />
+            )}
+            <Text
+              onPress={pickImage}
+              className="text-blue-500 font-bold mt-5 self-center"
+            >
+              Change
+            </Text>
+            <TextInput
+              value={caption}
+              onChangeText={setCaption}
+              placeholder="Caption for you outfit"
+              className="bg-white w-full p-3 rounded-xl mt-5"
+            />
+            {items.map((item, index) => (
+              <PieceComponent
+                key={index}
+                item={item}
+                onItemSelect={handleItemSelect}
+              />
+            ))}
           </>
         )}
-      </View>
-    </ScrollView>
+        <View className="mt-5 w-full">
+          {Object.keys(selectedSimilarItems).length > 0 &&
+            !isProcessingItems && (
+              <Button width="100%" title="Continue" onPress={handleContinue} />
+            )}
+          {isProcessingItems && (
+            <ActivityIndicator size="large" color="#0000ff" />
+          )}
+          {!isProcessingItems && (
+            <>
+              <Button width="100%" title="Share" onPress={createPost} />
+              <Button width="100%" title="Cancel" onPress={handleCancel} />
+            </>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -406,5 +419,5 @@ const LoadingIndicator = () => (
 );
 
 const PlaceholderImage = () => (
-  <View className="w-52 h-80 rounded-xl bg-gray-300" />
+  <View className="w-52 h-80 rounded-xl bg-gray-300 self-center" />
 );

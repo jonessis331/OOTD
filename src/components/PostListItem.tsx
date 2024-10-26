@@ -175,7 +175,7 @@ export default function PostListItem({ post }) {
   };
 
   return (
-    <View className="bg-zinc-800 mt-10">
+    <View className="bg-[#FFFCF1] mt-10">
       {/* Header */}
       <TouchableOpacity
         onPress={() => {
@@ -196,7 +196,7 @@ export default function PostListItem({ post }) {
                 className="w-12 aspect-square rounded-full border border-emerald-50"
               />
             )}
-            <Text className="ml-2 font-mono font-bold text-xl text-white">
+            <Text className="ml-2 font-mono font-bold text-xl text-[#1B1B1B]">
               {post?.profiles?.username}
             </Text>
           </View>
@@ -242,13 +242,13 @@ export default function PostListItem({ post }) {
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <AntDesign
               name={liked ? "heart" : "hearto"}
-              color="white"
+              color="#1B1B1B"
               size={22}
             />
           </Animated.View>
         </Pressable>
         <Text>{post?.outfit_caption}</Text>
-        <Feather name="share" color="white" size={22} className="" />
+        <Feather name="share" color="#1B1B1B" size={22} className="" />
       </View>
     </View>
   );
