@@ -7,6 +7,7 @@ import {
   Animated,
   Easing,
   Pressable,
+  Modal,
 } from "react-native";
 import { DetectedItem } from "../utils/dataTypes";
 import { useNavigation } from "@react-navigation/native";
@@ -150,17 +151,24 @@ export default function ItemInfoPopups({
 
   return (
     <>
-      {showDetail && (
-        <Animated.View style={[styles.popupContainer, { opacity: fadeAnim }]}>
-          <BlurView intensity={20} style={styles.blurView}>
-            <TouchableOpacity
-              style={styles.overlay}
-              onPress={() => setShowDetail(false)}
+      <Modal
+        visible={showDetail}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowDetail(false)}
+      >
+        {/* Full-Screen Blur Background */}
+        <BlurView style={StyleSheet.absoluteFill} intensity={50}>
+          {/* DetailScreenTwo component with inside touchables */}
+          <Animated.View style={[styles.popupContainer, { opacity: fadeAnim }]}>
+            <DetailScreenTwo
+              selectedItem={selectedItem}
+              items={items}
+              onClose={() => setShowDetail(false)} // Passing close handler
             />
-            <DetailScreenTwo selectedItem={selectedItem} items={items} />
-          </BlurView>
-        </Animated.View>
-      )}
+          </Animated.View>
+        </BlurView>
+      </Modal>
       <View className="absolute inset-0">
         {items.map((item, index) => {
           if (!item.googleItem?.thumbnail) return null;
@@ -185,7 +193,7 @@ export default function ItemInfoPopups({
               }}
             >
               <View
-                className="absolute bg-slate-400 w-24 p-4 m-2 rounded-lg shadow-lg"
+                className="absolute bg-[#B6C2CE] w-24 p-4 m-2 rounded-lg shadow-lg"
                 style={{ left: centerX, top: centerY }}
               >
                 <Image
@@ -194,7 +202,7 @@ export default function ItemInfoPopups({
                 />
                 <View className="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-slate-300 border border-slate-400" />
                 <View className="flex-row">
-                  <Text className="font-semibold mt-2" numberOfLines={1}>
+                  <Text className="font-normal mt-2" numberOfLines={1}>
                     {item.googleItem?.title || item.itemId}
                   </Text>
                   <Pressable
@@ -242,8 +250,9 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   blurView: {
-    flex: 1,
-    width: "100%",
+    // flex: 1,
+    // width: "100%",
+    ...StyleSheet.absoluteFillObject, // Full screen for the blur
     justifyContent: "center",
     alignItems: "center",
   },

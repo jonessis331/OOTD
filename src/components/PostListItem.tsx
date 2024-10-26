@@ -196,7 +196,7 @@ export default function PostListItem({ post }) {
                 className="w-12 aspect-square rounded-full border border-emerald-50"
               />
             )}
-            <Text className="ml-2 font-mono font-bold text-xl text-[#1B1B1B]">
+            <Text className="ml-2 font-medium text-xl text-[#1B1B1B]">
               {post?.profiles?.username}
             </Text>
           </View>
