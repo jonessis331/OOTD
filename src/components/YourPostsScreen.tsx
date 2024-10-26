@@ -27,7 +27,8 @@ export default function YourPostsScreen({ setShowSegmentedControl, userId }) {
       const { data: outfitsData } = await supabase
         .from("outfits")
         .select("*")
-        .eq("user_id", userId || user?.id);
+        .eq("user_id", userId || user?.id)
+        .order("date_created", { ascending: false });
 
       setOutfits(outfitsData);
     };
@@ -41,7 +42,7 @@ export default function YourPostsScreen({ setShowSegmentedControl, userId }) {
   const handlePress = (index) => {
     router.push({
       pathname: "/profile/post",
-      params: { index: index.toString(), type: "likedPosts" },
+      params: { index: index.toString(), type: "userPosts" },
     });
   };
 

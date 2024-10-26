@@ -1,5 +1,3 @@
-// app/(tabs)/profile/post/index.tsx
-
 import React, { useEffect, useState, useRef } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { View, FlatList } from "react-native";
@@ -12,17 +10,19 @@ export default function PostCarousel() {
   const [posts, setPosts] = useState([]);
   const { user } = useAuth();
   const flatListRef = useRef(null);
+  const [layoutComplete, setLayoutComplete] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
       let data;
       let error;
+
       if (type === "userPosts") {
         ({ data, error } = await supabase
           .from("outfits")
           .select("*, profiles (*)")
-          .eq("user_id", userId || user?.id)
-          .order("created_at", { ascending: false }));
+          .eq("user_id", user?.id)
+          .order("date_created", { ascending: false }));
       } else if (type === "likedPosts") {
         ({ data, error } = await supabase
           .from("outfit_likes")
@@ -39,8 +39,6 @@ export default function PostCarousel() {
         if (data) {
           data = data.map((item) => item.outfits);
         }
-      } else {
-        // Handle other types if necessary
       }
 
       if (error) {
@@ -54,6 +52,31 @@ export default function PostCarousel() {
     fetchPosts();
   }, [user, type]);
 
+  // Scroll to the selected index once posts are loaded and layout is complete
+  useEffect(() => {
+    const scrollIndex = parseInt(index, 10);
+    if (
+      flatListRef.current &&
+      posts.length > 0 &&
+      !isNaN(scrollIndex) &&
+      scrollIndex < posts.length &&
+      scrollIndex >= 0 &&
+      layoutComplete
+    ) {
+      console.log("Scrolling to index:", scrollIndex);
+      flatListRef.current.scrollToIndex({
+        index: scrollIndex,
+        animated: true,
+      });
+    } else if (
+      isNaN(scrollIndex) ||
+      scrollIndex < 0 ||
+      scrollIndex >= posts.length
+    ) {
+      //console.warn("Invalid index provided:", index);
+    }
+  }, [posts, index, layoutComplete]);
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false, headerTitle: "" }} />
@@ -62,7 +85,23 @@ export default function PostCarousel() {
           ref={flatListRef}
           data={posts}
           renderItem={({ item }) => <PostListItem post={item} />}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()} // Ensure it's a string
+          // Adjust or remove getItemLayout based on your item size
+          // getItemLayout={(data, index) => ({
+          //   length: 300,
+          //   offset: 300 * index,
+          //   index,
+          // })}
+          onLayout={() => setLayoutComplete(true)}
+          onScrollToIndexFailed={(info) => {
+            const wait = new Promise((resolve) => setTimeout(resolve, 500));
+            wait.then(() => {
+              flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+              });
+            });
+          }}
         />
       </View>
     </>
