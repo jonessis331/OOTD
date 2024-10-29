@@ -2,7 +2,7 @@ import axios from "axios";
 import { log, logIncomingData } from "~/src/utils/config";
 import { retryWithBackoff } from "~/src/utils/retryWithBackoff";
 
-const API_KEY = process.env.OPENAI_API_KEY_2;
+const API_KEY = process.env.OPENAI_API_KEY;
 
 const openAI = axios.create({
   baseURL: "https://api.openai.com/v1",

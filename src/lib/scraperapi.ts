@@ -6,7 +6,7 @@ const log = logger.createLogger();
 export const scrapUrl = async (cropUrl: string) => {
   log.info("Entering Scraping URL");
   try {
-    const apiKey = "36d1ef13a6905df230a1f181a1b7f579";
+    const apiKey = process.env.SCRAPER_API_KEY;
     const scraperApiUrl = `http://api.scraperapi.com/?api_key=${apiKey}&url=${encodeURIComponent(
       cropUrl
     )}&render=true&autoparse=true`;
@@ -22,11 +22,11 @@ export const scrapUrl = async (cropUrl: string) => {
 
 export const scrapUrlWithBeeScraper = async (productUrl: string) => {
   log.info("Scraping with BeeScraper:", productUrl);
+  const apiKey = process.env.SCRAPERBEE_API_KEY;
   try {
     const response = await axios.get("https://app.scrapingbee.com/api/v1/", {
       params: {
-        api_key:
-          "A3SL65KI0SG9O5QL7Y5NZI22GYO664YB48HAKX1E48PQME8NX0FTTMSYO9HYVRPBVQQCNE7FQZZKGZBN",
+        api_key: `${apiKey}`,
         url: productUrl,
         json_response: "true",
       },
