@@ -8,5 +8,10 @@ export default function AuthLayout() {
     return <Redirect href="/(tabs)" />;
   }
 
-  return <Stack />;
+  return (
+    <Stack initialRouteName="signIn">
+      <Stack.Screen name="signIn" options={{ headerShown: true }} />
+      <Stack.Screen name="signUp" options={{ headerShown: false }} />
+    </Stack>
+  );
 }
